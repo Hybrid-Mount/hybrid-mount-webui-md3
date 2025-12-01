@@ -1,14 +1,13 @@
 <script>
   import { onMount } from 'svelte';
   import { store } from '../lib/store.svelte';
+  import { API } from '../lib/api';
   import { ICONS } from '../lib/constants';
   import './InfoTab.css';
   import Skeleton from '../components/Skeleton.svelte';
 
-  // Adapted for the current project
   const REPO_OWNER = 'YuzakiKokuban';
   const REPO_NAME = 'meta-hybrid_mount';
-  // Sponsor link placeholder (using GitHub Sponsors if available, or just project page)
   const DONATE_LINK = `https://github.com/sponsors/${REPO_OWNER}`; 
 
   let contributors = $state([]);
@@ -21,20 +20,16 @@
 
   async function fetchContributors() {
     try {
-      // 1. Fetch basic contributor list
       const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contributors`);
       if (!res.ok) throw new Error('Failed to fetch list');
       
       const basicList = await res.json();
       
-      // 2. Fetch detailed user info to get bio (GitHub API rate limit applies)
-      // Since there might be many contributors, we process them in parallel.
       const detailPromises = basicList.map(async (user) => {
         try {
-            // Skip detailed fetch for bots
             if (user.type === 'Bot') return { ...user, bio: 'Bot' };
 
-            const detailRes = await fetch(user.url); // user.url is the API url for user details
+            const detailRes = await fetch(user.url);
             if (detailRes.ok) {
                 const detail = await detailRes.json();
                 return { ...user, bio: detail.bio, name: detail.name || user.login };
@@ -42,7 +37,7 @@
         } catch (e) {
             console.warn('Failed to fetch detail for', user.login);
         }
-        return user; // Fallback to basic info on failure
+        return user;
       });
 
       contributors = await Promise.all(detailPromises);
@@ -52,6 +47,11 @@
     } finally {
       loading = false;
     }
+  }
+
+  function handleLink(e, url) {
+    e.preventDefault();
+    API.openLink(url);
   }
 </script>
 
@@ -66,11 +66,15 @@
   </div>
 
   <div class="action-grid">
-    <a href={`https://github.com/${REPO_OWNER}/${REPO_NAME}`} target="_blank" class="action-card">
+    <a href={`https://github.com/${REPO_OWNER}/${REPO_NAME}`} 
+       class="action-card" 
+       onclick={(e) => handleLink(e, `https://github.com/${REPO_OWNER}/${REPO_NAME}`)}>
         <svg viewBox="0 0 24 24" class="action-icon"><path d={ICONS.github} /></svg>
         <span class="action-label">{store.L.info.projectLink}</span>
     </a>
-    <a href={DONATE_LINK} target="_blank" class="action-card">
+    <a href={DONATE_LINK} 
+       class="action-card"
+       onclick={(e) => handleLink(e, DONATE_LINK)}>
         <svg viewBox="0 0 24 24" class="action-icon" style="fill: #ffab91;"><path d={ICONS.donate} /></svg>
         <span class="action-label">{store.L.info.donate}</span>
     </a>
@@ -96,7 +100,9 @@
             </div>
         {:else}
             {#each contributors as user}
-                <a href={user.html_url} target="_blank" class="contributor-bar">
+                <a href={user.html_url} 
+                   class="contributor-bar"
+                   onclick={(e) => handleLink(e, user.html_url)}>
                     <img src={user.avatar_url} alt={user.login} class="c-avatar" />
                     <div class="c-info">
                         <span class="c-name">{user.name || user.login}</span>

@@ -1,18 +1,6 @@
 import { exec } from 'kernelsu';
 import { DEFAULT_CONFIG, PATHS } from './constants';
-function serializeKvConfig(cfg) {
-  const q = s => `"${s}"`;
-  const lines = ['# Hybrid Mount Config', ''];
-  lines.push(`moduledir = ${q(cfg.moduledir)}`);
-  if (cfg.tempdir) lines.push(`tempdir = ${q(cfg.tempdir)}`);
-  lines.push(`mountsource = ${q(cfg.mountsource)}`);
-  lines.push(`verbose = ${cfg.verbose}`);
-  lines.push(`force_ext4 = ${cfg.force_ext4}`);
-  lines.push(`enable_nuke = ${cfg.enable_nuke}`);
-  lines.push(`disable_umount = ${cfg.disable_umount}`);
-  if (cfg.partitions.length) lines.push(`partitions = ${q(cfg.partitions.join(','))}`);
-  return lines.join('\n');
-}
+
 export const API = {
   loadConfig: async () => {
     const cmd = `${PATHS.BINARY} show-config`;
@@ -29,12 +17,22 @@ export const API = {
       return DEFAULT_CONFIG; 
     }
   },
+
   saveConfig: async (config) => {
-    const data = serializeKvConfig(config).replace(/'/g, "'\\''");
-    const cmd = `mkdir -p "$(dirname "${PATHS.CONFIG}")" && printf '%s\n' '${data}' > "${PATHS.CONFIG}"`;
-    const { errno } = await exec(cmd);
-    if (errno !== 0) throw new Error('Failed to save config');
+    const jsonStr = JSON.stringify(config);
+    let hexPayload = '';
+    for (let i = 0; i < jsonStr.length; i++) {
+      hexPayload += jsonStr.charCodeAt(i).toString(16).padStart(2, '0');
+    }
+
+    const cmd = `${PATHS.BINARY} save-config --payload ${hexPayload}`;
+    const { errno, stderr } = await exec(cmd);
+    
+    if (errno !== 0) {
+      throw new Error(`Failed to save config: ${stderr}`);
+    }
   },
+
   scanModules: async () => {
     const cmd = `${PATHS.BINARY} modules`;
     try {
@@ -47,24 +45,34 @@ export const API = {
     }
     return [];
   },
+
   saveModules: async (modules) => {
     let content = "# Module Modes\n";
-    modules.forEach(m => { if (m.mode !== 'auto') content += `${m.id}=${m.mode}\n`; });
+    modules.forEach(m => { 
+      if (m.mode !== 'auto' && /^[a-zA-Z0-9_.-]+$/.test(m.id)) {
+        content += `${m.id}=${m.mode}\n`; 
+      }
+    });
+    
     const data = content.replace(/'/g, "'\\''");
     const { errno } = await exec(`mkdir -p "$(dirname "${PATHS.MODE_CONFIG}")" && printf '%s\n' '${data}' > "${PATHS.MODE_CONFIG}"`);
     if (errno !== 0) throw new Error('Failed to save modes');
   },
+
   readLogs: async (logPath, lines = 1000) => {
     const f = logPath || DEFAULT_CONFIG.logfile;
     const cmd = `[ -f "${f}" ] && tail -n ${lines} "${f}" || echo ""`;
     const { errno, stdout, stderr } = await exec(cmd);
+    
     if (errno === 0) return stdout || "";
     throw new Error(stderr || "Log file not found or unreadable");
   },
+
   getStorageUsage: async () => {
     try {
       const cmd = `${PATHS.BINARY} storage`;
       const { errno, stdout } = await exec(cmd);
+      
       if (errno === 0 && stdout) {
         const data = JSON.parse(stdout);
         return {
@@ -80,10 +88,12 @@ export const API = {
     }
     return { size: '-', used: '-', percent: '0%', type: null };
   },
+
   getSystemInfo: async () => {
     try {
       const cmdSys = `echo "KERNEL:$(uname -r)"; echo "SELINUX:$(getenforce)"`;
       const { errno: errSys, stdout: outSys } = await exec(cmdSys);
+      
       let info = { kernel: '-', selinux: '-', mountBase: '-' };
       if (errSys === 0 && outSys) {
         outSys.split('\n').forEach(line => {
@@ -91,8 +101,10 @@ export const API = {
           else if (line.startsWith('SELINUX:')) info.selinux = line.substring(8).trim();
         });
       }
+
       const cmdState = `cat "${PATHS.DAEMON_STATE}"`;
       const { errno: errState, stdout: outState } = await exec(cmdState);
+      
       if (errState === 0 && outState) {
         try {
           const state = JSON.parse(outState);
@@ -101,17 +113,20 @@ export const API = {
           console.error("Failed to parse daemon state JSON", e);
         }
       }
+
       return info;
     } catch (e) {
       console.error("System info check failed:", e);
       return { kernel: 'Unknown', selinux: 'Unknown', mountBase: 'Unknown' };
     }
   },
+
   getActiveMounts: async (sourceName) => {
     try {
       const src = sourceName || DEFAULT_CONFIG.mountsource;
       const cmd = `mount | grep "${src}"`; 
       const { errno, stdout } = await exec(cmd);
+      
       const mountedParts = [];
       if (errno === 0 && stdout) {
         stdout.split('\n').forEach(line => {
@@ -128,6 +143,12 @@ export const API = {
       return [];
     }
   },
+  openLink: async (url) => {
+    const safeUrl = url.replace(/"/g, '\\"');
+    const cmd = `am start -a android.intent.action.VIEW -d "${safeUrl}"`;
+    await exec(cmd);
+  },
+
   fetchSystemColor: async () => {
     try {
       const { stdout } = await exec('settings get secure theme_customization_overlay_packages');
