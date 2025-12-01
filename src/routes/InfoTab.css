@@ -75,6 +75,10 @@
   fill: var(--md-sys-color-primary);
 }
 
+.donate-icon {
+  fill: #ffab91;
+}
+
 .action-label {
   font-size: 14px;
   font-weight: 500;
@@ -126,6 +130,10 @@
   gap: 2px;
 }
 
+.skeleton-spacer {
+  margin-bottom: 6px;
+}
+
 .c-name {
   font-size: 16px;
   font-weight: 500;
@@ -145,4 +153,11 @@
   width: 20px;
   height: 20px;
   fill: var(--md-sys-color-outline);
+}
+
+.error-message {
+  text-align: center;
+  padding: 20px;
+  opacity: 0.6;
+  color: var(--md-sys-color-error);
 }

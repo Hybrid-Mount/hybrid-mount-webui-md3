@@ -5,9 +5,11 @@
   import { slide } from 'svelte/transition';
   import Skeleton from '../components/Skeleton.svelte';
   import './ModulesTab.css';
+
   let searchQuery = $state('');
   let filterType = $state('all');
-  let expandedMap = $state({}); 
+  let expandedMap = $state({});
+
   onMount(() => {
     store.loadModules();
   });
@@ -17,6 +19,7 @@
     const matchFilter = filterType === 'all' || m.mode === filterType;
     return matchSearch && matchFilter;
   }));
+
   function toggleExpand(id) {
     if (expandedMap[id]) {
       delete expandedMap[id];
@@ -25,6 +28,7 @@
     }
     expandedMap = { ...expandedMap };
   }
+
   function handleKeydown(e, id) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -32,11 +36,13 @@
     }
   }
 </script>
-<div class="md3-card" style="padding: 16px;">
-  <p style="margin: 0; font-size: 14px; color: var(--md-sys-color-on-surface-variant); line-height: 1.5;">
+
+<div class="md3-card desc-card">
+  <p class="desc-text">
     {store.L.modules.desc}
   </p>
 </div>
+
 <div class="search-container">
   <svg class="search-icon" viewBox="0 0 24 24"><path d={ICONS.search} /></svg>
   <input 
@@ -46,7 +52,7 @@
     bind:value={searchQuery}
   />
   <div class="filter-controls">
-    <span style="font-size: 12px; color: var(--md-sys-color-on-surface-variant);">{store.L.modules.filterLabel}</span>
+    <span class="filter-label-text">{store.L.modules.filterLabel}</span>
     <select class="filter-select" bind:value={filterType}>
       <option value="all">{store.L.modules.filterAll}</option>
       <option value="auto">{store.L.modules.modeAuto}</option>
@@ -54,12 +60,13 @@
     </select>
   </div>
 </div>
+
 {#if store.loading.modules}
   <div class="rules-list">
     {#each Array(5) as _}
       <div class="rule-card">
         <div class="rule-info">
-          <div style="display:flex; flex-direction:column; gap: 6px; width: 100%;">
+          <div class="skeleton-group">
             <Skeleton width="60%" height="20px" />
             <Skeleton width="40%" height="14px" />
           </div>
@@ -69,7 +76,7 @@
     {/each}
   </div>
 {:else if filteredModules.length === 0}
-  <div style="text-align:center; padding: 40px; opacity: 0.6">
+  <div class="empty-state">
     {store.modules.length === 0 ? store.L.modules.empty : "No matching modules"}
   </div>
 {:else}
@@ -85,19 +92,22 @@
       >
         <div class="rule-main">
           <div class="rule-info">
-            <div style="display:flex; flex-direction:column;">
+            <div class="info-col">
               <span class="module-name">{mod.name}</span>
-              <span class="module-id">{mod.id} <span style="opacity:0.6; margin-left: 8px;">{mod.version}</span></span>
+              <span class="module-id">{mod.id} <span class="version-tag">{mod.version}</span></span>
             </div>
           </div>
+          
           <div class="mode-badge {mod.mode === 'magic' ? 'badge-magic' : 'badge-auto'}">
             {mod.mode === 'magic' ? store.L.modules.modeMagic : store.L.modules.modeAuto}
           </div>
         </div>
+        
         {#if expandedMap[mod.id]}
           <div class="rule-details" transition:slide={{ duration: 200 }}>
             <p class="module-desc">{mod.description || 'No description'}</p>
             <p class="module-meta">Author: {mod.author || 'Unknown'}</p>
+            
             <div class="config-section">
               <div class="config-row">
                 <span class="config-label">{store.L.config.title}:</span>
@@ -115,12 +125,14 @@
                 </div>
               </div>
             </div>
+
           </div>
         {/if}
       </div>
     {/each}
   </div>
 {/if}
+
 <div class="bottom-actions">
   <button class="btn-tonal" onclick={() => store.loadModules()} disabled={store.loading.modules} title={store.L.modules.reload}>
     <svg viewBox="0 0 24 24" width="20" height="20"><path d={ICONS.refresh} fill="currentColor"/></svg>

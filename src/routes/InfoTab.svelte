@@ -75,7 +75,7 @@
     <a href={DONATE_LINK} 
        class="action-card"
        onclick={(e) => handleLink(e, DONATE_LINK)}>
-        <svg viewBox="0 0 24 24" class="action-icon" style="fill: #ffab91;"><path d={ICONS.donate} /></svg>
+        <svg viewBox="0 0 24 24" class="action-icon donate-icon"><path d={ICONS.donate} /></svg>
         <span class="action-label">{store.L.info.donate}</span>
     </a>
   </div>
@@ -89,13 +89,15 @@
                 <div class="contributor-bar">
                     <Skeleton width="48px" height="48px" borderRadius="50%" />
                     <div class="c-info">
-                        <Skeleton width="120px" height="16px" style="margin-bottom: 6px;" />
+                        <div class="skeleton-spacer">
+                            <Skeleton width="120px" height="16px" />
+                        </div>
                         <Skeleton width="200px" height="12px" />
                     </div>
                 </div>
             {/each}
         {:else if error}
-            <div style="text-align:center; padding: 20px; opacity: 0.6; color: var(--md-sys-color-error);">
+            <div class="error-message">
                 {store.L.info.loadFail}
             </div>
         {:else}
