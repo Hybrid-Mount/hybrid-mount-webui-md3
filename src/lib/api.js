@@ -20,9 +20,12 @@ export const API = {
 
   saveConfig: async (config) => {
     const jsonStr = JSON.stringify(config);
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(jsonStr);
+    
     let hexPayload = '';
-    for (let i = 0; i < jsonStr.length; i++) {
-      hexPayload += jsonStr.charCodeAt(i).toString(16).padStart(2, '0');
+    for (const byte of bytes) {
+      hexPayload += byte.toString(16).padStart(2, '0');
     }
 
     const cmd = `${PATHS.BINARY} save-config --payload ${hexPayload}`;
@@ -143,6 +146,7 @@ export const API = {
       return [];
     }
   },
+
   openLink: async (url) => {
     const safeUrl = url.replace(/"/g, '\\"');
     const cmd = `am start -a android.intent.action.VIEW -d "${safeUrl}"`;
