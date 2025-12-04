@@ -1,100 +1,83 @@
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+import { DEFAULT_CONFIG } from './constants';
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const MOCK_STATE = {
+    modules: [
+        { id: "magisk_module_test", name: "Magisk Module", version: "1.0", author: "User", description: "A test module", mode: "auto", enabled: true },
+        { id: "youtube_revanced", name: "YouTube ReVanced", version: "18.0.0", author: "ReVanced", description: "Extended YouTube", mode: "magic", enabled: true },
+        { id: "my_custom_mod", name: "Custom Tweak", version: "v2", author: "Me", description: "System tweaks", mode: "auto", enabled: true }
+    ],
+    config: { ...DEFAULT_CONFIG, partitions: ["product", "system_ext"] },
+    logs: [
+        "[INFO] Meta-Hybrid Daemon v0.2.8 started",
+        "[INFO] Storage backend: tmpfs (XATTR supported)",
+        "[INFO] Mounting overlay for /system...",
+        "[WARN] /vendor overlay skipped: target busy",
+        "[INFO] Magic mount active: youtube_revanced",
+        "[INFO] System operational."
+    ]
+};
 
 export const MockAPI = {
-  loadConfig: async () => {
-    await delay(300);
-    console.log('[Mock] loadConfig called');
-    return {
-      moduledir: '/data/adb/modules',
-      tempdir: '',
-      mountsource: 'KSU',
-      logfile: '/data/adb/meta-hybrid/daemon.log',
-      verbose: true,
-      partitions: ['my_product', 'mi_ext'],
-      force_ext4: false,
-      enable_nuke: true,
-      disable_umount: false
-    };
-  },
+    loadConfig: async () => {
+        await delay(500);
+        return MOCK_STATE.config;
+    },
 
-  saveConfig: async (config) => {
-    await delay(500);
-    console.log('[Mock] saveConfig received:', config);
-  },
+    saveConfig: async (config) => {
+        await delay(800);
+        MOCK_STATE.config = config;
+        console.log("[Mock] Config Saved:", config);
+    },
 
-  scanModules: async () => {
-    await delay(800);
-    console.log('[Mock] scanModules called');
-    return [
-      {
-        id: "youtube-revanced",
-        name: "YouTube ReVanced",
-        version: "v19.11.43",
-        author: "ReVanced Team",
-        description: "Extended YouTube functionality.",
-        mode: "auto"
-      },
-      {
-        id: "miui-home-mod",
-        name: "MIUI Home Mod",
-        version: "v4.25.0",
-        author: "Unknown",
-        description: "Modify system launcher.",
-        mode: "magic"
-      }
-    ];
-  },
+    scanModules: async () => {
+        await delay(1000);
+        return MOCK_STATE.modules;
+    },
 
-  saveModules: async (modules) => {
-    await delay(500);
-    console.log('[Mock] saveModules received:', modules);
-  },
+    saveModules: async (modules) => {
+        await delay(600);
+        MOCK_STATE.modules = modules;
+        console.log("[Mock] Module Modes Saved:", modules.map(m => `${m.id}=${m.mode}`));
+    },
 
-  readLogs: async (logPath, lines) => {
-    await delay(400);
-    return `[INFO] >> Initializing Meta-Hybrid Mount Daemon...
-[INFO] >> Storage Backend: [TMPFS]
-[INFO] >> Inventory Scan: Found 2 enabled modules.
-[INFO] [OverlayFS Fusion Sequence]
-[INFO] ├── [Target] /vendor
-[INFO] │   ╰── [Layer] miui-home-mod
-[INFO] >> Link Start! Executing mount plan...
-[INFO] >> System operational.`;
-  },
+    readLogs: async () => {
+        await delay(400);
+        return MOCK_STATE.logs.join('\n');
+    },
 
-  getStorageUsage: async () => {
-    await delay(600);
-    return {
-      size: '2.0G',
-      used: '350M',
-      avail: '1.65G',
-      percent: '17%',
-      type: 'ext4'
-    };
-  },
+    getStorageUsage: async () => {
+        await delay(600);
+        return {
+            size: '3.8G',
+            used: '1.2G',
+            percent: '31%',
+            type: 'tmpfs' 
+        };
+    },
 
-  getSystemInfo: async () => {
-    await delay(300);
-    return {
-      kernel: '6.6.77-android15-Kokuban-Herta-BYIF-SukiSUU-gc4abb096d-4k',
-      selinux: 'Enforcing',
-      mountBase: '/data/adb/meta-hybrid/img_mnt'
-    };
-  },
+    getSystemInfo: async () => {
+        await delay(600);
+        return {
+            kernel: '5.10.177-android12-9-00001-g5d3f2a (Mock)',
+            selinux: 'Enforcing',
+            mountBase: '/data/adb/meta-hybrid/mnt',
+            activeMounts: ['system', 'product', 'system_ext']
+        };
+    },
 
-  getActiveMounts: async (sourceName) => {
-    await delay(400);
-    return ['system', 'vendor'];
-  },
+    getActiveMounts: async () => {
+        return ['system', 'product'];
+    },
 
-  openLink: async (url) => {
-    console.log('[Mock] Opening URL:', url);
-    window.open(url, '_blank');
-  },
+    openLink: async (url) => {
+        console.log("[Mock] Opening URL:", url);
+        window.open(url, '_blank');
+    },
 
-  fetchSystemColor: async () => {
-    await delay(200);
-    console.log('[Mock] fetchSystemColor returning #D0BCFF');
-    return '#bcffff'; 
-  }
+    fetchSystemColor: async () => {
+        await delay(200);
+        return '#8FBC8F'; 
+    }
 };
