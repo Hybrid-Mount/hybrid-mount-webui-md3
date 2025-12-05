@@ -79,7 +79,6 @@
   onMount(() => {
     store.init();
   });
-
   let baseTranslateX = $derived(TABS.indexOf(activeTab) * -20);
 </script>
 
@@ -97,11 +96,21 @@
          style:transform={`translateX(calc(${baseTranslateX}% + ${dragOffset}px))`}
          style:transition={isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1)'}>
       
-      <div class="swipe-page"><div class="tab-pane"><StatusTab /></div></div>
-      <div class="swipe-page"><div class="tab-pane"><ConfigTab /></div></div>
-      <div class="swipe-page"><div class="tab-pane"><ModulesTab /></div></div>
-      <div class="swipe-page"><div class="tab-pane"><LogsTab /></div></div>
-      <div class="swipe-page"><div class="tab-pane"><InfoTab /></div></div>
+      <div class="swipe-page">
+        <div class="page-scroller"><StatusTab /></div>
+      </div>
+      <div class="swipe-page">
+        <div class="page-scroller"><ConfigTab /></div>
+      </div>
+      <div class="swipe-page">
+        <div class="page-scroller"><ModulesTab /></div>
+      </div>
+      <div class="swipe-page">
+        <div class="page-scroller"><LogsTab /></div>
+      </div>
+      <div class="swipe-page">
+        <div class="page-scroller"><InfoTab /></div>
+      </div>
 
     </div>
   </main>
@@ -128,11 +137,22 @@
     width: 20%;
     height: 100%;
     flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-scroller {
+    height: 100%;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-  }
-  :global(.tab-pane) {
-    height: 100%;
+    padding-bottom: 88px;
     box-sizing: border-box;
+  }
+  :global(.bottom-actions) {
+    position: absolute !important;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
   }
 </style>

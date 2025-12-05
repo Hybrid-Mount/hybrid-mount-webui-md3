@@ -15,7 +15,8 @@ export const store = $state({
 
   loading: { config: false, modules: false, logs: false, status: false },
   saving: { config: false, modules: false },
-  toast: { text: '', type: 'info', visible: false },
+
+  toasts: [],
   
   theme: 'auto',
   isSystemDark: false,
@@ -64,8 +65,18 @@ export const store = $state({
   },
 
   showToast(msg, type = 'info') {
-    this.toast = { text: msg, type, visible: true };
-    setTimeout(() => { this.toast.visible = false; }, 3000);
+    const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
+    this.toasts.push({ id, text: msg, type });
+    setTimeout(() => {
+      this.removeToast(id);
+    }, 3000);
+  },
+
+  removeToast(id) {
+    const index = this.toasts.findIndex(t => t.id === id);
+    if (index !== -1) {
+      this.toasts.splice(index, 1);
+    }
   },
 
   applyTheme() {
