@@ -16,6 +16,7 @@
     { id: 'logs', icon: ICONS.description },
     { id: 'info', icon: ICONS.info }
   ];
+  
   $effect(() => {
     if (activeTab && tabRefs[activeTab] && navContainer) {
       const tab = tabRefs[activeTab];
@@ -27,8 +28,7 @@
       navContainer.scrollTo({
         left: scrollLeft,
         behavior: 'smooth'
-     
-  });
+      });
     }
   });
 
@@ -85,7 +85,6 @@
         onclick={() => showLangMenu = !showLangMenu} 
         title={store.L.common.language}
       >
-  
        <svg viewBox="0 0 24 24"><path d={ICONS.translate} fill="currentColor"/></svg>
       </button>
     </div>
@@ -102,13 +101,14 @@
   <nav class="nav-tabs" bind:this={navContainer}>
     {#each TABS as tab}
       <button 
-        class="nav-tab {activeTab === tab.id ?
-        'active' : ''}" 
+        class="nav-tab {activeTab === tab.id ? 'active' : ''}" 
         onclick={() => onTabChange(tab.id)}
         bind:this={tabRefs[tab.id]}
       >
-        <svg viewBox="0 0 24 24"><path d={tab.icon}/></svg>
-        {store.L.tabs[tab.id]}
+        <div class="nav-icon-container">
+          <svg viewBox="0 0 24 24"><path d={tab.icon}/></svg>
+        </div>
+        <span>{store.L.tabs[tab.id]}</span>
       </button>
     {/each}
   </nav>

@@ -9,10 +9,29 @@
   let searchQuery = $state('');
   let filterType = $state('all');
   let expandedMap = $state({});
+  let initialModulesStr = $state('');
 
   onMount(() => {
-    store.loadModules();
+    load();
   });
+
+  function load() {
+    store.loadModules().then(() => {
+        initialModulesStr = JSON.stringify(store.modules.map(m => ({ id: m.id, mode: m.mode })));
+    });
+  }
+
+  let isDirty = $derived.by(() => {
+    if (!initialModulesStr) return false;
+    const current = JSON.stringify(store.modules.map(m => ({ id: m.id, mode: m.mode })));
+    return current !== initialModulesStr;
+  });
+
+  function save() {
+    store.saveModules().then(() => {
+        initialModulesStr = JSON.stringify(store.modules.map(m => ({ id: m.id, mode: m.mode })));
+    });
+  }
 
   let filteredModules = $derived(store.modules.filter(m => {
     const q = searchQuery.toLowerCase();
@@ -133,11 +152,11 @@
 {/if}
 
 <div class="bottom-actions">
-  <button class="btn-tonal" onclick={() => store.loadModules()} disabled={store.loading.modules} title={store.L.modules.reload}>
+  <button class="btn-tonal" onclick={load} disabled={store.loading.modules} title={store.L.modules.reload}>
     <svg viewBox="0 0 24 24" width="20" height="20"><path d={ICONS.refresh} fill="currentColor"/></svg>
   </button>
-  <button class="btn-filled" onclick={() => store.saveModules()} disabled={store.saving.modules}>
+  <button class="btn-filled" onclick={save} disabled={store.saving.modules || !isDirty}>
     <svg viewBox="0 0 24 24" width="18" height="18"><path d={ICONS.save} fill="currentColor"/></svg>
     {store.saving.modules ? store.L.common.saving : store.L.modules.save}
   </button>
-</div>  
+</div>
