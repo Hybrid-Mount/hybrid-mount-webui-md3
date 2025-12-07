@@ -1,105 +1,106 @@
+import { APP_VERSION } from './constants_gen';
 import { DEFAULT_CONFIG } from './constants';
-import type { AppConfig, Module, StorageStatus, SystemInfo, DeviceInfo } from './types';
+import type { AppConfig, DeviceInfo, Module, StorageStatus, SystemInfo } from './types';
 
+// Mock delay to simulate network latency
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-interface MockStateType {
-    modules: Module[];
-    config: AppConfig;
-    logs: string[];
-}
-
-const MOCK_STATE: MockStateType = {
-    modules: [
-        { id: "magisk_module_test", name: "Magisk Module", version: "1.0", author: "User", description: "A test module", mode: "auto", enabled: true },
-        { id: "youtube_revanced", name: "YouTube ReVanced", version: "18.0.0", author: "ReVanced", description: "Extended YouTube", mode: "magic", enabled: true },
-        { id: "my_custom_mod", name: "Custom Tweak", version: "v2", author: "Me", description: "System tweaks", mode: "auto", enabled: true }
-    ],
-    config: { ...DEFAULT_CONFIG, partitions: ["product", "system_ext"] },
-    logs: [
-        "[INFO] Meta-Hybrid Daemon v0.2.8 started",
-        "[INFO] Storage backend: tmpfs (XATTR supported)",
-        "[INFO] Mounting overlay for /system...",
-        "[WARN] /vendor overlay skipped: target busy",
-        "[INFO] Magic mount active: youtube_revanced",
-        "[INFO] System operational."
-    ]
-};
-
 export const MockAPI = {
-    loadConfig: async (): Promise<AppConfig> => {
-        await delay(500);
-        return MOCK_STATE.config;
-    },
+  async loadConfig(): Promise<AppConfig> {
+    await delay(300);
+    return { ...DEFAULT_CONFIG };
+  },
 
-    saveConfig: async (config: AppConfig): Promise<void> => {
-        await delay(800);
-        MOCK_STATE.config = config;
-        console.log("[Mock] Config Saved:", config);
-    },
+  async saveConfig(config: AppConfig): Promise<void> {
+    await delay(500);
+    console.log('[Mock] Config saved:', config);
+  },
 
-    scanModules: async (): Promise<Module[]> => {
-        await delay(1000);
-        return MOCK_STATE.modules;
-    },
+  async scanModules(dir: string): Promise<Module[]> {
+    await delay(600);
+    return [
+      {
+        id: 'magisk_module_1',
+        name: 'Example Module',
+        version: '1.0.0',
+        author: 'Developer',
+        description: 'This is a mock module for testing.',
+        path: `${dir}/magisk_module_1`,
+        mode: 'magic',
+        webui: null
+      },
+      {
+        id: 'overlay_module_2',
+        name: 'System UI Overlay',
+        version: '2.5',
+        author: 'Google',
+        description: 'Changes system colors.',
+        path: `${dir}/overlay_module_2`,
+        mode: 'auto',
+        webui: 'http://localhost:3000/ui'
+      }
+    ];
+  },
 
-    saveModules: async (modules: Module[]): Promise<void> => {
-        await delay(600);
-        MOCK_STATE.modules = modules;
-        console.log("[Mock] Module Modes Saved:", modules.map(m => `${m.id}=${m.mode}`));
-    },
+  async saveModules(modules: Module[]): Promise<void> {
+    await delay(400);
+    console.log('[Mock] Modules saved:', modules);
+  },
 
-    readLogs: async (): Promise<string> => {
-        await delay(400);
-        return MOCK_STATE.logs.join('\n');
-    },
+  async readLogs(): Promise<string> {
+    await delay(200);
+    return `[I] Daemon started at ${new Date().toISOString()}
+[I] Loading config from /data/adb/meta-hybrid/config.toml
+[D] Scanning modules...
+[I] Found 2 modules
+[W] OverlayFS is not supported on this kernel, falling back to Magic Mount
+[E] Failed to mount /system/app/TestApp: No such file or directory
+[I] Daemon ready`;
+  },
 
-    getStorageUsage: async (): Promise<StorageStatus> => {
-        await delay(600);
-        return {
-            size: '3.8G',
-            used: '1.2G',
-            percent: '31%',
-            type: 'tmpfs' 
-        };
-    },
+  async getDeviceStatus(): Promise<DeviceInfo> {
+    await delay(300);
+    return {
+      model: 'Pixel 8 Pro (Mock)',
+      android: '14 (API 34)',
+      kernel: '5.15.110-android14-11',
+      selinux: 'Enforcing'
+    };
+  },
 
-    getSystemInfo: async (): Promise<SystemInfo> => {
-        await delay(600);
-        return {
-            kernel: '5.10.177-android12-9-00001-g5d3f2a (Mock)',
-            selinux: 'Enforcing',
-            mountBase: '/data/adb/meta-hybrid/mnt',
-            activeMounts: ['system', 'product', 'system_ext']
-        };
-    },
+  async getVersion(): Promise<string> {
+    await delay(100);
+    return APP_VERSION;
+  },
 
-    getDeviceStatus: async (): Promise<DeviceInfo> => {
-        await delay(500);
-        return {
-            model: 'Pixel 7 Pro (Mock)',
-            android: '14',
-            kernel: '5.10.177-android12-9-00001-g5d3f2a',
-            selinux: 'Enforcing'
-        };
-    },
+  async getStorageUsage(): Promise<StorageStatus> {
+    await delay(300);
+    return {
+      used: '128 MB',
+      size: '1024 MB',
+      percent: '12.5%',
+      type: 'tmpfs'
+    };
+  },
 
-    getVersion: async (): Promise<string> => {
-        await delay(300);
-        return "v1.0.1-r1-mock";
-    },
+  async getSystemInfo(): Promise<SystemInfo> {
+    await delay(300);
+    return {
+      kernel: 'Linux localhost 5.15.0 #1 SMP PREEMPT',
+      selinux: 'Enforcing',
+      mountBase: '/data/adb/meta-hybrid/mnt',
+      activeMounts: ['system', 'product']
+    };
+  },
 
-    getActiveMounts: async (): Promise<string[]> => {
-        return ['system', 'product'];
-    },
+  async fetchSystemColor(): Promise<string | null> {
+    await delay(100);
+    // Return a mock system color (e.g., Pixel Blue) or null to use default
+    return '#8AB4F8';
+  },
 
-    openLink: async (url: string): Promise<void> => {
-        console.log("[Mock] Opening URL:", url);
-        window.open(url, '_blank');
-    },
-
-    fetchSystemColor: async (): Promise<string> => {
-        await delay(200);
-        return '#8FBC8F'; 
-    }
+  openLink(url: string): void {
+    console.log('[Mock] Opening link:', url);
+    window.open(url, '_blank');
+  }
 };
