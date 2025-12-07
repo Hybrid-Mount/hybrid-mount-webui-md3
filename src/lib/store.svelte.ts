@@ -109,6 +109,7 @@ const createStore = () => {
         const mod: any = (localeModules as any)[path];
         loadedLocale = mod.default; 
         lang = code;
+        document.documentElement.lang = code === 'zht' ? 'zh-TW' : code;
         localStorage.setItem('hm-lang', code);
       } catch (e) {
         console.error(`Failed to load locale: ${code}`, e);
