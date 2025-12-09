@@ -126,17 +126,19 @@ const RealAPI = {
   getStorageUsage: async (): Promise<StorageStatus> => {
     if (!ksuExec) return { size: '-', used: '-', percent: '0%', type: null, hymofs_available: false };
     try {
-      const cmd = `${PATHS.BINARY} storage`;
+      const stateFile = (PATHS as any).DAEMON_STATE || "/data/adb/meta-hybrid/run/daemon_state.json";
+      const cmd = `cat "${stateFile}"`;
       const { errno, stdout } = await ksuExec(cmd);
       
       if (errno === 0 && stdout) {
-        const raw = JSON.parse(stdout);
+        const state = JSON.parse(stdout);
+        
         return {
-          type: raw.type,
-          percent: `${raw.usage_percent}%`,
-          size: formatBytes(raw.total_size),
-          used: formatBytes(raw.used_size),
-          hymofs_available: raw.hymofs_available
+          type: state.storage_mode || 'unknown',
+          percent: `${state.storage_percent ?? 0}%`,
+          size: formatBytes(state.storage_total ?? 0),
+          used: formatBytes(state.storage_used ?? 0),
+          hymofs_available: state.hymofs_available ?? false
         };
       }
     } catch (e) {
