@@ -187,11 +187,15 @@ const createStore = () => {
     try {
       const rawLogs = await API.readLogs();
       logs = rawLogs.split('\n').map(line => {
+        // Strip timestamps (e.g. 2023-12-01T12:00:00Z or 2023-12-01 12:00:00)
+        const text = line.replace(/^[\d-]{10}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?\s*/, '');
+        
         let type: LogEntry['type'] = 'info';
-        if (line.includes('[E]')) type = 'error';
-        else if (line.includes('[W]')) type = 'warn';
-        else if (line.includes('[D]')) type = 'debug';
-        return { text: line, type };
+        if (text.includes('[E]') || text.includes('[ERROR]')) type = 'error';
+        else if (text.includes('[W]') || text.includes('[WARN]')) type = 'warn';
+        else if (text.includes('[D]') || text.includes('[DEBUG]')) type = 'debug';
+        
+        return { text, type };
       });
     } catch (e) {
       logs = [{ text: "Failed to load logs.", type: 'error' }];
