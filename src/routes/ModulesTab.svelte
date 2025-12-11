@@ -11,9 +11,8 @@
 
   let searchQuery = $state('');
   let filterType = $state('all');
-  let showUnmounted = $state(false); // New toggle state
+  let showUnmounted = $state(false); 
   let expandedId = $state<string | null>(null);
-  
   let initialRulesSnapshot = $state<Record<string, string>>({});
   
   onMount(() => {
@@ -74,8 +73,11 @@
     }
   }
 
-  function getModeLabel(mode: string) {
+  function getModeLabel(mod: Module) {
       const m = store.L.modules?.modes;
+      if (!mod.is_mounted) return m?.none ?? 'None';
+
+      const mode = mod.rules.default_mode;
       if (mode === 'magic') return m?.magic ?? 'Magic Mount';
       if (mode === 'hymofs') return m?.hymo ?? 'HymoFS';
       if (mode === 'ignore') return m?.ignore ?? 'Ignore';
@@ -191,13 +193,21 @@
             </div>
           </div>
           
-          <div class="mode-badge {mod.rules.default_mode === 'magic' ? 
-               'badge-magic' : mod.rules.default_mode === 'hymofs' ? 'badge-hymofs' : 'badge-auto'}"
-               style:background-color={mod.rules.default_mode === 'hymofs' ?
-               'var(--md-sys-color-primary-container)' : ''}
-               style:color={mod.rules.default_mode === 'hymofs' ?
-               'var(--md-sys-color-on-primary-container)' : ''}>
-            {getModeLabel(mod.rules.default_mode)}
+          <div class="mode-badge {
+               !mod.is_mounted ? 'badge-none' :
+               mod.rules.default_mode === 'magic' ? 'badge-magic' : 
+               mod.rules.default_mode === 'hymofs' ? 'badge-hymofs' : 
+               'badge-auto'}"
+               
+               style:background-color={
+                 !mod.is_mounted ? '' :
+                 mod.rules.default_mode === 'hymofs' ? 'var(--md-sys-color-primary-container)' : ''
+               }
+               style:color={
+                 !mod.is_mounted ? '' :
+                 mod.rules.default_mode === 'hymofs' ? 'var(--md-sys-color-on-primary-container)' : ''
+               }>
+            {getModeLabel(mod)}
           </div>
         </div>
         
