@@ -84,7 +84,12 @@
     "webui": "WebUI設定",
     "fixBottomNav": "ナビゲーションバー調整",
     "fixBottomNavOn": "調整を有効化しました",
-    "fixBottomNavOff": "調整を無効化しました"
+    "fixBottomNavOff": "調整を無効化しました",
+    "granarySettings": "保管庫設定 (バックアップ)",
+    "maxBackups": "最大保持数",
+    "maxBackupsDesc": "保持するスナップショットの最大数です。",
+    "retentionDays": "保持期間 (日)",
+    "retentionDaysDesc": "N日以上前のスナップショットを削除 (0 = 無制限)。"
   },
   "modules": {
     "title": "モジュールモード",

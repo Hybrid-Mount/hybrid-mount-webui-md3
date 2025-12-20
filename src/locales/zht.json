@@ -84,7 +84,12 @@
     "webui": "WebUI 設定",
     "fixBottomNav": "三按鈕導航列適配",
     "fixBottomNavOn": "已開啟三按鈕適配",
-    "fixBottomNavOff": "已關閉三按鈕適配"
+    "fixBottomNavOff": "已關閉三按鈕適配",
+    "granarySettings": "糧倉設定 (備份策略)",
+    "maxBackups": "最大保留數量",
+    "maxBackupsDesc": "超過此數量的舊備份將被自動刪除。",
+    "retentionDays": "保留天數",
+    "retentionDaysDesc": "自動刪除 N 天前的舊備份 (0 表示不限制)。"
   },
   "modules": {
     "title": "模組模式",

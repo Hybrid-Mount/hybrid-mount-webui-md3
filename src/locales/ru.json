@@ -84,7 +84,12 @@
     "webui": "Настройки WebUI",
     "fixBottomNav": "Испр. навигации",
     "fixBottomNavOn": "Исправление вкл.",
-    "fixBottomNavOff": "Исправление выкл."
+    "fixBottomNavOff": "Исправление выкл.",
+    "granarySettings": "Настройки архива",
+    "maxBackups": "Макс. резервных копий",
+    "maxBackupsDesc": "Максимальное количество хранимых снимков.",
+    "retentionDays": "Срок хранения (дней)",
+    "retentionDaysDesc": "Удалять снимки старше N дней (0 = безлимит)."
   },
   "modules": {
     "title": "Режимы модулей",

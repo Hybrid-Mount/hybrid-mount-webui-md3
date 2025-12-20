@@ -13,6 +13,7 @@
   import '@material/web/ripple/ripple.js';
   import '@material/web/dialog/dialog.js';
   import '@material/web/button/text-button.js';
+  import '@material/web/switch/switch.js';
 
   let initialConfigStr = $state('');
   let showResetConfirm = $state(false);
@@ -177,6 +178,51 @@
       </div>
     </div>
   </section>
+
+  {#if store.config.granary}
+  <section class="config-group">
+    <div class="config-card">
+        <div class="card-header">
+            <div class="card-icon">
+                <md-icon><svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" /></svg></md-icon>
+            </div>
+            <div class="card-text">
+                <span class="card-title">{store.L.config?.granarySettings || "Granary Settings"}</span>
+            </div>
+        </div>
+
+        <div class="setting-list">
+            <div class="list-item">
+                <div class="list-text">
+                    <span class="list-title">{store.L.config?.maxBackups || "Max Backups"}</span>
+                    <span class="list-desc">{store.L.config?.maxBackupsDesc || "Max snapshots to keep"}</span>
+                </div>
+                <input 
+                    type="number" 
+                    class="num-input" 
+                    min="1" max="100"
+                    bind:value={store.config.granary.max_backups} 
+                />
+            </div>
+            
+            <div class="item-separator"></div>
+
+            <div class="list-item">
+                <div class="list-text">
+                    <span class="list-title">{store.L.config?.retentionDays || "Retention Days"}</span>
+                    <span class="list-desc">{store.L.config?.retentionDaysDesc || "0 = Unlimited"}</span>
+                </div>
+                <input 
+                    type="number" 
+                    class="num-input" 
+                    min="0" max="365"
+                    bind:value={store.config.granary.retention_days} 
+                />
+            </div>
+        </div>
+    </div>
+  </section>
+  {/if}
 
   <section class="config-group">
     <div class="options-grid">

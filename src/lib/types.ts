@@ -1,3 +1,8 @@
+export interface GranaryConfig {
+  max_backups: number;
+  retention_days: number;
+}
+
 export interface AppConfig {
   moduledir: string;
   mountsource: string;
@@ -12,6 +17,7 @@ export interface AppConfig {
   hymofs_debug: boolean;
   logfile?: string;
   winnowing?: Record<string, string>;
+  granary: GranaryConfig;
 }
 
 export type MountMode = 'overlay' | 'hymofs' | 'magic' | 'ignore';
@@ -90,6 +96,8 @@ export interface Silo {
   label: string;
   reason: string;
   config_snapshot: AppConfig;
+  raw_config?: string;
+  raw_state?: string;
 }
 
 export interface DiagnosticIssue {

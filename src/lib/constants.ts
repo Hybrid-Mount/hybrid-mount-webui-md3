@@ -13,7 +13,14 @@ export const DEFAULT_CONFIG: AppConfig = {
   allow_umount_coexistence: false,
   dry_run: false,
   hymofs_stealth: true,
-  hymofs_debug: false
+  hymofs_debug: false,
+  winnowing: {
+    rules: ''
+  },
+  granary: {
+    max_backups: 20,
+    retention_days: 0
+  }
 };
 
 export const PATHS = {

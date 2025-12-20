@@ -90,7 +90,12 @@
     "fixBottomNavOff": "已关闭三按钮适配",
     "coexistenceWarning": "必须先开启共存选项才能禁用 Umount",
     "pathPlaceholder": "请输入路径...",
-    "invalidModuleDir": "模块路径无效"
+    "invalidModuleDir": "模块路径无效",
+    "granarySettings": "粮仓设置 (备份策略)",
+    "maxBackups": "最大保留数量",
+    "maxBackupsDesc": "超过此数量的旧备份将被自动删除。",
+    "retentionDays": "保留天数",
+    "retentionDaysDesc": "自动删除 N 天前的旧备份 (0 表示不限制)。"
   },
   "modules": {
     "title": "模块模式",

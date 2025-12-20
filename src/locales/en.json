@@ -82,7 +82,12 @@
     "webui": "WebUI Settings",
     "fixBottomNav": "Fix Bottom Nav",
     "fixBottomNavOn": "Bottom Nav Fix Enabled",
-    "fixBottomNavOff": "Bottom Nav Fix Disabled"
+    "fixBottomNavOff": "Bottom Nav Fix Disabled",
+    "granarySettings": "Granary Settings",
+    "maxBackups": "Max Backups",
+    "maxBackupsDesc": "Max number of snapshots to retain.",
+    "retentionDays": "Retention Days",
+    "retentionDaysDesc": "Delete snapshots older than N days (0 = unlimited)."
   },
   "modules": {
     "title": "Module Modes",

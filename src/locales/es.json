@@ -84,7 +84,12 @@
     "webui": "Ajustes WebUI",
     "fixBottomNav": "Arreglar Nav. Inferior",
     "fixBottomNavOn": "Arreglo activado",
-    "fixBottomNavOff": "Arreglo desactivado"
+    "fixBottomNavOff": "Arreglo desactivado",
+    "granarySettings": "Ajustes de Granero",
+    "maxBackups": "Máx. Copias",
+    "maxBackupsDesc": "Número máximo de copias a conservar.",
+    "retentionDays": "Días de Retención",
+    "retentionDaysDesc": "Eliminar copias de más de N días (0 = ilimitado)."
   },
   "modules": {
     "title": "Modos de Módulo",
