@@ -14,7 +14,7 @@
   const REPO_OWNER = 'YuzakiKokuban';
   const REPO_NAME = 'meta-hybrid_mount';
   const DONATE_LINK = `https://afdian.com/a/${REPO_OWNER}`;
-  const TELEGRAM_LINK = 'https://t.me/c/hybridmountchat';
+  const TELEGRAM_LINK = 'https://t.me/hybridmountchat';
   const CACHE_KEY = 'hm_contributors_cache';
   const CACHE_DURATION = 1000 * 60 * 60;
 
