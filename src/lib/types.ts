@@ -9,6 +9,7 @@ export interface AppConfig {
   verbose: boolean;
   partitions: string[];
   force_ext4: boolean;
+  use_erofs: boolean;
   enable_nuke: boolean;
   disable_umount: boolean;
   allow_umount_coexistence: boolean;
@@ -42,7 +43,7 @@ export interface StorageStatus {
   size: string;
   used: string;
   percent: string;
-  type: 'tmpfs' | 'ext4' | 'unknown' | null;
+  type: 'tmpfs' | 'ext4' | 'erofs' | 'unknown' | null;
   error?: string;
 }
 

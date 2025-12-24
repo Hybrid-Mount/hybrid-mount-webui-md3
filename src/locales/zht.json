@@ -56,6 +56,7 @@
     "verboseOn": "開啟",
     "dryRun": "預演模式 (Dry Run)",
     "forceExt4": "強制 Ext4 模式",
+    "useErofs": "EROFS 模式",
     "enableNuke": "啟用肉墊 (隱蔽模式)",
     "disableUmount": "禁用命名空間分離",
     "allowUmountCoexistence": "允許Umount共存",

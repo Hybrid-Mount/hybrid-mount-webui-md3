@@ -56,6 +56,7 @@
     "verboseOn": "オン",
     "dryRun": "ドライランモード (Dry Run)",
     "forceExt4": "Ext4 モードを強制",
+    "useErofs": "EROFS モード",
     "enableNuke": "肉球を有効化",
     "disableUmount": "Umount無効化",
     "allowUmountCoexistence": "共存を許可",

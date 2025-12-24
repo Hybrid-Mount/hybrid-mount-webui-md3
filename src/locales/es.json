@@ -56,6 +56,7 @@
     "verboseOn": "Sí",
     "dryRun": "Modo de Prueba (Dry Run)",
     "forceExt4": "Forzar Modo Ext4",
+    "useErofs": "Modo EROFS",
     "enableNuke": "Activar Paw Pad (Oculto)",
     "disableUmount": "Desactivar Umount",
     "allowUmountCoexistence": "Permitir Coexistencia",

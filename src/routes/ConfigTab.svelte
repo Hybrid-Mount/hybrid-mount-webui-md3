@@ -19,10 +19,12 @@
   let showResetConfirm = $state(false);
   const isValidPath = (p: string) => !p || (p.startsWith('/') && p.length > 1);
   let invalidModuleDir = $derived(!isValidPath(store.config.moduledir));
+
   let isDirty = $derived.by(() => {
     if (!initialConfigStr) return false;
     return JSON.stringify(store.config) !== initialConfigStr;
   });
+
   $effect(() => {
     if (!store.loading.config && store.config) {
       if (!initialConfigStr || initialConfigStr === JSON.stringify(store.config)) {
@@ -30,6 +32,7 @@
       }
     }
   });
+
   $effect(() => {
     if (store.systemInfo?.zygisksuEnforce && store.systemInfo.zygisksuEnforce !== '0' && !store.config.allow_umount_coexistence) {
         if (!store.config.disable_umount) {
@@ -37,6 +40,7 @@
         }
     }
   });
+
   function save() {
     if (invalidModuleDir) {
       store.showToast(store.L.config.invalidPath, "error");
@@ -85,7 +89,7 @@
   <div slot="headline">{store.L.config?.resetConfigTitle ?? 'Reset Configuration?'}</div>
   <div slot="content">
     {store.L.config?.resetConfigConfirm ??
-    'This will reset all backend settings to defaults. Continue?'}
+      'This will reset all backend settings to defaults. Continue?'}
   </div>
   <div slot="actions">
     <md-text-button 
@@ -94,8 +98,7 @@
       tabindex="0"
       onkeydown={() => {}}
     >
-      {store.L.common?.cancel ??
-      'Cancel'}
+      {store.L.common?.cancel ?? 'Cancel'}
     </md-text-button>
     <md-text-button 
       onclick={reset}
@@ -103,8 +106,7 @@
       tabindex="0"
       onkeydown={() => {}}
     >
-      {store.L.config?.resetConfig ??
-      'Reset Config'}
+      {store.L.config?.resetConfig ?? 'Reset Config'}
     </md-text-button>
   </div>
 </md-dialog>
@@ -119,7 +121,7 @@
         <div class="card-text">
           <span class="card-title">{store.L.config.moduleDir}</span>
           <span class="card-desc">{store.L.config?.moduleDirDesc ??
-          'Set the directory where modules are stored'}</span>
+            'Set the directory where modules are stored'}</span>
         </div>
       </div>
       
@@ -129,8 +131,7 @@
           value={store.config.moduledir}
           oninput={(e) => handleInput('moduledir', e.target.value)}
           error={invalidModuleDir}
-          supporting-text={invalidModuleDir ?
-          (store.L.config?.invalidModuleDir || "Invalid Path") : ""}
+          supporting-text={invalidModuleDir ? (store.L.config?.invalidModuleDir || "Invalid Path") : ""}
           class="full-width-field"
         >
           <md-icon slot="leading-icon"><svg viewBox="0 0 24 24"><path d={ICONS.modules} /></svg></md-icon>
@@ -142,12 +143,11 @@
       <div class="card-header">
         <div class="card-icon">
           <md-icon><svg viewBox="0 0 24 24"><path d={ICONS.ksu} /></svg></md-icon>
-     
         </div>
         <div class="card-text">
           <span class="card-title">{store.L.config.mountSource}</span>
           <span class="card-desc">{store.L.config?.mountSourceDesc ??
-          'Global mount source namespace (e.g. KSU)'}</span>
+            'Global mount source namespace (e.g. KSU)'}</span>
         </div>
       </div>
       
@@ -158,7 +158,6 @@
           oninput={(e) => handleInput('mountsource', e.target.value)}
           class="full-width-field"
         >
-       
           <md-icon slot="leading-icon"><svg viewBox="0 0 24 24"><path d={ICONS.ksu} /></svg></md-icon>
         </md-outlined-text-field>
       </div>
@@ -173,9 +172,8 @@
         </div>
         <div class="card-text">
           <span class="card-title">{store.L.config.partitions}</span>
-  
-         <span class="card-desc">{store.L.config?.partitionsDesc ??
-          'Add partitions to mount'}</span>
+          <span class="card-desc">{store.L.config?.partitionsDesc ??
+            'Add partitions to mount'}</span>
         </div>
       </div>
       <div class="p-input">
@@ -189,28 +187,23 @@
     <div class="config-card">
         <div class="card-header">
             <div class="card-icon">
-                <md-icon><svg viewBox="0 
- 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" /></svg></md-icon>
+                <md-icon><svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" /></svg></md-icon>
             </div>
             <div class="card-text">
-                <span class="card-title">{store.L.config?.granarySettings ||
-                "Granary Settings"}</span>
+                <span class="card-title">{store.L.config?.granarySettings || "Granary Settings"}</span>
             </div>
         </div>
 
         <div class="setting-list">
             <div class="list-item">
                 <div class="list-text">
-                    <span class="list-title">{store.L.config?.maxBackups ||
-                    "Max Backups"}</span>
-                    <span class="list-desc">{store.L.config?.maxBackupsDesc ||
-                    "Max snapshots to keep"}</span>
+                    <span class="list-title">{store.L.config?.maxBackups || "Max Backups"}</span>
+                    <span class="list-desc">{store.L.config?.maxBackupsDesc || "Max snapshots to keep"}</span>
                 </div>
                 <input 
                     type="number" 
                     class="num-input" 
                     min="1" max="100"
- 
                     bind:value={store.config.granary.max_backups} 
                 />
             </div>
@@ -218,18 +211,14 @@
             <div class="item-separator"></div>
 
             <div class="list-item">
-              
                 <div class="list-text">
-                    <span class="list-title">{store.L.config?.retentionDays ||
-                    "Retention Days"}</span>
-                    <span class="list-desc">{store.L.config?.retentionDaysDesc ||
-                    "0 = Unlimited"}</span>
+                    <span class="list-title">{store.L.config?.retentionDays || "Retention Days"}</span>
+                    <span class="list-desc">{store.L.config?.retentionDaysDesc || "0 = Unlimited"}</span>
                 </div>
                 <input 
                     type="number" 
                     class="num-input" 
                     min="0" max="365"
-  
                     bind:value={store.config.granary.retention_days} 
                 />
             </div>
@@ -243,7 +232,6 @@
       <button 
         class="option-tile clickable secondary" 
         class:active={store.config.force_ext4} 
-  
         onclick={() => toggle('force_ext4')}
       >
         <md-ripple></md-ripple>
@@ -254,7 +242,22 @@
         </div>
         <div class="tile-bottom">
           <span class="tile-label">{store.L.config.forceExt4}</span>
-  
+        </div>
+      </button>
+
+      <button 
+        class="option-tile clickable secondary" 
+        class:active={store.config.use_erofs} 
+        onclick={() => toggle('use_erofs')}
+      >
+        <md-ripple></md-ripple>
+        <div class="tile-top">
+          <div class="tile-icon">
+            <md-icon><svg viewBox="0 0 24 24"><path d={ICONS.save} /></svg></md-icon>
+          </div>
+        </div>
+        <div class="tile-bottom">
+          <span class="tile-label">{store.L.config?.useErofs || "EROFS Mode"}</span>
         </div>
       </button>
 
@@ -266,8 +269,7 @@
         <md-ripple></md-ripple>
         <div class="tile-top">
           <div class="tile-icon">
-            <md-icon><svg viewBox="0 0 24 24"><path 
- d={ICONS.cat_paw} /></svg></md-icon>
+            <md-icon><svg viewBox="0 0 24 24"><path d={ICONS.cat_paw} /></svg></md-icon>
           </div>
         </div>
         <div class="tile-bottom">
@@ -280,7 +282,6 @@
         class:active={store.config.disable_umount} 
         onclick={() => toggle('disable_umount')}
       >
-    
         <md-ripple></md-ripple>
         <div class="tile-top">
           <div class="tile-icon">
@@ -302,14 +303,12 @@
         >
           <md-ripple></md-ripple>
           <div class="tile-top">
-           
-           <div class="tile-icon">
+            <div class="tile-icon">
               <md-icon><svg viewBox="0 0 24 24"><path d={ICONS.shield} /></svg></md-icon>
             </div>
           </div>
           <div class="tile-bottom">
-              <span class="tile-label">{store.L.config?.allowUmountCoexistence ||
-              'Allow Coexistence'}</span>
+              <span class="tile-label">{store.L.config?.allowUmountCoexistence || 'Allow Coexistence'}</span>
           </div>
         </button>
       {/if}
@@ -322,8 +321,7 @@
         <md-ripple></md-ripple>
         <div class="tile-top">
           <div class="tile-icon">
-             <md-icon><svg 
- viewBox="0 0 24 24"><path d={ICONS.description} /></svg></md-icon>
+            <md-icon><svg viewBox="0 0 24 24"><path d={ICONS.description} /></svg></md-icon>
           </div>
         </div>
         <div class="tile-bottom">
@@ -335,7 +333,6 @@
         <button 
           class="option-tile clickable secondary" 
           class:active={store.config.dry_run} 
-   
           onclick={() => toggle('dry_run')}
           transition:slide
         >
@@ -343,8 +340,7 @@
           <div class="tile-top">
             <div class="tile-icon">
               <md-icon><svg viewBox="0 0 24 24"><path d={ICONS.ghost} /></svg></md-icon>
-             </div>
-      
+            </div>
           </div>
           <div class="tile-bottom">
             <span class="tile-label">{store.L.config.dryRun}</span>
@@ -356,8 +352,7 @@
 
   <section class="config-group">
     <div class="webui-label">
-        {store.L.config?.webui ||
-        'WebUI'}
+        {store.L.config?.webui || 'WebUI'}
     </div>
     <div class="options-grid">
       <button 
@@ -368,13 +363,11 @@
         <md-ripple></md-ripple>
         <div class="tile-top">
           <div class="tile-icon">
-            <md-icon><svg viewBox="0 0 24 24"><path d="M21 5v14H3V5h18zm0-2H3c-1.1 0-2 .9-2 2v14c0 
- 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8 17h5v-6H8v6zm0-8h5V7H8v2zM6 17h2V7H6v10zm12-6h-2v6h2v-6zm0-4h-2v2h2V7z" /></svg></md-icon>
+            <md-icon><svg viewBox="0 0 24 24"><path d="M21 5v14H3V5h18zm0-2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8 17h5v-6H8v6zm0-8h5V7H8v2zM6 17h2V7H6v10zm12-6h-2v6h2v-6zm0-4h-2v2h2V7z" /></svg></md-icon>
           </div>
         </div>
         <div class="tile-bottom">
-          <span class="tile-label">{store.L.config?.fixBottomNav ||
-          'Fix Bottom Nav'}</span>
+          <span class="tile-label">{store.L.config?.fixBottomNav || 'Fix Bottom Nav'}</span>
         </div>
       </button>
 
@@ -386,13 +379,11 @@
         <md-ripple></md-ripple>
         <div class="tile-top">
           <div class="tile-icon">
-            
- <md-icon><svg viewBox="0 0 24 24"><path d={ICONS.replay} /></svg></md-icon>
+            <md-icon><svg viewBox="0 0 24 24"><path d={ICONS.replay} /></svg></md-icon>
           </div>
         </div>
         <div class="tile-bottom">
-          <span class="tile-label">{store.L.config?.resetConfig ||
-          'Reset Config'}</span>
+          <span class="tile-label">{store.L.config?.resetConfig || 'Reset Config'}</span>
         </div>
       </button>
     </div>
@@ -415,14 +406,12 @@
 
   <md-filled-button 
     onclick={save} 
-    disabled={store.saving.config ||
-    !isDirty}
+    disabled={store.saving.config || !isDirty}
     role="button"
     tabindex="0"
     onkeydown={() => {}}
   >
     <md-icon slot="icon"><svg viewBox="0 0 24 24"><path d={ICONS.save} /></svg></md-icon>
-    {store.saving.config ?
-    store.L.common.saving : store.L.config.save}
+    {store.saving.config ? store.L.common.saving : store.L.config.save}
   </md-filled-button>
 </BottomActions>
