@@ -48,7 +48,7 @@ export const MockAPI = {
         is_mounted: true,
         rules: { 
             default_mode: 'magic', 
-            paths: { "system/fonts": "hymofs" } 
+            paths: { "system/fonts": "overlay" } 
         }
       },
       {
@@ -115,9 +115,8 @@ export const MockAPI = {
       used: '128 MB',
       size: '1024 MB',
       percent: '12.5%',
-      type: 'tmpfs',
+      type: 'erofs',
       hymofs_available: true,
-      hymofs_version: 4
     };
   },
   async getSystemInfo(): Promise<SystemInfo> {
@@ -137,8 +136,6 @@ export const MockAPI = {
   async getConflicts(): Promise<ConflictEntry[]> {
     await delay(500);
     return [
-        { path: "/system/etc/hosts", contenders: ["magisk_module_1", "overlay_module_2"], selected: "magisk_module_1", is_forced: false },
-        { path: "/vendor/etc/audio_policy_configuration.xml", contenders: ["sound_mod", "dolby"], selected: "sound_mod", is_forced: true }
     ];
   },
   async getDiagnostics(): Promise<DiagnosticIssue[]> {
