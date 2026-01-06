@@ -1,26 +1,62 @@
-/**
- * Copyright 2025 Meta-Hybrid Mount Authors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 import { 
   argbFromHex, 
   hexFromArgb, 
-  SchemeTonalSpot, 
-  Hct 
+  Hct,
+  SchemeTonalSpot,
+  SchemeMonochrome,
+  SchemeFidelity,
+  SchemeVibrant,
+  SchemeExpressive,
+  SchemeNeutral,
+  SchemeFruitSalad,
+  SchemeRainbow,
+  DynamicScheme
 } from '@material/material-color-utilities';
+
+export type ThemeStyle = 'TONAL_SPOT' | 'MONOCHROME' | 'VIBRANT' | 'EXPRESSIVE' | 'NEUTRAL' | 'FRUIT_SALAD' | 'RAINBOW' | 'FIDELITY';
+
 export const Monet = {
-  apply: (seedHex: string | null, isDark: boolean) => {
+  apply: (seedHex: string | null, isDark: boolean, style: ThemeStyle = 'TONAL_SPOT') => {
     if (!seedHex) return;
+    
     let seedArgb;
     try {
         seedArgb = argbFromHex(seedHex);
     } catch (e) {
-        console.warn("Invalid hex color, skipping theme application");
         return;
     }
+    
     const sourceColor = Hct.fromInt(seedArgb);
-    const scheme = new SchemeTonalSpot(sourceColor, isDark, 0.0);
+    let scheme: DynamicScheme;
+
+    switch (style) {
+        case 'MONOCHROME':
+            scheme = new SchemeMonochrome(sourceColor, isDark, 0.0);
+            break;
+        case 'VIBRANT':
+            scheme = new SchemeVibrant(sourceColor, isDark, 0.0);
+            break;
+        case 'EXPRESSIVE':
+            scheme = new SchemeExpressive(sourceColor, isDark, 0.0);
+            break;
+        case 'NEUTRAL':
+            scheme = new SchemeNeutral(sourceColor, isDark, 0.0);
+            break;
+        case 'FRUIT_SALAD':
+            scheme = new SchemeFruitSalad(sourceColor, isDark, 0.0);
+            break;
+         case 'RAINBOW':
+            scheme = new SchemeRainbow(sourceColor, isDark, 0.0);
+            break;
+        case 'FIDELITY':
+            scheme = new SchemeFidelity(sourceColor, isDark, 0.0);
+            break;
+        case 'TONAL_SPOT':
+        default:
+            scheme = new SchemeTonalSpot(sourceColor, isDark, 0.0);
+            break;
+    }
+
     const tokens: Record<string, number> = {
       '--md-sys-color-primary': scheme.primary,
       '--md-sys-color-on-primary': scheme.onPrimary,
@@ -55,6 +91,7 @@ export const Monet = {
       '--md-sys-color-inverse-primary': scheme.inversePrimary,
       '--md-sys-color-shadow': scheme.shadow,
     };
+    
     const root = document.documentElement.style;
     for (const [key, value] of Object.entries(tokens)) {
       root.setProperty(key, hexFromArgb(value));

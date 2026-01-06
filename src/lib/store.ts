@@ -7,7 +7,7 @@ import { createSignal, createMemo, createEffect } from 'solid-js';
 import { API } from './api';
 import { DEFAULT_CONFIG, DEFAULT_SEED } from './constants';
 import { APP_VERSION } from './constants_gen';
-import { Monet } from './theme';
+import { Monet, ThemeStyle } from './theme';
 import type { 
   AppConfig, 
   Module, 
@@ -30,6 +30,7 @@ export interface LogEntry {
 
 const createGlobalStore = () => {
   const [theme, setThemeSignal] = createSignal<'auto' | 'light' | 'dark'>('auto');
+  const [themeStyle, setThemeStyleSignal] = createSignal<ThemeStyle>('TONAL_SPOT');
   const [isSystemDark, setIsSystemDark] = createSignal(false);
   const [lang, setLangSignal] = createSignal('en');
   const [seed, setSeed] = createSignal<string | null>(DEFAULT_SEED);
@@ -105,14 +106,19 @@ const createGlobalStore = () => {
     setThemeSignal(t);
   }
 
+  function setThemeStyle(s: ThemeStyle) {
+    setThemeStyleSignal(s);
+  }
+
   createEffect(() => {
     const currentTheme = theme();
     const sysDark = isSystemDark();
     const currentSeed = seed();
+    const currentStyle = themeStyle();
 
     const isDark = currentTheme === 'auto' ? sysDark : currentTheme === 'dark';
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    Monet.apply(currentSeed, isDark);
+    Monet.apply(currentSeed, isDark, currentStyle);
   });
 
   async function loadLocale(code: string) {
@@ -289,6 +295,7 @@ const createGlobalStore = () => {
 
   return {
     get theme() { return theme(); },
+    get themeStyle() { return themeStyle(); },
     get isSystemDark() { return isSystemDark(); },
     get lang() { return lang(); },
     get seed() { return seed(); },
@@ -302,6 +309,7 @@ const createGlobalStore = () => {
     toggleBottomNavFix,
     showToast,
     setTheme,
+    setThemeStyle,
     setLang,
     init,
     
