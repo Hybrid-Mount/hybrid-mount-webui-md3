@@ -1,8 +1,3 @@
-/**
- * Copyright 2025 Meta-Hybrid Mount Authors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 import { createSignal, createEffect, createMemo, Show, For } from 'solid-js';
 import { store } from '../lib/store';
 import { ICONS } from '../lib/constants';
@@ -109,9 +104,13 @@ export default function ConfigTab() {
     updateConfig('overlay_mode', mode as OverlayMode);
   }
 
-  const availableModes = createMemo(() => 
-    store.systemInfo?.supported_overlay_modes ?? (['tmpfs', 'ext4', 'erofs'] as OverlayMode[])
-  );
+  const availableModes = createMemo(() => {
+    const storageModes = (store.storage as any)?.supported_modes;
+    if (storageModes && Array.isArray(storageModes)) {
+        return storageModes as OverlayMode[];
+    }
+    return store.systemInfo?.supported_overlay_modes ?? (['tmpfs', 'ext4', 'erofs'] as OverlayMode[]);
+  });
 
   const MODE_DESCS: Record<OverlayMode, string> = {
     'tmpfs': 'RAM-based. Fastest I/O, reset on reboot.',

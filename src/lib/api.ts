@@ -1,8 +1,3 @@
-/**
- * Copyright 2025 Meta-Hybrid Mount Authors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 import { DEFAULT_CONFIG, PATHS } from './constants';
 import { APP_VERSION } from './constants_gen';
 import { MockAPI } from './api.mock';
@@ -138,15 +133,17 @@ const RealAPI: AppAPI = {
     if (!ksuExec) return { size: '-', used: '-', percent: '0%', type: null };
     try {
       const stateFile = (PATHS as any).DAEMON_STATE || "/data/adb/meta-hybrid/run/daemon_state.json";
-      const cmd = `cat "${stateFile}"`;
+      const cmd = `${PATHS.BINARY} storage`;
       const { errno, stdout } = await ksuExec(cmd);
       if (errno === 0 && stdout) {
         const state = JSON.parse(stdout);
         return {
-          type: state.storage_mode || 'unknown',
-          percent: `${state.storage_percent ?? 0}%`,
-          size: formatBytes(state.storage_total ?? 0),
-          used: formatBytes(state.storage_used ?? 0)
+          type: state.type || 'unknown',
+          percent: `${state.usage_percent ?? 0}%`,
+          size: formatBytes(state.total_size ?? 0),
+          used: formatBytes(state.used_size ?? 0),
+          // @ts-ignore
+          supported_modes: state.supported_modes || ['tmpfs', 'ext4', 'erofs']
         };
       }
     } catch (e) {}
