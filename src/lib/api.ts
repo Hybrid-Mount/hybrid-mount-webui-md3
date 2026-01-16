@@ -1,7 +1,7 @@
 import { DEFAULT_CONFIG, PATHS } from './constants';
 import { APP_VERSION } from './constants_gen';
 import { MockAPI } from './api.mock';
-import type { AppConfig, Module, StorageStatus, SystemInfo, DeviceInfo, ConflictEntry, DiagnosticIssue, Silo } from './types';
+import type { AppConfig, Module, StorageStatus, SystemInfo, DeviceInfo, ConflictEntry, DiagnosticIssue, Silo, ModuleRules } from './types';
 
 interface KsuExecResult {
   errno: number;
@@ -58,6 +58,7 @@ interface AppAPI {
   resetConfig: () => Promise<void>;
   scanModules: (path?: string) => Promise<Module[]>;
   saveModules: (modules: Module[]) => Promise<void>;
+  saveModuleRules: (moduleId: string, rules: ModuleRules) => Promise<void>;
   readLogs: (logPath?: string, lines?: number) => Promise<string>;
   getStorageUsage: () => Promise<StorageStatus>;
   getSystemInfo: () => Promise<SystemInfo>;
@@ -101,7 +102,7 @@ const RealAPI: AppAPI = {
     const { errno, stderr } = await ksuExec(cmd);
     if (errno !== 0) throw new Error(`Failed to reset config: ${stderr}`);
   },
-  scanModules: async (path?: string): Promise<Module[]> => {
+  scanModules: async (_path?: string): Promise<Module[]> => {
     if (!ksuExec) return [];
     const cmd = `${PATHS.BINARY} modules`;
     try {
@@ -110,7 +111,15 @@ const RealAPI: AppAPI = {
     } catch (e) {}
     return [];
   },
-  saveModules: async (modules: Module[]): Promise<void> => { return; },
+  saveModules: async (_modules: Module[]): Promise<void> => { return; },
+  saveModuleRules: async (moduleId: string, rules: ModuleRules): Promise<void> => {
+    if (!ksuExec) throw new Error("No KSU environment");
+    const jsonStr = JSON.stringify(rules);
+    const hexPayload = stringToHex(jsonStr);
+    const cmd = `${PATHS.BINARY} save-module-rules --module "${moduleId}" --payload ${hexPayload}`;
+    const { errno, stderr } = await ksuExec(cmd);
+    if (errno !== 0) throw new Error(`Failed to save rules: ${stderr}`);
+  },
   readLogs: async (logPath?: string, lines = 1000): Promise<string> => {
     if (!ksuExec) return "";
     const f = logPath || (PATHS as any).DAEMON_LOG || "/data/adb/meta-hybrid/daemon.log";

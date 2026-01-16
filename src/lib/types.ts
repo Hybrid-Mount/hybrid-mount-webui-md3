@@ -3,6 +3,11 @@ export interface GranaryConfig {
   retention_days: number;
 }
 
+export interface ModuleRules {
+  default_mode: MountMode;
+  paths: Record<string, string>;
+}
+
 export type OverlayMode = 'tmpfs' | 'ext4' | 'erofs';
 
 export interface AppConfig {
@@ -32,6 +37,7 @@ export interface Module {
   is_mounted: boolean;
   enabled?: boolean;
   source_path?: string;
+  rules: ModuleRules;
 }
 
 export interface StorageStatus {
@@ -49,7 +55,7 @@ export interface SystemInfo {
   mountBase: string;
   activeMounts: string[];
   zygisksuEnforce?: string;
-  supported_overlay_modes?: OverlayMode[]; // For feature detection
+  supported_overlay_modes?: OverlayMode[];
 }
 
 export interface DeviceInfo {

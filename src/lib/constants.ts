@@ -1,8 +1,3 @@
-/**
- * Copyright 2025 Meta-Hybrid Mount Authors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 import { RUST_PATHS } from './constants_gen';
 import type { AppConfig } from './types';
 
@@ -16,9 +11,6 @@ export const DEFAULT_CONFIG: AppConfig = {
   disable_umount: false,
   allow_umount_coexistence: false,
   dry_run: false,
-  winnowing: {
-    rules: ''
-  },
   granary: {
     max_backups: 20,
     retention_days: 0
