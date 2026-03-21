@@ -57,9 +57,7 @@
     "mode_tmpfs": "Tmpfs",
     "mode_tmpfsDesc": "RAM-based. Fastest I/O, reset on reboot.",
     "mode_ext4": "Ext4",
-    "mode_ext4Desc": "Loopback image. Persistent, saves RAM.",
-    "mode_erofs": "EROFS",
-    "mode_erofsDesc": "Read-only compressed. High performance, space saving."
+    "mode_ext4Desc": "Loopback image. Persistent, saves RAM."
   },
   "modules": {
     "reload": "Обновить",

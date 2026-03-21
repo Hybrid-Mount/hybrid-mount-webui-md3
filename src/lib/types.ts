@@ -3,7 +3,7 @@ export interface ModuleRules {
   paths: Record<string, string>;
 }
 
-export type OverlayMode = "tmpfs" | "ext4" | "erofs";
+export type OverlayMode = "tmpfs" | "ext4";
 
 export interface AppConfig {
   moduledir: string;
@@ -30,7 +30,7 @@ export interface Module {
 }
 
 export interface StorageStatus {
-  type: "tmpfs" | "ext4" | "erofs" | "unknown" | null;
+  type: "tmpfs" | "ext4" | "unknown" | null;
   error?: string;
 }
 

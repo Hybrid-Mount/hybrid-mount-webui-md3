@@ -57,9 +57,7 @@
     "mode_tmpfs": "Tmpfs",
     "mode_tmpfsDesc": "基于内存，I/O性能优秀，重启即焚",
     "mode_ext4": "Ext4",
-    "mode_ext4Desc": "节省内存，使用 Loop 设备",
-    "mode_erofs": "EROFS",
-    "mode_erofsDesc": "高性能只读文件系统，极大节省空间"
+    "mode_ext4Desc": "节省内存，使用 Loop 设备"
   },
   "modules": {
     "reload": "刷新",

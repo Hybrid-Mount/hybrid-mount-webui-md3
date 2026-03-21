@@ -57,9 +57,7 @@
     "mode_tmpfs": "Tmpfs",
     "mode_tmpfsDesc": "RAM ベース、高速な I/O、再起動時にリセットされます。",
     "mode_ext4": "Ext4",
-    "mode_ext4Desc": "ループバックイメージ。永続的、RAM を節約できます。",
-    "mode_erofs": "EROFS",
-    "mode_erofsDesc": "読み取り専用な圧縮。高性能、省スペース。"
+    "mode_ext4Desc": "ループバックイメージ。永続的、RAM を節約できます。"
   },
   "modules": {
     "reload": "更新",

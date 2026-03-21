@@ -101,7 +101,7 @@ export default function ConfigTab() {
     } else {
       modes =
         sysStore.systemInfo?.supported_overlay_modes ??
-        (["tmpfs", "ext4", "erofs"] as OverlayMode[]);
+        (["tmpfs", "ext4"] as OverlayMode[]);
     }
 
     if (sysStore.systemInfo?.tmpfs_xattr_supported === false) {
@@ -114,7 +114,6 @@ export default function ConfigTab() {
   const MODE_DESCS: Record<OverlayMode, string> = {
     tmpfs: "RAM-based. Fastest I/O, reset on reboot.",
     ext4: "Loopback image. Persistent, saves RAM.",
-    erofs: "Read-only compressed. High performance, space saving.",
   };
 
   return (

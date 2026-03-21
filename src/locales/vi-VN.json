@@ -57,9 +57,7 @@
     "mode_tmpfs": "Tmpfs",
     "mode_tmpfsDesc": "Dựa trên RAM. I/O nhanh nhất, đặt lại khi khởi động lại.",
     "mode_ext4": "Ext4",
-    "mode_ext4Desc": "Hình ảnh lặp lại. Bền bỉ, tiết kiệm RAM.",
-    "mode_erofs": "EROFS",
-    "mode_erofsDesc": "Nén chỉ đọc. Hiệu năng cao, tiết kiệm không gian."
+    "mode_ext4Desc": "Hình ảnh lặp lại. Bền bỉ, tiết kiệm RAM."
   },
   "modules": {
     "reload": "Làm mới",
