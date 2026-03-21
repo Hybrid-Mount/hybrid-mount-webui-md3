@@ -88,7 +88,7 @@ export const MockAPI = {
   async getStorageUsage(): Promise<StorageStatus> {
     await delay(300);
     return {
-      type: "erofs",
+      type: "ext4",
     };
   },
   async getSystemInfo(): Promise<SystemInfo> {
