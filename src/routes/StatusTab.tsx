@@ -181,11 +181,19 @@ export default function StatusTab() {
             <div class="stats-legend">
               <div class="legend-item">
                 <div class="legend-dot dot-auto"></div>
-                <span>Overlay: {moduleStore.modeStats?.auto || 0}</span>
+                <span>
+                  {(uiStore.L.modules?.modes?.short?.auto ?? "Overlay") +
+                    ": " +
+                    (moduleStore.modeStats?.auto || 0)}
+                </span>
               </div>
               <div class="legend-item">
                 <div class="legend-dot dot-magic"></div>
-                <span>Magic: {moduleStore.modeStats?.magic || 0}</span>
+                <span>
+                  {(uiStore.L.modules?.modes?.short?.magic ?? "Magic") +
+                    ": " +
+                    (moduleStore.modeStats?.magic || 0)}
+                </span>
               </div>
             </div>
           </Show>

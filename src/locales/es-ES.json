@@ -26,7 +26,8 @@
     "kernel": "Núcleo",
     "selinux": "SELinux",
     "mountBase": "Base de montaje",
-    "activePartitions": "Particiones Activas"
+    "activePartitions": "Particiones Activas",
+    "loadError": "Failed to load system status"
   },
   "config": {
     "disableUmount": "Desactivar Umount",
@@ -78,7 +79,12 @@
         "magic": "Magic",
         "ignore": "Ignorar"
       }
-    }
+    },
+    "emptyState": "No modules found.",
+    "unmountedHiddenHint": "Unmounted modules are hidden.",
+    "defaultTag": "Default",
+    "compatTag": "Compat",
+    "disableTag": "Disable"
   },
   "logs": {
     "refresh": "Refresh"
@@ -88,6 +94,9 @@
     "donate": "Donar",
     "contributors": "Colaboradores",
     "loadFail": "Error al cargar (Límite de API)",
-    "noBio": "Sin biografía disponible"
+    "noBio": "Sin biografía disponible",
+    "telegram": "Telegram",
+    "supportUs": "Support Us",
+    "authorYuzaki": "YuzakiKokuban"
   }
 }

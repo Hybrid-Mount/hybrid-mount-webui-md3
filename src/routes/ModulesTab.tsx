@@ -199,8 +199,12 @@ export default function ModulesTab() {
                 title={uiStore.L.modules?.filterLabel || "Filter modules"}
               >
                 <option value="all">{uiStore.L.modules?.filterAll}</option>
-                <option value="auto">Overlay</option>
-                <option value="magic">Magic</option>
+                <option value="auto">
+                  {uiStore.L.modules?.modes?.short?.auto ?? "Overlay"}
+                </option>
+                <option value="magic">
+                  {uiStore.L.modules?.modes?.short?.magic ?? "Magic"}
+                </option>
               </select>
             </div>
           </div>
@@ -219,7 +223,7 @@ export default function ModulesTab() {
               when={filteredModules().length > 0}
               fallback={
                 <div class="empty-state">
-                  <div>No modules found.</div>
+                  <div>{uiStore.L.modules?.emptyState ?? "No modules found."}</div>
                   <Show when={!showUnmounted()}>
                     <div
                       style={{
@@ -228,7 +232,8 @@ export default function ModulesTab() {
                         "margin-top": "8px",
                       }}
                     >
-                      Unmounted modules are hidden.
+                      {uiStore.L.modules?.unmountedHiddenHint ??
+                        "Unmounted modules are hidden."}
                     </div>
                   </Show>
                 </div>
@@ -280,7 +285,9 @@ export default function ModulesTab() {
                                   {uiStore.L.modules?.modes?.short?.auto ??
                                     "Overlay"}
                                 </span>
-                                <span class="opt-sub">Default</span>
+                                <span class="opt-sub">
+                                  {uiStore.L.modules?.defaultTag ?? "Default"}
+                                </span>
                               </button>
                               <button
                                 class={`strategy-option ${mod.rules.default_mode === "magic" ? "selected" : ""}`}
@@ -290,7 +297,9 @@ export default function ModulesTab() {
                                   {uiStore.L.modules?.modes?.short?.magic ??
                                     "Magic"}
                                 </span>
-                                <span class="opt-sub">Compat</span>
+                                <span class="opt-sub">
+                                  {uiStore.L.modules?.compatTag ?? "Compat"}
+                                </span>
                               </button>
                               <button
                                 class={`strategy-option ${mod.rules.default_mode === "ignore" ? "selected" : ""}`}
@@ -300,7 +309,9 @@ export default function ModulesTab() {
                                   {uiStore.L.modules?.modes?.short?.ignore ??
                                     "Ignore"}
                                 </span>
-                                <span class="opt-sub">Disable</span>
+                                <span class="opt-sub">
+                                  {uiStore.L.modules?.disableTag ?? "Disable"}
+                                </span>
                               </button>
                             </div>
                           </div>

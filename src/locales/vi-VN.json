@@ -26,7 +26,8 @@
     "kernel": "Kernel",
     "selinux": "SELinux",
     "mountBase": "Cơ sở Gắn kết",
-    "activePartitions": "Phân vùng Đang hoạt động"
+    "activePartitions": "Phân vùng Đang hoạt động",
+    "loadError": "Failed to load system status"
   },
   "config": {
     "disableUmount": "Tắt Umount",
@@ -78,7 +79,12 @@
         "magic": "Magic",
         "ignore": "Phớt lờ"
       }
-    }
+    },
+    "emptyState": "No modules found.",
+    "unmountedHiddenHint": "Unmounted modules are hidden.",
+    "defaultTag": "Default",
+    "compatTag": "Compat",
+    "disableTag": "Disable"
   },
   "logs": {
     "refresh": "Làm mới"
@@ -88,6 +94,9 @@
     "donate": "Quyên góp",
     "contributors": "Những người đóng góp",
     "loadFail": "Thất bại khi tải (Giới hạn Tỷ lệ API)",
-    "noBio": "Không có sẵn tiểu sử"
+    "noBio": "Không có sẵn tiểu sử",
+    "telegram": "Telegram",
+    "supportUs": "Support Us",
+    "authorYuzaki": "YuzakiKokuban"
   }
 }

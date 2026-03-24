@@ -4,18 +4,12 @@
  */
 
 import js from "@eslint/js";
-import tseslint from "typescript-eslint";
-import solid from "eslint-plugin-solid";
 import globals from "globals";
 
-export default tseslint.config(
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
+export default [
   {
-    files: ["**/*.{ts,tsx}"],
-    ...solid.configs["typescript-recommended"],
-  },
-  {
+    ...js.configs.recommended,
+    files: ["**/*.{js,mjs,cjs}"],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -26,4 +20,4 @@ export default tseslint.config(
   {
     ignores: ["dist/**", "node_modules/**"],
   },
-);
+];

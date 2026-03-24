@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build --emptyOutDir",
     "preview": "vite preview",
-    "lint": "eslint .",
+    "lint": "eslint . && tsc --noEmit",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write ."
   },

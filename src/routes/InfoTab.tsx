@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show, For } from "solid-js";
+import { createSignal, onMount, onCleanup, Show, For } from "solid-js";
 import { uiStore } from "../lib/stores/uiStore";
 import { sysStore } from "../lib/stores/sysStore";
 import { API } from "../lib/api";
@@ -19,6 +19,7 @@ const TELEGRAM_LINK = "https://t.me/hybridmountchat";
 const PAYPAL_LINK = "https://www.paypal.me/LangQin280";
 const CACHE_KEY = "hm_contributors_cache";
 const CACHE_DURATION = 1000 * 60 * 60;
+const DETAIL_FETCH_LIMIT = 12;
 
 interface Contributor {
   login: string;
@@ -28,6 +29,11 @@ interface Contributor {
   url: string;
   name?: string;
   bio?: string;
+}
+
+interface ContributorCache {
+  data: Contributor[];
+  timestamp: number;
 }
 
 interface MdDialogElement extends HTMLElement {
@@ -41,6 +47,7 @@ export default function InfoTab() {
   const [error, setError] = createSignal(false);
   const [version, setVersion] = createSignal(sysStore.version);
   const [activeQr, setActiveQr] = createSignal<string>("");
+  const controller = new AbortController();
 
   let donateDialogRef: HTMLElement | undefined;
   let qrDialogRef: HTMLElement | undefined;
@@ -56,12 +63,13 @@ export default function InfoTab() {
     }
     await fetchContributors();
   });
+  onCleanup(() => controller.abort());
 
   async function fetchContributors() {
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       try {
-        const { data, timestamp } = JSON.parse(cached);
+        const { data, timestamp } = JSON.parse(cached) as ContributorCache;
         if (Date.now() - timestamp < CACHE_DURATION) {
           setContributors(data);
           setLoading(false);
@@ -75,6 +83,7 @@ export default function InfoTab() {
     try {
       const res = await fetch(
         `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contributors`,
+        { signal: controller.signal },
       );
       if (!res.ok) throw new Error("Failed to fetch list");
 
@@ -85,33 +94,36 @@ export default function InfoTab() {
         return !isBotType && !hasBotName;
       });
 
-      const detailPromises = filteredList.map(async (user: Contributor) => {
-        try {
-          const detailRes = await fetch(user.url);
-          if (detailRes.ok) {
-            const detail = await detailRes.json();
-            return {
-              ...user,
-              bio: detail.bio,
-              name: detail.name || user.login,
-            };
-          }
-        } catch (e) {
-          console.warn(e);
+      const enriched = [...filteredList];
+      const targets = filteredList.slice(0, DETAIL_FETCH_LIMIT);
+      const details = await Promise.allSettled(
+        targets.map(async (user: Contributor) => {
+          const detailRes = await fetch(user.url, { signal: controller.signal });
+          if (!detailRes.ok) throw new Error(`Failed to fetch ${user.login}`);
+          const detail = await detailRes.json();
+          return {
+            ...user,
+            bio: detail.bio || user.bio,
+            name: detail.name || user.login,
+          } as Contributor;
+        }),
+      );
+      details.forEach((result, index) => {
+        if (result.status === "fulfilled") {
+          enriched[index] = result.value;
         }
-        return user;
       });
 
-      const results = await Promise.all(detailPromises);
-      setContributors(results);
+      setContributors(enriched);
       localStorage.setItem(
         CACHE_KEY,
         JSON.stringify({
-          data: results,
+          data: enriched,
           timestamp: Date.now(),
         }),
       );
     } catch (e) {
+      if ((e as Error).name === "AbortError") return;
       console.error(e);
       setError(true);
     } finally {
@@ -241,9 +253,9 @@ export default function InfoTab() {
           {uiStore.L.info.projectLink}
         </md-filled-tonal-button>
 
-        <md-filled-tonal-button
-          class="action-btn"
-          onClick={(e: MouseEvent) => handleLink(e, TELEGRAM_LINK)}
+          <md-filled-tonal-button
+            class="action-btn"
+            onClick={(e: MouseEvent) => handleLink(e, TELEGRAM_LINK)}
           role="button"
           tabIndex={0}
         >
@@ -252,7 +264,7 @@ export default function InfoTab() {
               <path d={ICONS.telegram} />
             </svg>
           </md-icon>
-          Telegram
+          {uiStore.L.info?.telegram ?? "Telegram"}
         </md-filled-tonal-button>
 
         <md-filled-tonal-button
@@ -328,10 +340,12 @@ export default function InfoTab() {
       </div>
 
       <md-dialog ref={donateDialogRef} class="donate-dialog">
-        <div slot="headline">Support Us</div>
+        <div slot="headline">{uiStore.L.info?.supportUs ?? "Support Us"}</div>
         <div slot="content" class="donate-content">
           <div class="donate-section">
-            <div class="author-label">YuzakiKokuban</div>
+            <div class="author-label">
+              {uiStore.L.info?.authorYuzaki ?? "YuzakiKokuban"}
+            </div>
             <div class="donate-grid">
               <md-filled-tonal-button
                 onClick={() => openQr("/assets/donate/yuzaki_alipay.jpg")}

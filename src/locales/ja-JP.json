@@ -26,7 +26,8 @@
     "kernel": "カーネル",
     "selinux": "SELinux",
     "mountBase": "マウントベース",
-    "activePartitions": "有効なパーティション"
+    "activePartitions": "有効なパーティション",
+    "loadError": "Failed to load system status"
   },
   "config": {
     "disableUmount": "アンマウントを無効",
@@ -78,7 +79,12 @@
         "magic": "Magic",
         "ignore": "無視"
       }
-    }
+    },
+    "emptyState": "No modules found.",
+    "unmountedHiddenHint": "Unmounted modules are hidden.",
+    "defaultTag": "Default",
+    "compatTag": "Compat",
+    "disableTag": "Disable"
   },
   "logs": {
     "refresh": "更新"
@@ -88,6 +94,9 @@
     "donate": "寄付",
     "contributors": "貢献者",
     "loadFail": "読み込みに失敗しました (API 制限)",
-    "noBio": "自己紹介はありません"
+    "noBio": "自己紹介はありません",
+    "telegram": "Telegram",
+    "supportUs": "Support Us",
+    "authorYuzaki": "YuzakiKokuban"
   }
 }

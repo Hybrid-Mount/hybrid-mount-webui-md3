@@ -26,7 +26,8 @@
     "kernel": "内核版本",
     "selinux": "SELinux",
     "mountBase": "挂载基点",
-    "activePartitions": "活跃分区"
+    "activePartitions": "活跃分区",
+    "loadError": "系统状态加载失败"
   },
   "config": {
     "disableUmount": "禁用Umount",
@@ -78,7 +79,12 @@
         "magic": "Magic",
         "ignore": "忽略"
       }
-    }
+    },
+    "emptyState": "未找到模块。",
+    "unmountedHiddenHint": "未挂载模块已隐藏。",
+    "defaultTag": "默认",
+    "compatTag": "兼容",
+    "disableTag": "禁用"
   },
   "logs": {
     "refresh": "刷新"
@@ -88,6 +94,9 @@
     "donate": "捐赠支持",
     "contributors": "贡献者",
     "loadFail": "加载失败 (可能触发 API 限制)",
-    "noBio": "这位开发者很懒，什么都没写"
+    "noBio": "这位开发者很懒，什么都没写",
+    "telegram": "电报群",
+    "supportUs": "支持我们",
+    "authorYuzaki": "YuzakiKokuban"
   }
 }

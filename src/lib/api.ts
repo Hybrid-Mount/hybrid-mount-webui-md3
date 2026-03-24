@@ -29,6 +29,10 @@ try {
 
 const shouldUseMock = import.meta.env.DEV || !ksuExec;
 
+function shellEscapeDoubleQuoted(value: string): string {
+  return value.replace(/(["\\$`])/g, "\\$1");
+}
+
 function stringToHex(str: string): string {
   let bytes: Uint8Array;
   if (typeof TextEncoder !== "undefined") {
@@ -104,13 +108,29 @@ const RealAPI: AppAPI = {
     if (errno === 0 && stdout) return JSON.parse(stdout);
     throw new AppError(`scanModules failed: ${stderr}`, errno);
   },
-  saveModules: async (): Promise<void> => {
-    return;
+  saveModules: async (modules: Module[]): Promise<void> => {
+    if (!ksuExec) throw new AppError("No KSU environment");
+    for (const mod of modules) {
+      const hexPayload = stringToHex(JSON.stringify(mod.rules));
+      const safeModuleId = shellEscapeDoubleQuoted(mod.id);
+      const cmd = `${PATHS.BINARY} save-module-rules --module "${safeModuleId}" --payload ${hexPayload}`;
+      const { errno, stderr } = await ksuExec(cmd);
+      if (errno !== 0)
+        throw new AppError(
+          `saveModules failed for ${mod.id}: ${stderr}`,
+          errno,
+        );
+    }
   },
   readLogs: async (): Promise<string> => {
     if (!ksuExec) throw new AppError("No KSU environment");
+    let logPath = DEFAULT_CONFIG.logfile || "/data/adb/hybrid-mount/daemon.log";
+    try {
+      const cfg = await RealAPI.loadConfig();
+      if (cfg.logfile) logPath = cfg.logfile;
+    } catch {}
     const { errno, stdout, stderr } = await ksuExec(
-      `cat "${DEFAULT_CONFIG.logfile}"`,
+      `cat "${shellEscapeDoubleQuoted(logPath)}"`,
     );
     if (errno === 0 && stdout) return stdout;
     throw new AppError(`readLogs failed: ${stderr}`, errno);
@@ -121,7 +141,8 @@ const RealAPI: AppAPI = {
   ): Promise<void> => {
     if (!ksuExec) throw new AppError("No KSU environment");
     const hexPayload = stringToHex(JSON.stringify(rules));
-    const cmd = `${PATHS.BINARY} save-module-rules --module "${moduleId}" --payload ${hexPayload}`;
+    const safeModuleId = shellEscapeDoubleQuoted(moduleId);
+    const cmd = `${PATHS.BINARY} save-module-rules --module "${safeModuleId}" --payload ${hexPayload}`;
     const { errno, stderr } = await ksuExec(cmd);
     if (errno !== 0)
       throw new AppError(`saveModuleRules failed: ${stderr}`, errno);
@@ -201,11 +222,12 @@ const RealAPI: AppAPI = {
   },
   openLink: async (url: string): Promise<void> => {
     if (!ksuExec) {
-      window.open(url, "_blank");
+      window.open(url, "_blank", "noopener,noreferrer");
       return;
     }
+    const safeUrl = shellEscapeDoubleQuoted(url);
     await ksuExec(
-      `am start -a android.intent.action.VIEW -d "${url.replace(/"/g, '\\"')}"`,
+      `am start -a android.intent.action.VIEW -d "${safeUrl}"`,
     );
   },
   reboot: async (): Promise<void> => {

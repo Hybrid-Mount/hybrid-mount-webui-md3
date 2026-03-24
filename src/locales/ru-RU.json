@@ -26,7 +26,8 @@
     "kernel": "Ядро",
     "selinux": "SELinux",
     "mountBase": "База монтирования",
-    "activePartitions": "Активные разделы"
+    "activePartitions": "Активные разделы",
+    "loadError": "Failed to load system status"
   },
   "config": {
     "disableUmount": "Отключить Umount",
@@ -78,7 +79,12 @@
         "magic": "Magic",
         "ignore": "Ignore"
       }
-    }
+    },
+    "emptyState": "No modules found.",
+    "unmountedHiddenHint": "Unmounted modules are hidden.",
+    "defaultTag": "Default",
+    "compatTag": "Compat",
+    "disableTag": "Disable"
   },
   "logs": {
     "refresh": "Refresh"
@@ -88,6 +94,9 @@
     "donate": "Пожертвовать",
     "contributors": "Участники",
     "loadFail": "Ошибка загрузки (Лимит API)",
-    "noBio": "Биография отсутствует"
+    "noBio": "Биография отсутствует",
+    "telegram": "Telegram",
+    "supportUs": "Support Us",
+    "authorYuzaki": "YuzakiKokuban"
   }
 }

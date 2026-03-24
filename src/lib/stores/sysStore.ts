@@ -1,6 +1,7 @@
 import { createSignal, createRoot } from "solid-js";
 import { API } from "../api";
 import { APP_VERSION } from "../constants_gen";
+import { uiStore } from "./uiStore";
 import type { StorageStatus, SystemInfo, DeviceInfo } from "../types";
 
 const createSysStore = () => {
@@ -24,16 +25,24 @@ const createSysStore = () => {
   async function loadStatus() {
     setLoading(true);
     try {
-      const d = await API.getDeviceStatus();
+      const [d, v, s, info] = await Promise.all([
+        API.getDeviceStatus(),
+        API.getVersion(),
+        API.getStorageUsage(),
+        API.getSystemInfo(),
+      ]);
       setDevice(d);
-      const v = await API.getVersion();
       setVersion(v);
-      const s = await API.getStorageUsage();
       setStorage(s);
-      const info = await API.getSystemInfo();
       setSystemInfo(info);
       setActivePartitions(info.activeMounts || []);
-    } catch {}
+    } catch (e) {
+      console.error("Failed to load system status", e);
+      uiStore.showToast(
+        uiStore.L.status?.loadError || "Failed to load system status",
+        "error",
+      );
+    }
     setLoading(false);
   }
 

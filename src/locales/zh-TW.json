@@ -26,7 +26,8 @@
     "kernel": "核心版本",
     "selinux": "SELinux",
     "mountBase": "掛載基點 (Mount Base)",
-    "activePartitions": "活躍分區"
+    "activePartitions": "活躍分區",
+    "loadError": "Failed to load system status"
   },
   "config": {
     "disableUmount": "禁用命名空間分離",
@@ -78,7 +79,12 @@
         "magic": "Magic",
         "ignore": "忽略"
       }
-    }
+    },
+    "emptyState": "No modules found.",
+    "unmountedHiddenHint": "Unmounted modules are hidden.",
+    "defaultTag": "Default",
+    "compatTag": "Compat",
+    "disableTag": "Disable"
   },
   "logs": {
     "refresh": "Refresh"
@@ -88,6 +94,9 @@
     "donate": "捐贈支持",
     "contributors": "貢獻者",
     "loadFail": "載入失敗 (可能觸發 API 限制)",
-    "noBio": "這位開發者很懶，什麼都沒寫"
+    "noBio": "這位開發者很懶，什麼都沒寫",
+    "telegram": "Telegram",
+    "supportUs": "Support Us",
+    "authorYuzaki": "YuzakiKokuban"
   }
 }
