@@ -64,12 +64,26 @@ export default function ModulesTab() {
     });
   }
 
+  const moduleRuleSignatures = createMemo<Record<string, string>>(() => {
+    const signatures: Record<string, string> = {};
+    moduleStore.modules.forEach((m) => {
+      signatures[m.id] = JSON.stringify(m.rules);
+    });
+    return signatures;
+  });
+
+  const dirtyModuleIds = createMemo(() => {
+    const dirty = new Set<string>();
+    const signatures = moduleRuleSignatures();
+    const snapshots = initialRulesSnapshot();
+    for (const [id, initial] of Object.entries(snapshots)) {
+      if (signatures[id] !== initial) dirty.add(id);
+    }
+    return dirty;
+  });
+
   const dirtyModules = createMemo(() =>
-    moduleStore.modules.filter((m) => {
-      const initial = initialRulesSnapshot()[m.id];
-      if (!initial) return false;
-      return JSON.stringify(m.rules) !== initial;
-    }),
+    moduleStore.modules.filter((m) => dirtyModuleIds().has(m.id)),
   );
 
   const isDirty = createMemo(() => dirtyModules().length > 0);
@@ -102,22 +116,26 @@ export default function ModulesTab() {
     }
   }
 
-  const filteredModules = createMemo(() =>
-    moduleStore.modules.filter((m) => {
-      const q = deferredSearchQuery().toLowerCase();
-      if (!m.is_mounted && !showUnmounted()) {
-        return false;
-      }
+  const normalizedSearchQuery = createMemo(() =>
+    deferredSearchQuery().trim().toLowerCase(),
+  );
+
+  const filteredModules = createMemo(() => {
+    const q = normalizedSearchQuery();
+    const typeFilter = filterType();
+    const shouldShowUnmounted = showUnmounted();
+    return moduleStore.modules.filter((m) => {
+      if (!m.is_mounted && !shouldShowUnmounted) return false;
       const matchSearch =
         m.name.toLowerCase().includes(q) || m.id.toLowerCase().includes(q);
       if (!matchSearch) return false;
-      if (filterType() !== "all" && m.mode !== filterType()) {
+      if (typeFilter !== "all" && m.mode !== typeFilter) {
         return false;
       }
 
       return true;
-    }),
-  );
+    });
+  });
 
   function toggleExpand(id: string) {
     if (expandedId() === id) {
@@ -242,7 +260,7 @@ export default function ModulesTab() {
               <For each={filteredModules().slice(0, visibleCount())}>
                 {(mod) => (
                   <div
-                    class={`module-card ${expandedId() === mod.id ? "expanded" : ""} ${initialRulesSnapshot()[mod.id] !== JSON.stringify(mod.rules) ? "dirty" : ""}`}
+                    class={`module-card ${expandedId() === mod.id ? "expanded" : ""} ${dirtyModuleIds().has(mod.id) ? "dirty" : ""}`}
                   >
                     <div
                       class="module-header"

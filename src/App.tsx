@@ -1,4 +1,12 @@
-import { createSignal, createMemo, onMount, Show, lazy, For } from "solid-js";
+import {
+  createSignal,
+  createMemo,
+  createEffect,
+  onMount,
+  Show,
+  lazy,
+  For,
+} from "solid-js";
 import { uiStore } from "./lib/stores/uiStore";
 import { configStore } from "./lib/stores/configStore";
 import { sysStore } from "./lib/stores/sysStore";
@@ -12,11 +20,15 @@ const routes = [
   { id: "modules", component: lazy(() => import("./routes/ModulesTab")) },
   { id: "info", component: lazy(() => import("./routes/InfoTab")) },
 ];
+const visibleTabIds = routes.map((r) => r.id);
 
 export default function App() {
   const [activeTab, setActiveTab] = createSignal("status");
   const [dragOffset, setDragOffset] = createSignal(0);
   const [isDragging, setIsDragging] = createSignal(false);
+  const [mountedTabs, setMountedTabs] = createSignal<Set<string>>(
+    new Set(["status"]),
+  );
 
   let containerRef: HTMLDivElement | undefined;
   let containerWidth = 0;
@@ -25,12 +37,29 @@ export default function App() {
   let ticking = false;
   let rafId: number | null = null;
 
-  const visibleTabs = createMemo(() => routes.map((r) => r.id));
-
   const baseTranslateX = createMemo(() => {
-    const index = visibleTabs().indexOf(activeTab());
-    return index * -(100 / visibleTabs().length);
+    const index = visibleTabIds.indexOf(activeTab());
+    return index * -(100 / visibleTabIds.length);
   });
+
+  const activeTabIndex = createMemo(() => visibleTabIds.indexOf(activeTab()));
+
+  createEffect(() => {
+    const current = activeTab();
+    setMountedTabs((prev) => {
+      if (prev.has(current)) return prev;
+      const next = new Set(prev);
+      next.add(current);
+      return next;
+    });
+  });
+
+  const shouldRenderTab = (tabId: string) => {
+    if (mountedTabs().has(tabId)) return true;
+    const index = visibleTabIds.indexOf(tabId);
+    if (index === -1) return false;
+    return Math.abs(index - activeTabIndex()) <= 1;
+  };
 
   function handleTouchStart(e: TouchEvent) {
     touchStartX = e.changedTouches[0].screenX;
@@ -60,7 +89,7 @@ export default function App() {
         ticking = false;
         rafId = null;
         if (!isDragging()) return;
-        const tabs = visibleTabs();
+        const tabs = visibleTabIds;
         const currentIndex = tabs.indexOf(activeTab());
         if (
           (currentIndex === 0 && diffX > 0) ||
@@ -83,7 +112,7 @@ export default function App() {
     }
     if (containerRef) containerWidth = containerRef.clientWidth;
     const threshold = containerWidth * 0.33 || 80;
-    const tabs = visibleTabs();
+    const tabs = visibleTabIds;
     const currentIndex = tabs.indexOf(activeTab());
     let nextIndex = currentIndex;
     const currentOffset = dragOffset();
@@ -126,7 +155,7 @@ export default function App() {
             class="swipe-track"
             style={{
               transform: `translateX(calc(${baseTranslateX()}% + ${dragOffset()}px))`,
-              width: `${visibleTabs().length * 100}%`,
+              width: `${visibleTabIds.length * 100}%`,
               transition: isDragging()
                 ? "none"
                 : "transform 0.4s cubic-bezier(0.2, 1, 0.2, 1)",
@@ -136,11 +165,13 @@ export default function App() {
               {(route) => (
                 <div
                   class="swipe-page"
-                  style={{ width: `${100 / visibleTabs().length}%` }}
+                  style={{ width: `${100 / visibleTabIds.length}%` }}
                 >
-                  <div class="page-scroller">
-                    <route.component />
-                  </div>
+                  <Show when={shouldRenderTab(route.id)}>
+                    <div class="page-scroller">
+                      <route.component />
+                    </div>
+                  </Show>
                 </div>
               )}
             </For>
