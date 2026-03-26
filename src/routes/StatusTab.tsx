@@ -1,4 +1,4 @@
-import { createMemo, createSignal, onMount, Show, For } from "solid-js";
+import { createMemo, createSignal, Show, For } from "solid-js";
 import { uiStore } from "../lib/stores/uiStore";
 import { sysStore } from "../lib/stores/sysStore";
 import { configStore } from "../lib/stores/configStore";
@@ -17,10 +17,6 @@ import "@material/web/button/text-button.js";
 import "@material/web/ripple/ripple.js";
 
 export default function StatusTab() {
-  onMount(() => {
-    sysStore.loadStatus();
-  });
-
   const displayPartitions = createMemo(() => [
     ...new Set([
       ...BUILTIN_PARTITIONS,

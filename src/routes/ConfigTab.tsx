@@ -26,19 +26,22 @@ export default function ConfigTab() {
   const invalidModuleDir = createMemo(
     () => !isValidPath(configStore.config.moduledir),
   );
+  const configSignature = createMemo(() => JSON.stringify(configStore.config));
 
   const isDirty = createMemo(() => {
-    if (!initialConfigStr()) return false;
-    return JSON.stringify(configStore.config) !== initialConfigStr();
+    const initial = initialConfigStr();
+    if (!initial) return false;
+    return configSignature() !== initial;
   });
 
   createEffect(() => {
     if (!configStore.loading && configStore.config) {
+      const current = configSignature();
       if (
         !initialConfigStr() ||
-        initialConfigStr() === JSON.stringify(configStore.config)
+        initialConfigStr() === current
       ) {
-        setInitialConfigStr(JSON.stringify(configStore.config));
+        setInitialConfigStr(current);
       }
     }
   });
@@ -56,20 +59,20 @@ export default function ConfigTab() {
       return;
     }
     configStore.saveConfig().then(() => {
-      setInitialConfigStr(JSON.stringify(configStore.config));
+      setInitialConfigStr(configSignature());
     });
   }
 
   function reload() {
     configStore.loadConfig().then(() => {
-      setInitialConfigStr(JSON.stringify(configStore.config));
+      setInitialConfigStr(configSignature());
     });
   }
 
   function reset() {
     setShowResetConfirm(false);
     configStore.resetConfig().then(() => {
-      setInitialConfigStr(JSON.stringify(configStore.config));
+      setInitialConfigStr(configSignature());
     });
   }
 
