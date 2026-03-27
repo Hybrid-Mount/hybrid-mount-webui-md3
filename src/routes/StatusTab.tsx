@@ -1,4 +1,4 @@
-import { createMemo, createSignal, Show, For } from "solid-js";
+import { createMemo, createSignal, Show, For, createEffect } from "solid-js";
 import { uiStore } from "../lib/stores/uiStore";
 import { sysStore } from "../lib/stores/sysStore";
 import { configStore } from "../lib/stores/configStore";
@@ -17,6 +17,9 @@ import "@material/web/button/text-button.js";
 import "@material/web/ripple/ripple.js";
 
 export default function StatusTab() {
+  let autoBarRef: HTMLDivElement | undefined;
+  let magicBarRef: HTMLDivElement | undefined;
+
   const displayPartitions = createMemo(() => [
     ...new Set([
       ...BUILTIN_PARTITIONS,
@@ -46,11 +49,15 @@ export default function StatusTab() {
     };
   });
 
-  function widthClass(percent: number) {
-    const normalized = Number.isFinite(percent) ? Math.round(percent) : 0;
-    const clamped = Math.min(100, Math.max(0, normalized));
-    return `w-${clamped}`;
-  }
+  createEffect(() => {
+    const distribution = modeDistribution();
+    if (autoBarRef) {
+      autoBarRef.style.width = `${Math.max(0, Math.min(100, distribution.auto))}%`;
+    }
+    if (magicBarRef) {
+      magicBarRef.style.width = `${Math.max(0, Math.min(100, distribution.magic))}%`;
+    }
+  });
 
   return (
     <>
@@ -165,10 +172,12 @@ export default function StatusTab() {
           >
             <div class="stats-bar-container">
               <div
-                class={`bar-segment bar-auto ${widthClass(modeDistribution().auto)}`}
+                class="bar-segment bar-auto"
+                ref={autoBarRef}
               ></div>
               <div
-                class={`bar-segment bar-magic ${widthClass(modeDistribution().magic)}`}
+                class="bar-segment bar-magic"
+                ref={magicBarRef}
               ></div>
             </div>
             <div class="stats-legend">
