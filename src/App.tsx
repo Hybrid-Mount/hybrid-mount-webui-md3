@@ -36,11 +36,9 @@ export default function App() {
   let touchStartY = 0;
   let ticking = false;
   let rafId: number | null = null;
+  let swipeTrackRef: HTMLDivElement | undefined;
 
-  const baseTranslateX = createMemo(() => {
-    const index = visibleTabIds.indexOf(activeTab());
-    return index * -(100 / visibleTabIds.length);
-  });
+  const baseTranslateX = createMemo(() => visibleTabIds.indexOf(activeTab()) * -100);
 
   const activeTabIndex = createMemo(() => visibleTabIds.indexOf(activeTab()));
 
@@ -52,6 +50,12 @@ export default function App() {
       next.add(current);
       return next;
     });
+  });
+
+  createEffect(() => {
+    if (!swipeTrackRef) return;
+    const translate = `translateX(calc(${baseTranslateX()}% + ${dragOffset()}px))`;
+    swipeTrackRef.style.transform = translate;
   });
 
   const shouldRenderTab = (tabId: string) => {
@@ -159,21 +163,12 @@ export default function App() {
           onTouchCancel={handleTouchEnd}
         >
           <div
-            class="swipe-track"
-            style={{
-              transform: `translateX(calc(${baseTranslateX()}% + ${dragOffset()}px))`,
-              width: `${visibleTabIds.length * 100}%`,
-              transition: isDragging()
-                ? "none"
-                : "transform 0.4s cubic-bezier(0.2, 1, 0.2, 1)",
-            }}
+            class={`swipe-track ${isDragging() ? "is-dragging" : ""}`}
+            ref={swipeTrackRef}
           >
             <For each={routes}>
               {(route) => (
-                <div
-                  class="swipe-page"
-                  style={{ width: `${100 / visibleTabIds.length}%` }}
-                >
+                <div class="swipe-page">
                   <Show when={shouldRenderTab(route.id)}>
                     <div class="page-scroller">
                       <route.component />

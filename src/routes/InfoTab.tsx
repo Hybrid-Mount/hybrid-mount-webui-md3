@@ -170,36 +170,21 @@ export default function InfoTab() {
                 <circle cx="60" cy="60" r="38" class="logo-base-track" />
                 <circle cx="60" cy="60" r="26" class="logo-base-track" />
 
-                <g
-                  style={{
-                    "transform-origin": "center",
-                    transform: "rotate(-45deg)",
-                  }}
-                >
+                <g class="dev-logo-arc dev-logo-arc-outer-wrap">
                   <path
                     d="M 60 10 A 50 50 0 1 1 10 60"
                     class="logo-arc logo-arc-outer"
                   />
                 </g>
 
-                <g
-                  style={{
-                    "transform-origin": "center",
-                    transform: "rotate(135deg)",
-                  }}
-                >
+                <g class="dev-logo-arc dev-logo-arc-mid-wrap">
                   <path
                     d="M 60 22 A 38 38 0 0 1 60 98"
                     class="logo-arc logo-arc-mid logo-arc-error"
                   />
                 </g>
 
-                <g
-                  style={{
-                    "transform-origin": "center",
-                    transform: "rotate(270deg)",
-                  }}
-                >
+                <g class="dev-logo-arc dev-logo-arc-inner-wrap">
                   <path
                     d="M 60 34 A 26 26 0 1 1 47 82.5"
                     class="logo-arc logo-arc-inner"

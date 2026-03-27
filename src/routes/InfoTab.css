@@ -215,6 +215,22 @@ md-icon svg {
   stroke: var(--md-sys-color-outline);
 }
 
+.dev-logo-arc {
+  transform-origin: center;
+}
+
+.dev-logo-arc-outer-wrap {
+  transform: rotate(-45deg);
+}
+
+.dev-logo-arc-mid-wrap {
+  transform: rotate(135deg);
+}
+
+.dev-logo-arc-inner-wrap {
+  transform: rotate(270deg);
+}
+
 /* Donate Dialog Styles */
 .donate-dialog {
   --md-dialog-container-color: var(--md-sys-color-surface-container-high);

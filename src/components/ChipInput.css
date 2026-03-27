@@ -17,6 +17,14 @@
   gap: 8px;
 }
 
+.chips-has-items {
+  margin-bottom: 8px;
+}
+
+.chips-empty {
+  margin-bottom: 0;
+}
+
 .chip-input-field {
   flex: 1;
   min-width: 80px;

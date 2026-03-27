@@ -61,8 +61,8 @@ export default function TopBar() {
               {(l) => (
                 <md-list-item
                   type="button"
+                  class="lang-item"
                   onClick={() => setLang(l.code)}
-                  style={{ cursor: "pointer" }}
                 >
                   <div slot="headline">{l.name}</div>
                   <Show when={uiStore.lang === l.code}>

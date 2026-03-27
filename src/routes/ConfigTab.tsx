@@ -100,22 +100,27 @@ export default function ConfigTab() {
   }
 
   const availableModes = createMemo(() => {
+    const allowedModes: OverlayMode[] = ["tmpfs", "ext4"];
     const storageModes = (sysStore.storage as any)?.supported_modes;
-    let modes: OverlayMode[];
+    let modes: string[];
 
     if (storageModes && Array.isArray(storageModes)) {
-      modes = storageModes as OverlayMode[];
+      modes = storageModes as string[];
     } else {
       modes =
         sysStore.systemInfo?.supported_overlay_modes ??
-        (["tmpfs", "ext4"] as OverlayMode[]);
+        allowedModes;
     }
+
+    let filteredModes = modes.filter((m): m is OverlayMode =>
+      allowedModes.includes(m as OverlayMode),
+    );
 
     if (sysStore.systemInfo?.tmpfs_xattr_supported === false) {
-      modes = modes.filter((m) => m !== "tmpfs");
+      filteredModes = filteredModes.filter((m) => m !== "tmpfs");
     }
 
-    return modes;
+    return [...new Set(filteredModes)];
   });
 
   const MODE_DESCS: Record<OverlayMode, string> = {
