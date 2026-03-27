@@ -194,14 +194,9 @@ export default function ModulesTab() {
 
             <div class="filter-group">
               <button
-                class="btn-icon"
+                class={`btn-icon ${showUnmounted() ? "active" : ""}`}
                 onClick={() => setShowUnmounted(!showUnmounted())}
                 title={showUnmounted() ? "Hide unmounted" : "Show unmounted"}
-                style={{
-                  color: showUnmounted()
-                    ? "var(--md-sys-color-primary)"
-                    : "var(--md-sys-color-outline)",
-                }}
               >
                 <svg viewBox="0 0 24 24" width="20" height="20">
                   <path
@@ -247,13 +242,7 @@ export default function ModulesTab() {
                 <div class="empty-state">
                   <div>{uiStore.L.modules?.emptyState ?? "No modules found."}</div>
                   <Show when={!showUnmounted()}>
-                    <div
-                      style={{
-                        "font-size": "12px",
-                        opacity: "0.7",
-                        "margin-top": "8px",
-                      }}
-                    >
+                    <div class="unmounted-hint">
                       {uiStore.L.modules?.unmountedHiddenHint ??
                         "Unmounted modules are hidden."}
                     </div>
@@ -343,7 +332,7 @@ export default function ModulesTab() {
                   </div>
                 )}
               </For>
-              <div ref={observerTarget} style={{ height: "20px" }}></div>
+              <div ref={observerTarget} class="observer-target"></div>
             </Show>
           </Show>
         </div>

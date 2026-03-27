@@ -97,14 +97,7 @@ export default function StatusTab() {
             </div>
 
             <div class="mount-base-chip">
-              <md-icon
-                style={{
-                  "font-size": "14px",
-                  width: "14px",
-                  height: "14px",
-                  opacity: 0.7,
-                }}
-              >
+              <md-icon class="mount-base-icon">
                 <svg viewBox="0 0 24 24">
                   <path d={ICONS.mount_path} />
                 </svg>
@@ -226,7 +219,7 @@ export default function StatusTab() {
             </Show>
           </div>
 
-          <div class="card-title" style={{ "margin-top": "8px" }}>
+          <div class="card-title mt-8">
             {uiStore.L?.status?.activePartitions ?? "Partitions"}
           </div>
 
