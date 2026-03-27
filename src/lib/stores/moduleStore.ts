@@ -7,7 +7,6 @@ import type { Module, ModeStats } from "../types";
 const createModuleStore = () => {
   const [modules, setModulesStore] = createStore<Module[]>([]);
   const [loading, setLoading] = createSignal(false);
-  const [saving, setSaving] = createSignal(false);
 
   const modeStats = createMemo((): ModeStats => {
     const stats = { auto: 0, magic: 0 };
@@ -33,20 +32,6 @@ const createModuleStore = () => {
     setLoading(false);
   }
 
-  async function saveModules() {
-    setSaving(true);
-    try {
-      await API.saveModules(modules);
-      uiStore.showToast(uiStore.L.common?.saved || "Saved", "success");
-    } catch (e: any) {
-      uiStore.showToast(
-        uiStore.L.modules?.saveFailed || "Failed to save module modes",
-        "error",
-      );
-    }
-    setSaving(false);
-  }
-
   return {
     get modules() {
       return modules;
@@ -57,14 +42,10 @@ const createModuleStore = () => {
     get loading() {
       return loading();
     },
-    get saving() {
-      return saving();
-    },
     get modeStats() {
       return modeStats();
     },
     loadModules,
-    saveModules,
   };
 };
 
