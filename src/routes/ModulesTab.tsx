@@ -101,14 +101,18 @@ export default function ModulesTab() {
     setIsSaving(true);
     try {
       const dirty = dirtyModules();
-      for (const mod of dirty) {
-        await API.saveModuleRules(mod.id, mod.rules);
-      }
+      const promises = dirty.map(mod => API.saveModuleRules(mod.id, mod.rules));
+      const results = await Promise.allSettled(promises);
+      const hasError = results.some(r => r.status === "rejected");
       await load();
-      uiStore.showToast(
-        uiStore.L.modules?.saveSuccess || "Saved successfully",
-        "success",
-      );
+      if (hasError) {
+        uiStore.showToast("Some modules failed to save", "error");
+      } else {
+        uiStore.showToast(
+          uiStore.L.modules?.saveSuccess || "Saved successfully",
+          "success",
+        );
+      }
     } catch (e: any) {
       uiStore.showToast(e.message || "Failed to save", "error");
     } finally {

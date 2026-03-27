@@ -82,13 +82,17 @@ export default function ConfigTab() {
 
     updateConfig(key, newVal);
 
-    API.saveConfig({ ...configStore.config, [key]: newVal }).catch(() => {
-      updateConfig(key, currentVal);
-      uiStore.showToast(
-        uiStore.L.config?.saveFailed || "Failed to update setting",
-        "error",
-      );
-    });
+    API.saveConfig({ ...configStore.config, [key]: newVal })
+      .then(() => {
+        setInitialConfigStr(configSignature());
+      })
+      .catch(() => {
+        updateConfig(key, currentVal);
+        uiStore.showToast(
+          uiStore.L.config?.saveFailed || "Failed to update setting",
+          "error",
+        );
+      });
   }
 
   function setOverlayMode(mode: string) {

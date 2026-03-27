@@ -110,7 +110,6 @@ export default function App() {
       rafId = null;
       ticking = false;
     }
-    if (containerRef) containerWidth = containerRef.clientWidth;
     const threshold = containerWidth * 0.33 || 80;
     const tabs = visibleTabIds;
     const currentIndex = tabs.indexOf(activeTab());
@@ -127,6 +126,14 @@ export default function App() {
   }
 
   onMount(async () => {
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        containerWidth = entry.contentRect.width;
+      }
+    });
+    if (containerRef) {
+      observer.observe(containerRef);
+    }
     await uiStore.init();
     await Promise.all([configStore.loadConfig(), sysStore.loadStatus()]);
   });
