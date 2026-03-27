@@ -12,10 +12,31 @@
   );
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.5s infinite linear;
-  width: var(--skeleton-width, 100%);
-  height: var(--skeleton-height, 20px);
-  border-radius: var(--skeleton-radius, 12px);
 }
+
+.skeleton-w-100p { width: 100%; }
+.skeleton-w-80p { width: 80%; }
+.skeleton-w-60p { width: 60%; }
+.skeleton-w-50p { width: 50%; }
+.skeleton-w-40p { width: 40%; }
+.skeleton-w-180 { width: 180px; }
+.skeleton-w-120 { width: 120px; }
+.skeleton-w-100 { width: 100px; }
+.skeleton-w-60 { width: 60px; }
+.skeleton-w-40 { width: 40px; }
+
+.skeleton-h-64 { height: 64px; }
+.skeleton-h-48 { height: 48px; }
+.skeleton-h-40 { height: 40px; }
+.skeleton-h-32 { height: 32px; }
+.skeleton-h-24 { height: 24px; }
+.skeleton-h-20 { height: 20px; }
+.skeleton-h-16 { height: 16px; }
+.skeleton-h-12 { height: 12px; }
+
+.skeleton-r-50p { border-radius: 50%; }
+.skeleton-r-16 { border-radius: 16px; }
+.skeleton-r-12 { border-radius: 12px; }
 
 @keyframes skeleton-shimmer {
   0% {

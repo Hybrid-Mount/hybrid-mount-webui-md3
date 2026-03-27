@@ -46,6 +46,12 @@ export default function StatusTab() {
     };
   });
 
+  function widthClass(percent: number) {
+    const normalized = Number.isFinite(percent) ? Math.round(percent) : 0;
+    const clamped = Math.min(100, Math.max(0, normalized));
+    return `w-${clamped}`;
+  }
+
   return (
     <>
       <md-dialog
@@ -159,12 +165,10 @@ export default function StatusTab() {
           >
             <div class="stats-bar-container">
               <div
-                class="bar-segment bar-auto"
-                style={{ width: `${modeDistribution().auto}%` }}
+                class={`bar-segment bar-auto ${widthClass(modeDistribution().auto)}`}
               ></div>
               <div
-                class="bar-segment bar-magic"
-                style={{ width: `${modeDistribution().magic}%` }}
+                class={`bar-segment bar-magic ${widthClass(modeDistribution().magic)}`}
               ></div>
             </div>
             <div class="stats-legend">

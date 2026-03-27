@@ -36,13 +36,8 @@ export default function NavBar(props: Props) {
 
   return (
     <nav
-      class="bottom-nav"
+      class={`bottom-nav ${uiStore.fixBottomNav ? "fix-padding" : "safe-padding"}`}
       ref={navContainer}
-      style={{
-        "padding-bottom": uiStore.fixBottomNav
-          ? "48px"
-          : "max(16px, env(safe-area-inset-bottom, 0px))",
-      }}
     >
       <For each={props.tabs}>
         {(tab) => (
@@ -56,10 +51,7 @@ export default function NavBar(props: Props) {
             <div class="icon-container">
               <md-icon>
                 <svg viewBox="0 0 24 24">
-                  <path
-                    d={iconMap[tab.id] || ICONS.description}
-                    style={{ transition: "none" }}
-                  />
+                  <path d={iconMap[tab.id] || ICONS.description} />
                 </svg>
               </md-icon>
             </div>
