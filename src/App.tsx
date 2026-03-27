@@ -34,6 +34,7 @@ export default function App() {
   let containerWidth = 0;
   let touchStartX = 0;
   let touchStartY = 0;
+  let gestureAxis: "x" | "y" | null = null;
   let ticking = false;
   let rafId: number | null = null;
   let swipeTrackRef: HTMLDivElement | undefined;
@@ -66,8 +67,10 @@ export default function App() {
   };
 
   function handleTouchStart(e: TouchEvent) {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
+    if (e.touches.length !== 1) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    gestureAxis = null;
     setIsDragging(true);
     setDragOffset(0);
     ticking = false;
@@ -78,13 +81,19 @@ export default function App() {
   }
 
   function handleTouchMove(e: TouchEvent) {
-    if (!isDragging()) return;
-    const currentX = e.changedTouches[0].screenX;
-    const currentY = e.changedTouches[0].screenY;
+    if (!isDragging() || e.touches.length !== 1) return;
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
     let diffX = currentX - touchStartX;
     const diffY = currentY - touchStartY;
 
-    if (Math.abs(diffY) > Math.abs(diffX)) return;
+    if (gestureAxis === null) {
+      const absX = Math.abs(diffX);
+      const absY = Math.abs(diffY);
+      if (absX < 8 && absY < 8) return;
+      gestureAxis = absX >= absY ? "x" : "y";
+    }
+    if (gestureAxis !== "x") return;
     if (e.cancelable) e.preventDefault();
 
     if (!ticking) {
@@ -109,10 +118,16 @@ export default function App() {
   function handleTouchEnd() {
     if (!isDragging()) return;
     setIsDragging(false);
+    const endedAxis = gestureAxis;
+    gestureAxis = null;
     if (rafId !== null) {
       cancelAnimationFrame(rafId);
       rafId = null;
       ticking = false;
+    }
+    if (endedAxis !== "x") {
+      setDragOffset(0);
+      return;
     }
     const threshold = containerWidth * 0.33 || 80;
     const tabs = visibleTabIds;

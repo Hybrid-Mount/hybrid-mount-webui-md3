@@ -34,6 +34,11 @@ export default function NavBar(props: Props) {
     }
   });
 
+  function activateTab(tabId: string) {
+    if (props.activeTab === tabId) return;
+    props.onTabChange(tabId);
+  }
+
   return (
     <nav
       class={`bottom-nav ${uiStore.fixBottomNav ? "fix-padding" : "safe-padding"}`}
@@ -43,7 +48,15 @@ export default function NavBar(props: Props) {
         {(tab) => (
           <button
             class={`nav-tab ${props.activeTab === tab.id ? "active" : ""}`}
-            onClick={() => props.onTabChange(tab.id)}
+            onClick={() => activateTab(tab.id)}
+            onPointerUp={() => activateTab(tab.id)}
+            onTouchEnd={() => activateTab(tab.id)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                activateTab(tab.id);
+              }
+            }}
             ref={(el) => (tabRefs[tab.id] = el)}
             type="button"
           >
