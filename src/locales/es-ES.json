@@ -31,8 +31,6 @@
   },
   "config": {
     "disableUmount": "Desactivar Umount",
-    "allowUmountCoexistence": "Permitir Coexistencia",
-    "coexistenceRequired": "Opción de coexistencia requerida",
     "moduleDir": "Dir. Módulos",
     "moduleDirDesc": "Set the directory where modules are stored",
     "mountSource": "Fuente Montaje",
@@ -59,8 +57,7 @@
     "mode_tmpfsDesc": "RAM-based. Fastest I/O, reset on reboot.",
     "mode_ext4": "Ext4",
     "mode_ext4Desc": "Loopback image. Persistent, saves RAM.",
-    "enableOverlayFallback": "Habilitar fallback de overlay",
-    "enableOverlayFallbackDesc": "Permitir que los módulos del plan overlay retrocedan a Magic Mount cuando overlayfs no esté disponible"
+    "enableOverlayFallback": "Habilitar fallback de overlay"
   },
   "modules": {
     "reload": "Refrescar",

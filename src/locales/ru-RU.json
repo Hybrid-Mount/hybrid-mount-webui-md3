@@ -31,8 +31,6 @@
   },
   "config": {
     "disableUmount": "Отключить Umount",
-    "allowUmountCoexistence": "Разрешить сосуществование",
-    "coexistenceRequired": "Требуется включить сосуществование",
     "moduleDir": "Путь модулей",
     "moduleDirDesc": "Set the directory where modules are stored",
     "mountSource": "Источник монтирования",
@@ -59,8 +57,7 @@
     "mode_tmpfsDesc": "RAM-based. Fastest I/O, reset on reboot.",
     "mode_ext4": "Ext4",
     "mode_ext4Desc": "Loopback image. Persistent, saves RAM.",
-    "enableOverlayFallback": "Включить fallback overlay",
-    "enableOverlayFallbackDesc": "Разрешить модулям overlay-плана откатываться на Magic Mount, если overlayfs недоступен"
+    "enableOverlayFallback": "Включить fallback overlay"
   },
   "modules": {
     "reload": "Обновить",

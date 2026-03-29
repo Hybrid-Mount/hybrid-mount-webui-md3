@@ -31,8 +31,6 @@
   },
   "config": {
     "disableUmount": "Вимкнути Umount",
-    "allowUmountCoexistence": "Дозволити співіснування Umount",
-    "coexistenceRequired": "Потрібна опція співіснування",
     "moduleDir": "Каталог модулів",
     "moduleDirDesc": "Встановіть каталог, де зберігаються модулі",
     "mountSource": "Джерело монтування",
@@ -59,8 +57,7 @@
     "mode_tmpfsDesc": "На основі оперативної пам'яті. Найшвидший ввід/вивід, скидання після перезавантаження.",
     "mode_ext4": "Ext4",
     "mode_ext4Desc": "Образ з циклічним замиканням. Постійне, економить оперативну пам'ять.",
-    "enableOverlayFallback": "Увімкнути fallback overlay",
-    "enableOverlayFallbackDesc": "Дозволити модулям overlay-плану переходити на Magic Mount, якщо overlayfs недоступний"
+    "enableOverlayFallback": "Увімкнути fallback overlay"
   },
   "modules": {
     "reload": "Оновити",

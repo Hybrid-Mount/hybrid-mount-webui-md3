@@ -31,8 +31,6 @@
   },
   "config": {
     "disableUmount": "禁用Umount",
-    "allowUmountCoexistence": "允许Umount共存",
-    "coexistenceRequired": "需开启共存选项",
     "moduleDir": "模块路径",
     "moduleDirDesc": "设置模块储存的路径",
     "mountSource": "挂载源名",
@@ -59,8 +57,7 @@
     "mode_tmpfsDesc": "基于内存，I/O性能优秀，重启即焚",
     "mode_ext4": "Ext4",
     "mode_ext4Desc": "节省内存，使用 Loop 设备",
-    "enableOverlayFallback": "允许 Overlay 回退",
-    "enableOverlayFallbackDesc": "当 overlayfs 不可用时，允许 overlay 计划模块回退到 Magic Mount"
+    "enableOverlayFallback": "允许 Overlay 回退"
   },
   "modules": {
     "reload": "刷新",

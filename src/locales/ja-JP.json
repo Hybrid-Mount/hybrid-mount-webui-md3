@@ -31,8 +31,6 @@
   },
   "config": {
     "disableUmount": "アンマウントを無効",
-    "allowUmountCoexistence": "アンマウントの共存を許可",
-    "coexistenceRequired": "共存のオプションが必要です",
     "moduleDir": "モジュールのディレクトリ",
     "moduleDirDesc": "モジュールを保存するディレクトリを設定します",
     "mountSource": "マウントソース",
@@ -59,8 +57,7 @@
     "mode_tmpfsDesc": "RAM ベース、高速な I/O、再起動時にリセットされます。",
     "mode_ext4": "Ext4",
     "mode_ext4Desc": "ループバックイメージ。永続的、RAM を節約できます。",
-    "enableOverlayFallback": "Overlay フォールバックを有効化",
-    "enableOverlayFallbackDesc": "overlayfs が利用できない場合、overlay 計画モジュールを Magic Mount にフォールバックします"
+    "enableOverlayFallback": "Overlay フォールバックを有効化"
   },
   "modules": {
     "reload": "更新",
