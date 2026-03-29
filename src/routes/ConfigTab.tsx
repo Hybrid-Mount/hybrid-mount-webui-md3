@@ -10,12 +10,10 @@ import "./ConfigTab.css";
 import "@material/web/textfield/outlined-text-field.js";
 import "@material/web/button/filled-button.js";
 import "@material/web/iconbutton/filled-tonal-icon-button.js";
-import "@material/web/iconbutton/icon-button.js";
 import "@material/web/icon/icon.js";
 import "@material/web/ripple/ripple.js";
 import "@material/web/dialog/dialog.js";
 import "@material/web/button/text-button.js";
-import "@material/web/switch/switch.js";
 import type { OverlayMode, AppConfig } from "../lib/types";
 
 export default function ConfigTab() {
