@@ -31,8 +31,6 @@
   },
   "config": {
     "disableUmount": "Tắt Umount",
-    "allowUmountCoexistence": "Cho phép Umount Cùng tồn tại",
-    "coexistenceRequired": "Cần có tuỳ chọn cùng tồn tại.",
     "moduleDir": "Thư mục Mô-đun",
     "moduleDirDesc": "Đặt thư mục nơi các mô-đun được lưu trữ",
     "mountSource": "Nguồn Gắn kết",
@@ -59,8 +57,7 @@
     "mode_tmpfsDesc": "Dựa trên RAM. I/O nhanh nhất, đặt lại khi khởi động lại.",
     "mode_ext4": "Ext4",
     "mode_ext4Desc": "Hình ảnh lặp lại. Bền bỉ, tiết kiệm RAM.",
-    "enableOverlayFallback": "Bật fallback overlay",
-    "enableOverlayFallbackDesc": "Cho phép module kế hoạch overlay quay về Magic Mount khi overlayfs không khả dụng"
+    "enableOverlayFallback": "Bật fallback overlay"
   },
   "modules": {
     "reload": "Làm mới",
