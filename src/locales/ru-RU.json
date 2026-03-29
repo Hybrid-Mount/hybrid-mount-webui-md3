@@ -58,7 +58,9 @@
     "mode_tmpfs": "Tmpfs",
     "mode_tmpfsDesc": "RAM-based. Fastest I/O, reset on reboot.",
     "mode_ext4": "Ext4",
-    "mode_ext4Desc": "Loopback image. Persistent, saves RAM."
+    "mode_ext4Desc": "Loopback image. Persistent, saves RAM.",
+    "enableOverlayFallback": "Включить fallback overlay",
+    "enableOverlayFallbackDesc": "Разрешить модулям overlay-плана откатываться на Magic Mount, если overlayfs недоступен"
   },
   "modules": {
     "reload": "Обновить",

@@ -58,7 +58,9 @@
     "mode_tmpfs": "Tmpfs",
     "mode_tmpfsDesc": "RAM ベース、高速な I/O、再起動時にリセットされます。",
     "mode_ext4": "Ext4",
-    "mode_ext4Desc": "ループバックイメージ。永続的、RAM を節約できます。"
+    "mode_ext4Desc": "ループバックイメージ。永続的、RAM を節約できます。",
+    "enableOverlayFallback": "Overlay フォールバックを有効化",
+    "enableOverlayFallbackDesc": "overlayfs が利用できない場合、overlay 計画モジュールを Magic Mount にフォールバックします"
   },
   "modules": {
     "reload": "更新",

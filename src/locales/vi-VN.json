@@ -58,7 +58,9 @@
     "mode_tmpfs": "Tmpfs",
     "mode_tmpfsDesc": "Dựa trên RAM. I/O nhanh nhất, đặt lại khi khởi động lại.",
     "mode_ext4": "Ext4",
-    "mode_ext4Desc": "Hình ảnh lặp lại. Bền bỉ, tiết kiệm RAM."
+    "mode_ext4Desc": "Hình ảnh lặp lại. Bền bỉ, tiết kiệm RAM.",
+    "enableOverlayFallback": "Bật fallback overlay",
+    "enableOverlayFallbackDesc": "Cho phép module kế hoạch overlay quay về Magic Mount khi overlayfs không khả dụng"
   },
   "modules": {
     "reload": "Làm mới",

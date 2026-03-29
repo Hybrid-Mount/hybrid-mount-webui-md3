@@ -58,7 +58,9 @@
     "mode_tmpfs": "Tmpfs",
     "mode_tmpfsDesc": "RAM-based. Fastest I/O, reset on reboot.",
     "mode_ext4": "Ext4",
-    "mode_ext4Desc": "Loopback image. Persistent, saves RAM."
+    "mode_ext4Desc": "Loopback image. Persistent, saves RAM.",
+    "enableOverlayFallback": "允許 Overlay 回退",
+    "enableOverlayFallbackDesc": "當 overlayfs 無法使用時，允許 overlay 計劃模組回退到 Magic Mount"
   },
   "modules": {
     "reload": "重新整理",

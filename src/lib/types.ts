@@ -11,6 +11,7 @@ export interface AppConfig {
   partitions: string[];
   overlay_mode: OverlayMode;
   disable_umount: boolean;
+  enable_overlay_fallback: boolean;
   logfile?: string;
 }
 

@@ -7,6 +7,7 @@ export const DEFAULT_CONFIG: AppConfig = {
   logfile: RUST_PATHS.DAEMON_LOG || "/data/adb/hybrid-mount/daemon.log",
   partitions: [],
   disable_umount: false,
+  enable_overlay_fallback: false,
   overlay_mode: "tmpfs",
 };
 
