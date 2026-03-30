@@ -68,6 +68,7 @@
     "searchPlaceholder": "Tìm kiếm các mô-đun...",
     "filterLabel": "Bộ lọc:",
     "filterAll": "Tất cả",
+    "loadMore": "Tải thêm",
     "defaultMode": "Chiến lược Mặc định",
     "modes": {
       "auto": "OverlayFS",

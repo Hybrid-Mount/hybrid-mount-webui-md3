@@ -68,6 +68,7 @@
     "searchPlaceholder": "Поиск модулей...",
     "filterLabel": "Фильтр:",
     "filterAll": "Все",
+    "loadMore": "Загрузить ещё",
     "defaultMode": "Стратегия",
     "modes": {
       "auto": "OverlayFS",

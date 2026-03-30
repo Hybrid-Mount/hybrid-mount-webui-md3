@@ -68,6 +68,7 @@
     "searchPlaceholder": "搜尋模組...",
     "filterLabel": "篩選:",
     "filterAll": "全部",
+    "loadMore": "載入更多",
     "defaultMode": "預設策略",
     "modes": {
       "auto": "OverlayFS",

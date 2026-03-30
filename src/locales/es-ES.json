@@ -68,6 +68,7 @@
     "searchPlaceholder": "Buscar módulos...",
     "filterLabel": "Filtro:",
     "filterAll": "Todos",
+    "loadMore": "Cargar más",
     "defaultMode": "Estrategia",
     "modes": {
       "auto": "OverlayFS",

@@ -68,6 +68,7 @@
     "searchPlaceholder": "Пошук модулів...",
     "filterLabel": "Фільтр:",
     "filterAll": "Усі",
+    "loadMore": "Завантажити ще",
     "defaultMode": "Стратегія за замовчуванням",
     "modes": {
       "auto": "OverlayFS",
