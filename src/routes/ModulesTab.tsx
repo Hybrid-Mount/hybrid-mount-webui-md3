@@ -18,9 +18,11 @@ import type { Module, MountMode } from "../lib/types";
 import "./ModulesTab.css";
 import "@material/web/iconbutton/filled-tonal-icon-button.js";
 import "@material/web/button/filled-button.js";
+import "@material/web/button/filled-tonal-button.js";
 import "@material/web/icon/icon.js";
 
 export default function ModulesTab() {
+  const BATCH_SIZE = 20;
   const [searchQuery, setSearchQuery] = createSignal("");
   const deferredSearchQuery = createDeferred(searchQuery);
   const [filterType, setFilterType] = createSignal("all");
@@ -30,18 +32,20 @@ export default function ModulesTab() {
     Record<string, string>
   >({});
   const [isSaving, setIsSaving] = createSignal(false);
-  const [visibleCount, setVisibleCount] = createSignal(20);
+  const [visibleCount, setVisibleCount] = createSignal(BATCH_SIZE);
   let observerTarget: HTMLDivElement | undefined;
 
   onMount(() => {
     load();
+    const observerRoot =
+      observerTarget?.closest(".page-scroller") ?? undefined;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setVisibleCount((c) => c + 20);
+          setVisibleCount((c) => c + BATCH_SIZE);
         }
       },
-      { rootMargin: "200px" },
+      { root: observerRoot, rootMargin: "200px" },
     );
     if (observerTarget) observer.observe(observerTarget);
     onCleanup(() => observer.disconnect());
@@ -51,7 +55,7 @@ export default function ModulesTab() {
     searchQuery();
     filterType();
     showUnmounted();
-    setVisibleCount(20);
+    setVisibleCount(BATCH_SIZE);
   });
 
   function load() {
@@ -118,6 +122,13 @@ export default function ModulesTab() {
       return true;
     }),
   );
+  const canLoadMore = createMemo(
+    () => visibleCount() < filteredModules().length,
+  );
+
+  function loadMore() {
+    setVisibleCount((c) => c + BATCH_SIZE);
+  }
 
   function toggleExpand(id: string) {
     if (expandedId() === id) {
@@ -328,6 +339,12 @@ export default function ModulesTab() {
       </div>
 
       <BottomActions>
+        <Show when={canLoadMore()}>
+          <md-filled-tonal-button onClick={loadMore}>
+            {uiStore.L.modules?.loadMore ?? "Load More"}
+          </md-filled-tonal-button>
+        </Show>
+
         <md-filled-tonal-icon-button
           onClick={load}
           disabled={moduleStore.loading}
