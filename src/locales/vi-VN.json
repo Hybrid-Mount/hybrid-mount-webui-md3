@@ -20,14 +20,14 @@
   },
   "status": {
     "storageTitle": "Bộ nhớ",
-    "moduleActive": "Mô-đun đang hoạt động",
+    "moduleActive": "Mô-đun Đang hoạt động",
     "modeStats": "Thống kê Chế độ",
     "sysInfoTitle": "Thông tin Hệ thống",
     "kernel": "Kernel",
     "selinux": "SELinux",
     "mountBase": "Cơ sở Gắn kết",
     "activePartitions": "Phân vùng Đang hoạt động",
-    "loadError": "Failed to load system status"
+    "loadError": "Thất bại khi tải trạng thái hệ thống"
   },
   "config": {
     "disableUmount": "Tắt Umount",
@@ -51,13 +51,13 @@
     "fixBottomNav": "Sửa Điều hướng Phía dưới",
     "fixBottomNavOn": "Sửa Điều hướng Phía dưới đã Bật",
     "fixBottomNavOff": "Sửa Điều hướng Phía dưới đã Tắt",
-    "overlayMode": "Chế độ Lớp phủ",
+    "overlayMode": "Chế độ Overlay",
     "overlayModeDesc": "Chọn chiến lược lưu trữ sao lưu",
     "mode_tmpfs": "Tmpfs",
     "mode_tmpfsDesc": "Dựa trên RAM. I/O nhanh nhất, đặt lại khi khởi động lại.",
     "mode_ext4": "Ext4",
     "mode_ext4Desc": "Hình ảnh lặp lại. Bền bỉ, tiết kiệm RAM.",
-    "enableOverlayFallback": "Bật fallback overlay"
+    "enableOverlayFallback": "Bật Overlay Dự phòng"
   },
   "modules": {
     "reload": "Làm mới",
@@ -72,19 +72,19 @@
     "defaultMode": "Chiến lược Mặc định",
     "modes": {
       "auto": "OverlayFS",
-      "magic": "Gắn kết Magic",
+      "magic": "Magic Mount",
       "none": "Đã bỏ gắn kết",
       "short": {
         "auto": "Overlay",
         "magic": "Magic",
-        "ignore": "Phớt lờ"
+        "ignore": "Bỏ qua"
       }
     },
-    "emptyState": "No modules found.",
-    "unmountedHiddenHint": "Unmounted modules are hidden.",
-    "defaultTag": "Default",
-    "compatTag": "Compat",
-    "disableTag": "Disable"
+    "emptyState": "Không có mô-đun nào được tìm thấy.",
+    "unmountedHiddenHint": "Mô-đun đã bỏ gắn kết bị ẩn.",
+    "defaultTag": "Mặc định",
+    "compatTag": "Tương thích",
+    "disableTag": "Tắt"
   },
   "logs": {
     "refresh": "Làm mới"
@@ -96,7 +96,7 @@
     "loadFail": "Thất bại khi tải (Giới hạn Tỷ lệ API)",
     "noBio": "Không có sẵn tiểu sử",
     "telegram": "Telegram",
-    "supportUs": "Support Us",
+    "supportUs": "Ủng hộ Chúng tôi",
     "authorYuzaki": "YuzakiKokuban"
   }
 }
