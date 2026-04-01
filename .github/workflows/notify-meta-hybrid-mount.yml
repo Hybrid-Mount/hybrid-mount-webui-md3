@@ -1,0 +1,39 @@
+name: Notify Meta Hybrid Mount
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger submodule sync workflow
+        env:
+          TARGET_OWNER: Hybrid-Mount
+          TARGET_REPO: meta-hybrid_mount
+          TARGET_EVENT: webui-updated
+          TARGET_TOKEN: ${{ secrets.META_HYBRID_MOUNT_REPO_TOKEN }}
+        run: |
+          if [[ -z "${TARGET_TOKEN}" ]]; then
+            echo "META_HYBRID_MOUNT_REPO_TOKEN is required to dispatch the submodule sync workflow."
+            exit 1
+          fi
+
+          curl --fail-with-body \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${TARGET_TOKEN}" \
+            https://api.github.com/repos/${TARGET_OWNER}/${TARGET_REPO}/dispatches \
+            -d @- <<EOF
+          {
+            "event_type": "${TARGET_EVENT}",
+            "client_payload": {
+              "source_repository": "${GITHUB_REPOSITORY}",
+              "source_branch": "${GITHUB_REF_NAME}",
+              "source_sha": "${GITHUB_SHA}"
+            }
+          }
+          EOF
