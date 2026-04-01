@@ -12,17 +12,16 @@ export default function BottomActions(props: ParentProps) {
       <style>
         {`
         .bottom-actions-root {
-          position: sticky;
-          bottom: 0;
+          position: fixed;
+          bottom: calc(var(--bottom-nav-height, 88px) + env(safe-area-inset-bottom, 0px));
           left: 0;
           right: 0;
           display: flex;
           align-items: center;
-          padding: 0px;
+          padding: 0 16px;
           gap: 16px;
           z-index: 90;
           pointer-events: none;
-          margin-top: auto;
         }
         .bottom-actions-root > * {
           pointer-events: auto;

@@ -351,27 +351,6 @@ export default function ConfigTab() {
           <div class="webui-label">{uiStore.L.config?.webui || "WebUI"}</div>
           <div class="options-grid">
             <button
-              class={`option-tile clickable secondary ${uiStore.fixBottomNav ? "active" : ""}`}
-              onClick={uiStore.toggleBottomNavFix}
-            >
-              <md-ripple></md-ripple>
-              <div class="tile-top">
-                <div class="tile-icon">
-                  <md-icon>
-                    <svg viewBox="0 0 24 24">
-                      <path d="M21 5v14H3V5h18zm0-2H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8 17h5v-6H8v6zm0-8h5V7H8v2zM6 17h2V7H6v10zm12-6h-2v6h2v-6zm0-4h-2v2h2V7z" />
-                    </svg>
-                  </md-icon>
-                </div>
-              </div>
-              <div class="tile-bottom">
-                <span class="tile-label">
-                  {uiStore.L.config?.fixBottomNav || "Fix Bottom Nav"}
-                </span>
-              </div>
-            </button>
-
-            <button
               class="option-tile clickable error"
               onClick={() => setShowResetConfirm(true)}
               disabled={configStore.saving}

@@ -12,7 +12,6 @@ const createUiStore = () => {
     type: "info",
     visible: false,
   });
-  const [fixBottomNav, setFixBottomNavSignal] = createSignal(false);
   const [isReady, setIsReady] = createSignal(false);
 
   const availableLanguages: LanguageOption[] = [
@@ -72,22 +71,10 @@ const createUiStore = () => {
     loadLocale(code);
   }
 
-  function toggleBottomNavFix() {
-    const newVal = !fixBottomNav();
-    setFixBottomNavSignal(newVal);
-    localStorage.setItem("hm_fix_bottom_nav", String(newVal));
-    const dict = L();
-    const msg = newVal
-      ? dict.config?.fixBottomNavOn || "Bottom Nav Fix Enabled"
-      : dict.config?.fixBottomNavOff || "Bottom Nav Fix Disabled";
-    showToast(msg, "info");
-  }
-
   async function init() {
     const savedLang = localStorage.getItem("lang") || "en-US";
     setLangSignal(savedLang);
     await loadLocale(savedLang);
-    setFixBottomNavSignal(localStorage.getItem("hm_fix_bottom_nav") === "true");
     setIsReady(true);
   }
 
@@ -107,13 +94,9 @@ const createUiStore = () => {
     get toasts() {
       return toast().visible ? [toast()] : [];
     },
-    get fixBottomNav() {
-      return fixBottomNav();
-    },
     get isReady() {
       return isReady();
     },
-    toggleBottomNavFix,
     showToast,
     setLang,
     init,
