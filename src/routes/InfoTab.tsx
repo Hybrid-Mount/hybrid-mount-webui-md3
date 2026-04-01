@@ -45,7 +45,6 @@ export default function InfoTab() {
   const [contributors, setContributors] = createSignal<Contributor[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal(false);
-  const [version, setVersion] = createSignal(sysStore.version);
   const [activeQr, setActiveQr] = createSignal<string>("");
   const controller = new AbortController();
 
@@ -54,14 +53,8 @@ export default function InfoTab() {
 
   const isDev = () => !IS_RELEASE;
 
-  onMount(async () => {
-    try {
-      const v = await API.getVersion();
-      if (v) setVersion(v);
-    } catch {
-      console.error("Failed to fetch version");
-    }
-    await fetchContributors();
+  onMount(() => {
+    void fetchContributors();
   });
   onCleanup(() => controller.abort());
 
@@ -170,36 +163,21 @@ export default function InfoTab() {
                 <circle cx="60" cy="60" r="38" class="logo-base-track" />
                 <circle cx="60" cy="60" r="26" class="logo-base-track" />
 
-                <g
-                  style={{
-                    "transform-origin": "center",
-                    transform: "rotate(-45deg)",
-                  }}
-                >
+                <g class="dev-logo-outer-group">
                   <path
                     d="M 60 10 A 50 50 0 1 1 10 60"
                     class="logo-arc logo-arc-outer"
                   />
                 </g>
 
-                <g
-                  style={{
-                    "transform-origin": "center",
-                    transform: "rotate(135deg)",
-                  }}
-                >
+                <g class="dev-logo-mid-group">
                   <path
                     d="M 60 22 A 38 38 0 0 1 60 98"
                     class="logo-arc logo-arc-mid logo-arc-error"
                   />
                 </g>
 
-                <g
-                  style={{
-                    "transform-origin": "center",
-                    transform: "rotate(270deg)",
-                  }}
-                >
+                <g class="dev-logo-inner-group">
                   <path
                     d="M 60 34 A 26 26 0 1 1 47 82.5"
                     class="logo-arc logo-arc-inner"
@@ -233,7 +211,7 @@ export default function InfoTab() {
           </Show>
         </div>
         <span class="app-name">{uiStore.L.common.appName}</span>
-        <span class="app-version">{version()}</span>
+        <span class="app-version">{sysStore.version}</span>
       </div>
 
       <div class="action-buttons">
@@ -242,8 +220,6 @@ export default function InfoTab() {
           onClick={(e: MouseEvent) =>
             handleLink(e, `https://github.com/${REPO_OWNER}/${REPO_NAME}`)
           }
-          role="button"
-          tabIndex={0}
         >
           <md-icon slot="icon">
             <svg viewBox="0 0 24 24">
@@ -253,11 +229,9 @@ export default function InfoTab() {
           {uiStore.L.info.projectLink}
         </md-filled-tonal-button>
 
-          <md-filled-tonal-button
-            class="action-btn"
-            onClick={(e: MouseEvent) => handleLink(e, TELEGRAM_LINK)}
-          role="button"
-          tabIndex={0}
+        <md-filled-tonal-button
+          class="action-btn"
+          onClick={(e: MouseEvent) => handleLink(e, TELEGRAM_LINK)}
         >
           <md-icon slot="icon">
             <svg viewBox="0 0 24 24">
@@ -270,8 +244,6 @@ export default function InfoTab() {
         <md-filled-tonal-button
           class="action-btn donate-btn"
           onClick={openDonate}
-          role="button"
-          tabIndex={0}
         >
           <md-icon slot="icon">
             <svg viewBox="0 0 24 24">
@@ -312,12 +284,11 @@ export default function InfoTab() {
                 <For each={contributors()}>
                   {(user) => (
                     <md-list-item
+                      class="contributor-link"
                       type="link"
                       href={user.html_url}
                       target="_blank"
                       onClick={(e: MouseEvent) => handleLink(e, user.html_url)}
-                      role="link"
-                      tabIndex={0}
                     >
                       <img
                         slot="start"

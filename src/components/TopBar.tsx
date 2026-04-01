@@ -36,12 +36,7 @@ export default function TopBar() {
         <div class="top-bar-content">
           <h1 class="screen-title">{uiStore.L?.common?.appName}</h1>
           <div class="top-actions">
-            <md-icon-button
-              onClick={openLangDialog}
-              title={uiStore.L?.common?.language}
-              role="button"
-              tabIndex={0}
-            >
+            <md-icon-button onClick={openLangDialog} title={uiStore.L?.common?.language}>
               <md-icon>
                 <svg viewBox="0 0 24 24">
                   <path d={ICONS.translate} />
@@ -60,9 +55,9 @@ export default function TopBar() {
             <For each={uiStore.availableLanguages}>
               {(l) => (
                 <md-list-item
+                  class="lang-option"
                   type="button"
                   onClick={() => setLang(l.code)}
-                  style={{ cursor: "pointer" }}
                 >
                   <div slot="headline">{l.name}</div>
                   <Show when={uiStore.lang === l.code}>

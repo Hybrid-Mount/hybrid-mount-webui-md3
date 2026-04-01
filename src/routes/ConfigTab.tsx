@@ -380,8 +380,6 @@ export default function ConfigTab() {
           onClick={reload}
           disabled={configStore.loading}
           title={uiStore.L.config.reload}
-          role="button"
-          tabIndex={0}
         >
           <md-icon>
             <svg viewBox="0 0 24 24">
@@ -395,8 +393,6 @@ export default function ConfigTab() {
         <md-filled-button
           onClick={save}
           disabled={configStore.saving || !isDirty()}
-          role="button"
-          tabIndex={0}
         >
           <md-icon slot="icon">
             <svg viewBox="0 0 24 24">

@@ -48,10 +48,7 @@ export default function NavBar(props: Props) {
             <div class="icon-container">
               <md-icon>
                 <svg viewBox="0 0 24 24">
-                  <path
-                    d={iconMap[tab.id] || ICONS.description}
-                    style={{ transition: "none" }}
-                  />
+                  <path d={iconMap[tab.id] || ICONS.description} />
                 </svg>
               </md-icon>
             </div>

@@ -183,14 +183,11 @@ export default function ModulesTab() {
 
             <div class="filter-group">
               <button
-                class="btn-icon"
+                class={`btn-icon ${showUnmounted() ? "active" : ""}`}
                 onClick={() => setShowUnmounted(!showUnmounted())}
                 title={showUnmounted() ? "Hide unmounted" : "Show unmounted"}
-                style={{
-                  color: showUnmounted()
-                    ? "var(--md-sys-color-primary)"
-                    : "var(--md-sys-color-outline)",
-                }}
+                type="button"
+                aria-pressed={showUnmounted()}
               >
                 <svg viewBox="0 0 24 24" width="20" height="20">
                   <path
@@ -236,13 +233,7 @@ export default function ModulesTab() {
                 <div class="empty-state">
                   <div>{uiStore.L.modules?.emptyState ?? "No modules found."}</div>
                   <Show when={!showUnmounted()}>
-                    <div
-                      style={{
-                        "font-size": "12px",
-                        opacity: "0.7",
-                        "margin-top": "8px",
-                      }}
-                    >
+                    <div class="empty-state-hint">
                       {uiStore.L.modules?.unmountedHiddenHint ??
                         "Unmounted modules are hidden."}
                     </div>
@@ -255,14 +246,11 @@ export default function ModulesTab() {
                   <div
                     class={`module-card ${expandedId() === mod.id ? "expanded" : ""} ${initialRulesSnapshot()[mod.id] !== JSON.stringify(mod.rules) ? "dirty" : ""}`}
                   >
-                    <div
+                    <button
                       class="module-header"
                       onClick={() => toggleExpand(mod.id)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) =>
-                        e.key === "Enter" && toggleExpand(mod.id)
-                      }
+                      type="button"
+                      aria-expanded={expandedId() === mod.id}
                     >
                       <div class="module-info">
                         <div class="module-name">{mod.name}</div>
@@ -274,7 +262,7 @@ export default function ModulesTab() {
                       <div class={`mode-indicator ${getModeClass(mod)}`}>
                         {getModeLabel(mod)}
                       </div>
-                    </div>
+                    </button>
 
                     <div class="module-body-wrapper">
                       <div class="module-body-inner">
@@ -332,7 +320,7 @@ export default function ModulesTab() {
                   </div>
                 )}
               </For>
-              <div ref={observerTarget} style={{ height: "20px" }}></div>
+              <div ref={observerTarget} class="observer-sentinel"></div>
             </Show>
           </Show>
         </div>

@@ -7,17 +7,22 @@
     "dev": "vite",
     "build": "vite build --emptyOutDir",
     "preview": "vite preview",
+    "test": "vitest run",
     "lint": "eslint . && tsc --noEmit",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@solidjs/testing-library": "^0.8.10",
+    "@testing-library/jest-dom": "^6.9.1",
     "eslint": "^10.1.0",
     "globals": "^17.4.0",
+    "jsdom": "^29.0.1",
     "prettier": "^3.8.1",
     "tslib": "^2.8.1",
     "typescript": "^6.0.2",
-    "vite": "^8.0.3"
+    "vite": "^8.0.3",
+    "vitest": "^4.1.2"
   },
   "dependencies": {
     "@eslint/js": "^10.0.1",

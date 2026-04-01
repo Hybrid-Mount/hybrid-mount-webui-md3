@@ -1,4 +1,4 @@
-import { createMemo, createSignal, onMount, Show, For } from "solid-js";
+import { createEffect, createMemo, createSignal, Show, For } from "solid-js";
 import { uiStore } from "../lib/stores/uiStore";
 import { sysStore } from "../lib/stores/sysStore";
 import { configStore } from "../lib/stores/configStore";
@@ -17,9 +17,8 @@ import "@material/web/button/text-button.js";
 import "@material/web/ripple/ripple.js";
 
 export default function StatusTab() {
-  onMount(() => {
-    sysStore.loadStatus();
-  });
+  let autoBarRef: HTMLDivElement | undefined;
+  let magicBarRef: HTMLDivElement | undefined;
 
   const displayPartitions = createMemo(() => [
     ...new Set([
@@ -48,6 +47,12 @@ export default function StatusTab() {
       auto: (stats.auto / total) * 100,
       magic: (stats.magic / total) * 100,
     };
+  });
+
+  createEffect(() => {
+    const { auto, magic } = modeDistribution();
+    if (autoBarRef) autoBarRef.style.width = `${auto}%`;
+    if (magicBarRef) magicBarRef.style.width = `${magic}%`;
   });
 
   return (
@@ -101,14 +106,7 @@ export default function StatusTab() {
             </div>
 
             <div class="mount-base-chip">
-              <md-icon
-                style={{
-                  "font-size": "14px",
-                  width: "14px",
-                  height: "14px",
-                  opacity: 0.7,
-                }}
-              >
+              <md-icon class="mount-base-icon">
                 <svg viewBox="0 0 24 24">
                   <path d={ICONS.mount_path} />
                 </svg>
@@ -169,14 +167,8 @@ export default function StatusTab() {
             }
           >
             <div class="stats-bar-container">
-              <div
-                class="bar-segment bar-auto"
-                style={{ width: `${modeDistribution().auto}%` }}
-              ></div>
-              <div
-                class="bar-segment bar-magic"
-                style={{ width: `${modeDistribution().magic}%` }}
-              ></div>
+              <div ref={autoBarRef} class="bar-segment bar-auto"></div>
+              <div ref={magicBarRef} class="bar-segment bar-magic"></div>
             </div>
             <div class="stats-legend">
               <div class="legend-item">
@@ -230,7 +222,7 @@ export default function StatusTab() {
             </Show>
           </div>
 
-          <div class="card-title" style={{ "margin-top": "8px" }}>
+          <div class="card-title card-title-spaced">
             {uiStore.L?.status?.activePartitions ?? "Partitions"}
           </div>
 
@@ -260,8 +252,6 @@ export default function StatusTab() {
             class="reboot-btn"
             onClick={() => setShowRebootConfirm(true)}
             title="Reboot"
-            role="button"
-            tabIndex={0}
           >
             <md-icon>
               <svg viewBox="0 0 24 24">
@@ -274,8 +264,6 @@ export default function StatusTab() {
             onClick={() => sysStore.loadStatus()}
             disabled={sysStore.loading}
             title={uiStore.L?.logs?.refresh}
-            role="button"
-            tabIndex={0}
           >
             <md-icon>
               <svg viewBox="0 0 24 24">

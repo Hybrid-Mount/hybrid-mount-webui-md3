@@ -95,6 +95,10 @@
   background: transparent;
   padding: 8px 0;
 }
+
+.contributor-link {
+  cursor: pointer;
+}
 .c-avatar {
   width: 40px;
   height: 40px;
@@ -183,6 +187,24 @@
   stroke: var(--md-sys-color-primary);
   stroke-width: 6;
   animation: logo-spin-cw 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.dev-logo-outer-group,
+.dev-logo-mid-group,
+.dev-logo-inner-group {
+  transform-origin: center;
+}
+
+.dev-logo-outer-group {
+  transform: rotate(-45deg);
+}
+
+.dev-logo-mid-group {
+  transform: rotate(135deg);
+}
+
+.dev-logo-inner-group {
+  transform: rotate(270deg);
 }
 
 .logo-core {

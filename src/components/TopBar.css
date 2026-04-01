@@ -67,6 +67,11 @@ md-list-item {
   border-radius: 12px;
   margin-bottom: 4px;
 }
+
+.lang-option {
+  cursor: pointer;
+}
+
 md-list-item md-icon[slot="end"] {
   color: var(--md-sys-color-primary);
 }

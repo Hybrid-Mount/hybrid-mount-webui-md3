@@ -1,4 +1,5 @@
 import {
+  createEffect,
   createSignal,
   createMemo,
   onMount,
@@ -30,6 +31,9 @@ export default function App() {
   const [activeTab, setActiveTab] = createSignal("status");
   const [dragOffset, setDragOffset] = createSignal(0);
   const [isDragging, setIsDragging] = createSignal(false);
+  const [visitedTabs, setVisitedTabs] = createSignal(
+    new Set<string>([activeTab()]),
+  );
 
   let containerRef: HTMLDivElement | undefined;
   let containerWidth = 0;
@@ -43,6 +47,16 @@ export default function App() {
   const baseTranslateX = createMemo(() => {
     const index = visibleTabs().indexOf(activeTab());
     return index * -(100 / visibleTabs().length);
+  });
+
+  createEffect(() => {
+    const currentTab = activeTab();
+    setVisitedTabs((prev) => {
+      if (prev.has(currentTab)) return prev;
+      const next = new Set(prev);
+      next.add(currentTab);
+      return next;
+    });
   });
 
   function handleTouchStart(e: TouchEvent) {
@@ -112,7 +126,7 @@ export default function App() {
 
   onMount(async () => {
     await uiStore.init();
-    await Promise.all([configStore.loadConfig(), sysStore.loadStatus()]);
+    await Promise.all([configStore.loadConfig(), sysStore.ensureStatusLoaded()]);
 
     const pendingRoutes = routes.filter((route) => route.id !== activeTab());
     let preloadTimer = 0;
@@ -169,9 +183,14 @@ export default function App() {
                   class="swipe-page"
                   style={{ width: `${100 / visibleTabs().length}%` }}
                 >
-                  <div class="page-scroller">
-                    <route.component />
-                  </div>
+                  <Show
+                    when={visitedTabs().has(route.id)}
+                    fallback={<div class="page-scroller" aria-hidden="true" />}
+                  >
+                    <div class="page-scroller">
+                      <route.component />
+                    </div>
+                  </Show>
                 </div>
               )}
             </For>

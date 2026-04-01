@@ -50,9 +50,7 @@ export default function ChipInput(props: Props) {
 
   return (
     <div class="chip-input-wrapper">
-      <md-chip-set
-        style={{ "margin-bottom": props.values.length > 0 ? "8px" : "0px" }}
-      >
+      <md-chip-set classList={{ "chip-set-has-values": props.values.length > 0 }}>
         <For each={props.values}>
           {(val, i) => (
             <md-input-chip
@@ -76,13 +74,7 @@ export default function ChipInput(props: Props) {
           enterkeyhint="done"
         />
         <Show when={inputValue().trim().length > 0}>
-          <md-icon-button
-            onClick={addChip}
-            class="add-btn"
-            role="button"
-            tabIndex={0}
-            title="Add tag"
-          >
+          <md-icon-button onClick={addChip} class="add-btn" title="Add tag">
             <md-icon>
               <svg viewBox="0 0 24 24">
                 <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
