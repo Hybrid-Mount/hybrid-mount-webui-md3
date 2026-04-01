@@ -35,15 +35,7 @@ export default function NavBar(props: Props) {
   });
 
   return (
-    <nav
-      class="bottom-nav"
-      ref={navContainer}
-      style={{
-        "padding-bottom": uiStore.fixBottomNav
-          ? "48px"
-          : "max(16px, env(safe-area-inset-bottom, 0px))",
-      }}
-    >
+    <nav class="bottom-nav" ref={navContainer}>
       <For each={props.tabs}>
         {(tab) => (
           <button

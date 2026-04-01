@@ -22,6 +22,7 @@
 
   --top-inset: var(--window-inset-top, 0px);
   --bottom-inset: var(--window-inset-bottom, 0px);
+  --bottom-nav-height: 88px;
 
   --md-sys-color-primary: var(--primary, #6750a4);
   --md-sys-color-on-primary: var(--onPrimary, #ffffff);
