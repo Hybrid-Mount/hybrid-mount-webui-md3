@@ -58,6 +58,10 @@ describe("App", () => {
       ensureStatusLoaded: vi.fn().mockResolvedValue(undefined),
     };
 
+    const moduleStoreMock = {
+      ensureModulesLoaded: vi.fn().mockResolvedValue(undefined),
+    };
+
     vi.doMock("./lib/stores/uiStore", () => ({
       uiStore: uiStoreMock,
     }));
@@ -68,6 +72,10 @@ describe("App", () => {
 
     vi.doMock("./lib/stores/sysStore", () => ({
       sysStore: sysStoreMock,
+    }));
+
+    vi.doMock("./lib/stores/moduleStore", () => ({
+      moduleStore: moduleStoreMock,
     }));
 
     vi.doMock("./components/TopBar", () => ({
@@ -126,6 +134,7 @@ describe("App", () => {
       expect(uiStoreMock.init).toHaveBeenCalledTimes(1);
       expect(configStoreMock.loadConfig).toHaveBeenCalledTimes(1);
       expect(sysStoreMock.ensureStatusLoaded).toHaveBeenCalledTimes(1);
+      expect(moduleStoreMock.ensureModulesLoaded).toHaveBeenCalledTimes(1);
     });
 
     await fireEvent.click(screen.getByRole("button", { name: "nav:config" }));

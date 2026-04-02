@@ -23,7 +23,7 @@ export interface Module {
   version: string;
   author: string;
   description: string;
-  mode: string;
+  mode: MountMode;
   is_mounted: boolean;
   enabled?: boolean;
   source_path?: string;
@@ -66,6 +66,6 @@ export interface LanguageOption {
 }
 
 export interface ModeStats {
-  auto: number;
+  overlay: number;
   magic: number;
 }

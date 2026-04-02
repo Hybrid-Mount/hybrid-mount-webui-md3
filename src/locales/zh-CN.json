@@ -68,17 +68,17 @@
     "loadMore": "加载更多",
     "defaultMode": "默认策略",
     "modes": {
-      "auto": "OverlayFS",
+      "overlay": "OverlayFS",
       "magic": "Magic Mount",
-      "none": "未挂载",
+      "umount": "Umount",
       "short": {
-        "auto": "Overlay",
+        "overlay": "Overlay",
         "magic": "Magic",
         "ignore": "忽略"
       }
     },
     "emptyState": "未找到模块。",
-    "unmountedHiddenHint": "未挂载模块已隐藏。",
+    "umountHiddenHint": "Umount 模块已隐藏。",
     "defaultTag": "默认",
     "compatTag": "兼容",
     "disableTag": "禁用"

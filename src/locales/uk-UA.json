@@ -68,17 +68,17 @@
     "loadMore": "Завантажити ще",
     "defaultMode": "Стратегія за замовчуванням",
     "modes": {
-      "auto": "OverlayFS",
+      "overlay": "OverlayFS",
       "magic": "Magic Mount",
-      "none": "Розмонтовано",
+      "umount": "Umount",
       "short": {
-        "auto": "Накладання",
+        "overlay": "Накладання",
         "magic": "Magic",
         "ignore": "Ігнор"
       }
     },
     "emptyState": "No modules found.",
-    "unmountedHiddenHint": "Unmounted modules are hidden.",
+    "umountHiddenHint": "Umount modules are hidden.",
     "defaultTag": "Default",
     "compatTag": "Compat",
     "disableTag": "Disable"

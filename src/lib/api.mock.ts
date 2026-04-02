@@ -46,7 +46,7 @@ export const MockAPI = {
         version: "2.5",
         author: "Google",
         description: "Changes system colors.",
-        mode: "auto",
+        mode: "overlay",
         is_mounted: true,
         rules: {
           default_mode: "overlay",
@@ -55,7 +55,7 @@ export const MockAPI = {
       },
       {
         id: "disabled_module",
-        name: "Unmounted Module",
+        name: "Umount Module",
         version: "0.1",
         author: "Tester",
         description: "This module is not mounted.",

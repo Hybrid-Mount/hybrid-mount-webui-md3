@@ -68,17 +68,17 @@
     "loadMore": "載入更多",
     "defaultMode": "預設策略",
     "modes": {
-      "auto": "OverlayFS",
+      "overlay": "OverlayFS",
       "magic": "Magic Mount",
-      "none": "Unmounted",
+      "umount": "Umount",
       "short": {
-        "auto": "Overlay",
+        "overlay": "Overlay",
         "magic": "Magic",
         "ignore": "忽略"
       }
     },
     "emptyState": "No modules found.",
-    "unmountedHiddenHint": "Unmounted modules are hidden.",
+    "umountHiddenHint": "Umount 模組已隱藏。",
     "defaultTag": "Default",
     "compatTag": "Compat",
     "disableTag": "Disable"

@@ -17,7 +17,7 @@ import "@material/web/button/text-button.js";
 import "@material/web/ripple/ripple.js";
 
 export default function StatusTab() {
-  let autoBarRef: HTMLDivElement | undefined;
+  let overlayBarRef: HTMLDivElement | undefined;
   let magicBarRef: HTMLDivElement | undefined;
 
   const displayPartitions = createMemo(() => [
@@ -32,6 +32,9 @@ export default function StatusTab() {
   );
 
   const [showRebootConfirm, setShowRebootConfirm] = createSignal(false);
+  const moduleStatsReady = createMemo(
+    () => !moduleStore.loading && moduleStore.hasLoaded,
+  );
 
   function getModeDisplayName(mode: string | null | undefined) {
     if (!mode) return "Unknown";
@@ -41,17 +44,17 @@ export default function StatusTab() {
 
   const modeDistribution = createMemo(() => {
     const stats = moduleStore.modeStats;
-    const total = (stats?.auto || 0) + (stats?.magic || 0);
-    if (total === 0) return { auto: 0, magic: 0 };
+    const total = (stats?.overlay || 0) + (stats?.magic || 0);
+    if (total === 0) return { overlay: 0, magic: 0 };
     return {
-      auto: (stats.auto / total) * 100,
+      overlay: (stats.overlay / total) * 100,
       magic: (stats.magic / total) * 100,
     };
   });
 
   createEffect(() => {
-    const { auto, magic } = modeDistribution();
-    if (autoBarRef) autoBarRef.style.width = `${auto}%`;
+    const { overlay, magic } = modeDistribution();
+    if (overlayBarRef) overlayBarRef.style.width = `${overlay}%`;
     if (magicBarRef) magicBarRef.style.width = `${magic}%`;
   });
 
@@ -121,7 +124,7 @@ export default function StatusTab() {
         <div class="metrics-row">
           <div class="metric-card">
             <Show
-              when={!sysStore.loading}
+              when={moduleStatsReady()}
               fallback={<Skeleton width="50%" height="32px" />}
             >
               <div class="metric-icon-bg">
@@ -161,22 +164,22 @@ export default function StatusTab() {
             {uiStore.L?.status?.modeStats ?? "Mode Distribution"}
           </div>
           <Show
-            when={!sysStore.loading}
+            when={moduleStatsReady()}
             fallback={
               <Skeleton width="100%" height="24px" borderRadius="12px" />
             }
           >
             <div class="stats-bar-container">
-              <div ref={autoBarRef} class="bar-segment bar-auto"></div>
+              <div ref={overlayBarRef} class="bar-segment bar-overlay"></div>
               <div ref={magicBarRef} class="bar-segment bar-magic"></div>
             </div>
             <div class="stats-legend">
               <div class="legend-item">
-                <div class="legend-dot dot-auto"></div>
+                <div class="legend-dot dot-overlay"></div>
                 <span>
-                  {(uiStore.L.modules?.modes?.short?.auto ?? "Overlay") +
+                  {(uiStore.L.modules?.modes?.short?.overlay ?? "Overlay") +
                     ": " +
-                    (moduleStore.modeStats?.auto || 0)}
+                    (moduleStore.modeStats?.overlay || 0)}
                 </span>
               </div>
               <div class="legend-item">

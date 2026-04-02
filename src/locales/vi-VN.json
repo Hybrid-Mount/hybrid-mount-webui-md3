@@ -68,17 +68,17 @@
     "loadMore": "Tải thêm",
     "defaultMode": "Chiến lược Mặc định",
     "modes": {
-      "auto": "OverlayFS",
+      "overlay": "OverlayFS",
       "magic": "Magic Mount",
-      "none": "Đã bỏ gắn kết",
+      "umount": "Umount",
       "short": {
-        "auto": "Overlay",
+        "overlay": "Overlay",
         "magic": "Magic",
         "ignore": "Bỏ qua"
       }
     },
     "emptyState": "Không có mô-đun nào được tìm thấy.",
-    "unmountedHiddenHint": "Mô-đun đã bỏ gắn kết bị ẩn.",
+    "umountHiddenHint": "Các mô-đun Umount đang bị ẩn.",
     "defaultTag": "Mặc định",
     "compatTag": "Tương thích",
     "disableTag": "Tắt"

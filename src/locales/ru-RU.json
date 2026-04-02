@@ -68,17 +68,17 @@
     "loadMore": "Загрузить ещё",
     "defaultMode": "Стратегия",
     "modes": {
-      "auto": "OverlayFS",
+      "overlay": "OverlayFS",
       "magic": "Magic Mount",
-      "none": "Unmounted",
+      "umount": "Umount",
       "short": {
-        "auto": "Overlay",
+        "overlay": "Overlay",
         "magic": "Magic",
         "ignore": "Ignore"
       }
     },
     "emptyState": "No modules found.",
-    "unmountedHiddenHint": "Unmounted modules are hidden.",
+    "umountHiddenHint": "Umount modules are hidden.",
     "defaultTag": "Default",
     "compatTag": "Compat",
     "disableTag": "Disable"

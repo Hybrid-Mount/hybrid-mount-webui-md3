@@ -14,6 +14,7 @@ import { ICONS } from "../lib/constants";
 import Skeleton from "../components/Skeleton";
 import BottomActions from "../components/BottomActions";
 import { API } from "../lib/api";
+import { normalizeModuleMode } from "../lib/moduleMode";
 import type { Module, MountMode } from "../lib/types";
 import "./ModulesTab.css";
 import "@material/web/iconbutton/filled-tonal-icon-button.js";
@@ -25,8 +26,8 @@ export default function ModulesTab() {
   const BATCH_SIZE = 20;
   const [searchQuery, setSearchQuery] = createSignal("");
   const deferredSearchQuery = createDeferred(searchQuery);
-  const [filterType, setFilterType] = createSignal("all");
-  const [showUnmounted, setShowUnmounted] = createSignal(false);
+  const [filterType, setFilterType] = createSignal<"all" | MountMode>("all");
+  const [showUmount, setShowUmount] = createSignal(false);
   const [expandedId, setExpandedId] = createSignal<string | null>(null);
   const [initialRulesSnapshot, setInitialRulesSnapshot] = createSignal<
     Record<string, string>
@@ -54,7 +55,7 @@ export default function ModulesTab() {
   createEffect(() => {
     searchQuery();
     filterType();
-    showUnmounted();
+    showUmount();
     setVisibleCount(BATCH_SIZE);
   });
 
@@ -109,13 +110,16 @@ export default function ModulesTab() {
   const filteredModules = createMemo(() =>
     moduleStore.modules.filter((m) => {
       const q = deferredSearchQuery().toLowerCase();
-      if (!m.is_mounted && !showUnmounted()) {
+      if (!m.is_mounted && !showUmount()) {
         return false;
       }
       const matchSearch =
         m.name.toLowerCase().includes(q) || m.id.toLowerCase().includes(q);
       if (!matchSearch) return false;
-      if (filterType() !== "all" && m.mode !== filterType()) {
+      if (
+        filterType() !== "all" &&
+        normalizeModuleMode(m.mode) !== filterType()
+      ) {
         return false;
       }
 
@@ -140,15 +144,15 @@ export default function ModulesTab() {
 
   function getModeLabel(mod: Module) {
     const m = uiStore.L.modules?.modes;
-    if (!mod.is_mounted) return m?.none ?? "Unmounted";
-    if (mod.mode === "magic") return m?.magic ?? "Magic";
-    return m?.auto ?? "Overlay";
+    if (!mod.is_mounted) return m?.umount ?? "Umount";
+    if (normalizeModuleMode(mod.mode) === "magic") return m?.magic ?? "Magic";
+    return m?.overlay ?? "OverlayFS";
   }
 
   function getModeClass(mod: Module) {
     if (!mod.is_mounted) return "mode-ignore";
-    if (mod.mode === "magic") return "mode-magic";
-    return "mode-auto";
+    if (normalizeModuleMode(mod.mode) === "magic") return "mode-magic";
+    return "mode-overlay";
   }
 
   function updateModuleRules(
@@ -183,17 +187,15 @@ export default function ModulesTab() {
 
             <div class="filter-group">
               <button
-                class={`btn-icon ${showUnmounted() ? "active" : ""}`}
-                onClick={() => setShowUnmounted(!showUnmounted())}
-                title={showUnmounted() ? "Hide unmounted" : "Show unmounted"}
+                class={`btn-icon ${showUmount() ? "active" : ""}`}
+                onClick={() => setShowUmount(!showUmount())}
+                title={showUmount() ? "Hide Umount" : "Show Umount"}
                 type="button"
-                aria-pressed={showUnmounted() ? "true" : "false"}
+                aria-pressed={showUmount() ? "true" : "false"}
               >
                 <svg viewBox="0 0 24 24" width="20" height="20">
                   <path
-                    d={
-                      showUnmounted() ? ICONS.visibility : ICONS.visibility_off
-                    }
+                    d={showUmount() ? ICONS.visibility : ICONS.visibility_off}
                     fill="currentColor"
                   />
                 </svg>
@@ -202,13 +204,15 @@ export default function ModulesTab() {
               <select
                 class="filter-select"
                 value={filterType()}
-                onChange={(e) => setFilterType(e.currentTarget.value)}
+                onChange={(e) =>
+                  setFilterType(e.currentTarget.value as "all" | MountMode)
+                }
                 aria-label={uiStore.L.modules?.filterLabel || "Filter modules"}
                 title={uiStore.L.modules?.filterLabel || "Filter modules"}
               >
                 <option value="all">{uiStore.L.modules?.filterAll}</option>
-                <option value="auto">
-                  {uiStore.L.modules?.modes?.short?.auto ?? "Overlay"}
+                <option value="overlay">
+                  {uiStore.L.modules?.modes?.short?.overlay ?? "Overlay"}
                 </option>
                 <option value="magic">
                   {uiStore.L.modules?.modes?.short?.magic ?? "Magic"}
@@ -232,10 +236,10 @@ export default function ModulesTab() {
               fallback={
                 <div class="empty-state">
                   <div>{uiStore.L.modules?.emptyState ?? "No modules found."}</div>
-                  <Show when={!showUnmounted()}>
+                  <Show when={!showUmount()}>
                     <div class="empty-state-hint">
-                      {uiStore.L.modules?.unmountedHiddenHint ??
-                        "Unmounted modules are hidden."}
+                      {uiStore.L.modules?.umountHiddenHint ??
+                        "Umount modules are hidden."}
                     </div>
                   </Show>
                 </div>
@@ -283,7 +287,7 @@ export default function ModulesTab() {
                                 }
                               >
                                 <span class="opt-title">
-                                  {uiStore.L.modules?.modes?.short?.auto ??
+                                  {uiStore.L.modules?.modes?.short?.overlay ??
                                     "Overlay"}
                                 </span>
                                 <span class="opt-sub">

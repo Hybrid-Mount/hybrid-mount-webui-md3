@@ -11,6 +11,7 @@ import {
 import { uiStore } from "./lib/stores/uiStore";
 import { configStore } from "./lib/stores/configStore";
 import { sysStore } from "./lib/stores/sysStore";
+import { moduleStore } from "./lib/stores/moduleStore";
 import TopBar from "./components/TopBar";
 import NavBar from "./components/NavBar";
 import Toast from "./components/Toast";
@@ -126,7 +127,11 @@ export default function App() {
 
   onMount(async () => {
     await uiStore.init();
-    await Promise.all([configStore.loadConfig(), sysStore.ensureStatusLoaded()]);
+    await Promise.all([
+      configStore.loadConfig(),
+      sysStore.ensureStatusLoaded(),
+      moduleStore.ensureModulesLoaded(),
+    ]);
 
     const pendingRoutes = routes.filter((route) => route.id !== activeTab());
     let preloadTimer = 0;

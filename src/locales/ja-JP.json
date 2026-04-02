@@ -68,17 +68,17 @@
     "loadMore": "さらに読み込む",
     "defaultMode": "デフォルト",
     "modes": {
-      "auto": "OverlayFS",
+      "overlay": "OverlayFS",
       "magic": "Magic Mount",
-      "none": "アンマウント済み",
+      "umount": "Umount",
       "short": {
-        "auto": "オーバーレイ",
+        "overlay": "オーバーレイ",
         "magic": "Magic",
         "ignore": "無視"
       }
     },
     "emptyState": "No modules found.",
-    "unmountedHiddenHint": "Unmounted modules are hidden.",
+    "umountHiddenHint": "Umount modules are hidden.",
     "defaultTag": "Default",
     "compatTag": "Compat",
     "disableTag": "Disable"
