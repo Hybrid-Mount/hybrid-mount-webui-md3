@@ -301,7 +301,15 @@ button:active {
   will-change: opacity, transform;
   transform: translate3d(
     0,
-    calc(-1 * var(--bottom-actions-keyboard-inset, 0px)),
+    calc(
+      -1 *
+        max(
+          0px,
+          calc(
+            var(--bottom-actions-keyboard-inset, 0px) - var(--bottom-inset, 0px)
+          )
+        )
+    ),
     0
   );
   transition:
