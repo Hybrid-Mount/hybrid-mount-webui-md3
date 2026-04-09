@@ -19,6 +19,7 @@ import type { OverlayMode, AppConfig } from "../lib/types";
 export default function ConfigTab() {
   const [initialConfigStr, setInitialConfigStr] = createSignal("");
   const [showResetConfirm, setShowResetConfirm] = createSignal(false);
+  let mountSourceInputRef: HTMLElement | undefined;
 
   const isValidPath = (p: string) => !p || (p.startsWith("/") && p.length > 1);
   const invalidModuleDir = createMemo(
@@ -207,6 +208,7 @@ export default function ConfigTab() {
 
             <div class="input-stack">
               <md-outlined-text-field
+                ref={(el) => (mountSourceInputRef = el)}
                 label={uiStore.L.config.mountSource}
                 value={configStore.config.mountsource}
                 onInput={(e: Event) =>
@@ -215,6 +217,14 @@ export default function ConfigTab() {
                     (e.currentTarget as HTMLInputElement).value,
                   )
                 }
+                onFocus={() => {
+                  setTimeout(() => {
+                    mountSourceInputRef?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "center",
+                    });
+                  }, 300);
+                }}
                 class="full-width-field"
               >
                 <md-icon slot="leading-icon">
