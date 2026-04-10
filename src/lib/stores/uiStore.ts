@@ -17,6 +17,7 @@ const createUiStore = () => {
   const availableLanguages: LanguageOption[] = [
     { code: "en-US", name: "English" },
     { code: "es-ES", name: "Español" },
+    { code: "it-IT", name: "Italiano" },
     { code: "ja-JP", name: "日本語" },
     { code: "ru-RU", name: "Русский" },
     { code: "uk-UA", name: "Українська" },
