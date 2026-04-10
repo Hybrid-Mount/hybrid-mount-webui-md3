@@ -1,0 +1,99 @@
+{
+  "lang": {
+    "display": "Italiano"
+  },
+  "common": {
+    "appName": "Hybrid Mount",
+    "saving": "Salvo...",
+    "language": "Lingua",
+    "rebootTitle": "Riavviare il sistema?",
+    "rebootConfirm": "Sei sicuro di voler riavviare il dispositivo?",
+    "reboot": "Riavvio",
+    "cancel": "Annulla",
+    "saved": "Salvato"
+  },
+  "tabs": {
+    "status": "Stato",
+    "config": "Config",
+    "modules": "Moduli",
+    "info": "Info"
+  },
+  "status": {
+    "storageTitle": "Memoria",
+    "moduleActive": "Moduli Attivi",
+    "modeStats": "Statistiche Modalità",
+    "sysInfoTitle": "Info Sistema",
+    "kernel": "Kernel",
+    "selinux": "SELinux",
+    "mountBase": "Base Mount",
+    "activePartitions": "Partizioni Attive",
+    "loadError": "Impossibile caricare lo stato del sistema"
+  },
+  "config": {
+    "disableUmount": "Disabilita Umount",
+    "moduleDir": "Directory Moduli",
+    "moduleDirDesc": "Imposta la directory dove sono memorizzati i moduli",
+    "mountSource": "Sorgente Mount",
+    "mountSourceDesc": "Namespace sorgente Global mount (es. KSU)",
+    "partitions": "Partizioni",
+    "partitionsDesc": "Aggiungi partizioni da montare",
+    "reload": "Ricarica",
+    "save": "Salva",
+    "resetConfig": "Reset Config",
+    "resetConfigTitle": "Ripristinare la configurazione?",
+    "resetConfigConfirm": "Questa operazione ripristinerà tutte le impostazioni di backend ai valori predefiniti. Continuare?",
+    "invalidPath": "Percorso non valido rilevato",
+    "invalidModuleDir": "Percorso non valido",
+    "loadError": "Impossibile caricare la configurazione",
+    "saveFailed": "Impossibile salvare",
+    "resetSuccess": "Configurazione ripristinata ai valori predefiniti",
+    "webui": "Impostazioni WebUI",
+    "overlayMode": "Modalità Overlay",
+    "overlayModeDesc": "Selezionare la strategia di archiviazione di backup",
+    "mode_tmpfs": "Tmpfs",
+    "mode_tmpfsDesc": "Basato su RAM. I/O più veloce, ripristino al riavvio.",
+    "mode_ext4": "Ext4",
+    "mode_ext4Desc": "Immagine di loopback. Persistente, consente di risparmiare RAM.",
+    "enableOverlayFallback": "Abilita Fallback Overlay"
+  },
+  "modules": {
+    "reload": "Ricarica",
+    "save": "Modalità Salvataggio",
+    "scanError": "Impossibile scansionare i moduli",
+    "saveSuccess": "Modalità salvata",
+    "saveFailed": "Impossibile salvare le modalità",
+    "searchPlaceholder": "Ricerca moduli...",
+    "filterLabel": "Filtro:",
+    "filterAll": "Tutto",
+    "loadMore": "Carica altro",
+    "defaultMode": "Strategia predefinita",
+    "modes": {
+      "overlay": "OverlayFS",
+      "magic": "Magic Mount",
+      "umount": "Umount",
+      "short": {
+        "overlay": "Overlay",
+        "magic": "Magic",
+        "ignore": "Ignora"
+      }
+    },
+    "emptyState": "Nessun modulo trovato.",
+    "umountHiddenHint": "Moduli umount sono nascosti.",
+    "defaultTag": "Predefinito",
+    "compatTag": "Compatibilità",
+    "disableTag": "Disabilita"
+  },
+  "logs": {
+    "refresh": "Ricarica"
+  },
+  "info": {
+    "projectLink": "Repository",
+    "donate": "Donare",
+    "contributors": "Collaboratori",
+    "loadFail": "Caricamento non riuscito (API Rate Limit)",
+    "noBio": "Nessuna bio disponibile",
+    "telegram": "Telegram",
+    "supportUs": "Sostienici",
+    "authorYuzaki": "YuzakiKokuban"
+  }
+}
