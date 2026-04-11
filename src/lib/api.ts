@@ -226,9 +226,7 @@ const RealAPI: AppAPI = {
       return;
     }
     const safeUrl = shellEscapeDoubleQuoted(url);
-    await ksuExec(
-      `am start -a android.intent.action.VIEW -d "${safeUrl}"`,
-    );
+    await ksuExec(`am start -a android.intent.action.VIEW -d "${safeUrl}"`);
   },
   reboot: async (): Promise<void> => {
     if (!ksuExec) throw new AppError("No KSU environment");

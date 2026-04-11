@@ -51,7 +51,9 @@ export default function ChipInput(props: Props) {
 
   return (
     <div class="chip-input-wrapper">
-      <md-chip-set classList={{ "chip-set-has-values": props.values.length > 0 }}>
+      <md-chip-set
+        classList={{ "chip-set-has-values": props.values.length > 0 }}
+      >
         <For each={props.values}>
           {(val, i) => (
             <md-input-chip

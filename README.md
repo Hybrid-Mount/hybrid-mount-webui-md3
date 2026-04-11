@@ -68,21 +68,21 @@ Core frontend layers:
 
 The frontend uses a single abstraction: `AppAPI` (`src/lib/api.ts`).
 
-| Method | Input | Output | Description |
-| --- | --- | --- | --- |
-| `loadConfig` | - | `Promise<AppConfig>` | Load active global config. |
-| `saveConfig` | `AppConfig` | `Promise<void>` | Persist global config payload. |
-| `resetConfig` | - | `Promise<void>` | Regenerate/reset config. |
-| `scanModules` | `path?: string` | `Promise<Module[]>` | Discover modules and rules. |
-| `saveModules` | `Module[]` | `Promise<void>` | Batch persist module rulesets. |
-| `saveModuleRules` | `moduleId`, `rules` | `Promise<void>` | Persist one module ruleset. |
-| `getStorageUsage` | - | `Promise<StorageStatus>` | Read storage backend mode. |
-| `getSystemInfo` | - | `Promise<SystemInfo>` | Read runtime/system-level diagnostics. |
-| `getDeviceStatus` | - | `Promise<DeviceInfo>` | Read device profile metadata. |
-| `getVersion` | - | `Promise<string>` | Read module/app version. |
-| `openLink` | `url: string` | `Promise<void>` | Open external URL. |
-| `reboot` | - | `Promise<void>` | Trigger reboot action. |
-| `readLogs` | - | `Promise<string>` | Read daemon log content. |
+| Method            | Input               | Output                   | Description                            |
+| ----------------- | ------------------- | ------------------------ | -------------------------------------- |
+| `loadConfig`      | -                   | `Promise<AppConfig>`     | Load active global config.             |
+| `saveConfig`      | `AppConfig`         | `Promise<void>`          | Persist global config payload.         |
+| `resetConfig`     | -                   | `Promise<void>`          | Regenerate/reset config.               |
+| `scanModules`     | `path?: string`     | `Promise<Module[]>`      | Discover modules and rules.            |
+| `saveModules`     | `Module[]`          | `Promise<void>`          | Batch persist module rulesets.         |
+| `saveModuleRules` | `moduleId`, `rules` | `Promise<void>`          | Persist one module ruleset.            |
+| `getStorageUsage` | -                   | `Promise<StorageStatus>` | Read storage backend mode.             |
+| `getSystemInfo`   | -                   | `Promise<SystemInfo>`    | Read runtime/system-level diagnostics. |
+| `getDeviceStatus` | -                   | `Promise<DeviceInfo>`    | Read device profile metadata.          |
+| `getVersion`      | -                   | `Promise<string>`        | Read module/app version.               |
+| `openLink`        | `url: string`       | `Promise<void>`          | Open external URL.                     |
+| `reboot`          | -                   | `Promise<void>`          | Trigger reboot action.                 |
+| `readLogs`        | -                   | `Promise<string>`        | Read daemon log content.               |
 
 Primary schemas (`src/lib/types.ts`):
 

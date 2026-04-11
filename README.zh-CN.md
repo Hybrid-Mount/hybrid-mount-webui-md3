@@ -68,21 +68,21 @@ WebUI 运行流程如下：
 
 前端依赖统一抽象 `AppAPI`（定义于 `src/lib/api.ts`）。
 
-| 方法 | 入参 | 返回 | 说明 |
-| --- | --- | --- | --- |
-| `loadConfig` | - | `Promise<AppConfig>` | 读取当前全局配置。 |
-| `saveConfig` | `AppConfig` | `Promise<void>` | 保存全局配置。 |
-| `resetConfig` | - | `Promise<void>` | 重置/重新生成配置。 |
-| `scanModules` | `path?: string` | `Promise<Module[]>` | 扫描模块与规则。 |
-| `saveModules` | `Module[]` | `Promise<void>` | 批量保存模块规则。 |
-| `saveModuleRules` | `moduleId`, `rules` | `Promise<void>` | 保存单模块规则。 |
-| `getStorageUsage` | - | `Promise<StorageStatus>` | 查询存储后端模式。 |
-| `getSystemInfo` | - | `Promise<SystemInfo>` | 查询系统运行诊断。 |
-| `getDeviceStatus` | - | `Promise<DeviceInfo>` | 查询设备信息。 |
-| `getVersion` | - | `Promise<string>` | 获取模块/应用版本。 |
-| `openLink` | `url: string` | `Promise<void>` | 打开外部链接。 |
-| `reboot` | - | `Promise<void>` | 执行重启动作。 |
-| `readLogs` | - | `Promise<string>` | 读取 daemon 日志。 |
+| 方法              | 入参                | 返回                     | 说明                |
+| ----------------- | ------------------- | ------------------------ | ------------------- |
+| `loadConfig`      | -                   | `Promise<AppConfig>`     | 读取当前全局配置。  |
+| `saveConfig`      | `AppConfig`         | `Promise<void>`          | 保存全局配置。      |
+| `resetConfig`     | -                   | `Promise<void>`          | 重置/重新生成配置。 |
+| `scanModules`     | `path?: string`     | `Promise<Module[]>`      | 扫描模块与规则。    |
+| `saveModules`     | `Module[]`          | `Promise<void>`          | 批量保存模块规则。  |
+| `saveModuleRules` | `moduleId`, `rules` | `Promise<void>`          | 保存单模块规则。    |
+| `getStorageUsage` | -                   | `Promise<StorageStatus>` | 查询存储后端模式。  |
+| `getSystemInfo`   | -                   | `Promise<SystemInfo>`    | 查询系统运行诊断。  |
+| `getDeviceStatus` | -                   | `Promise<DeviceInfo>`    | 查询设备信息。      |
+| `getVersion`      | -                   | `Promise<string>`        | 获取模块/应用版本。 |
+| `openLink`        | `url: string`       | `Promise<void>`          | 打开外部链接。      |
+| `reboot`          | -                   | `Promise<void>`          | 执行重启动作。      |
+| `readLogs`        | -                   | `Promise<string>`        | 读取 daemon 日志。  |
 
 核心数据结构（`src/lib/types.ts`）：
 

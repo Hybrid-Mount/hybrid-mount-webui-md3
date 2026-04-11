@@ -373,10 +373,14 @@ export default function InfoTab() {
                   <div class="group-header">
                     <button
                       class="group-link"
-                      onClick={(e: MouseEvent) => handleLink(e, section.repoUrl)}
+                      onClick={(e: MouseEvent) =>
+                        handleLink(e, section.repoUrl)
+                      }
                     >
                       <div class="group-title">{section.label}</div>
-                      <div class="group-subtitle">{section.repoDisplayName}</div>
+                      <div class="group-subtitle">
+                        {section.repoDisplayName}
+                      </div>
                     </button>
                   </div>
 
@@ -384,7 +388,9 @@ export default function InfoTab() {
                     <Show
                       when={!section.error}
                       fallback={
-                        <div class="error-message">{uiStore.L.info.loadFail}</div>
+                        <div class="error-message">
+                          {uiStore.L.info.loadFail}
+                        </div>
                       }
                     >
                       <md-list class="contributors-list">
@@ -406,7 +412,9 @@ export default function InfoTab() {
                                 class="c-avatar"
                                 loading="lazy"
                               />
-                              <div slot="headline">{user.name || user.login}</div>
+                              <div slot="headline">
+                                {user.name || user.login}
+                              </div>
                               <div slot="supporting-text">
                                 {user.bio || uiStore.L.info.noBio}
                               </div>
