@@ -135,6 +135,48 @@ export default function App() {
   });
 
   onMount(() => {
+    const viewport = window.visualViewport;
+    const rootStyle = document.documentElement.style;
+
+    if (viewport) {
+      let viewportRafId = 0;
+      let lastInset = -1;
+
+      const updateViewportBottomOffset = () => {
+        if (viewportRafId) return;
+
+        viewportRafId = window.requestAnimationFrame(() => {
+          viewportRafId = 0;
+          const inset = Math.max(
+            0,
+            Math.round(
+              window.innerHeight - viewport.height - viewport.offsetTop,
+            ),
+          );
+
+          if (Math.abs(lastInset - inset) < 2) return;
+          lastInset = inset;
+          rootStyle.setProperty("--viewport-bottom-offset", `${inset}px`);
+        });
+      };
+
+      updateViewportBottomOffset();
+      viewport.addEventListener("resize", updateViewportBottomOffset);
+      viewport.addEventListener("scroll", updateViewportBottomOffset);
+      window.addEventListener("orientationchange", updateViewportBottomOffset);
+
+      onCleanup(() => {
+        if (viewportRafId) window.cancelAnimationFrame(viewportRafId);
+        viewport.removeEventListener("resize", updateViewportBottomOffset);
+        viewport.removeEventListener("scroll", updateViewportBottomOffset);
+        window.removeEventListener(
+          "orientationchange",
+          updateViewportBottomOffset,
+        );
+        rootStyle.removeProperty("--viewport-bottom-offset");
+      });
+    }
+
     void initializeApp();
   });
 

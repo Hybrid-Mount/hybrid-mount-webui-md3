@@ -20,9 +20,14 @@
   --md-ref-typeface-plain: var(--font-stack);
   --md-ref-typeface-mono: "JetBrains Mono", "Fira Code", monospace;
 
-  --top-inset: var(--window-inset-top, 0px);
-  --bottom-inset: var(--window-inset-bottom, 0px);
+  --top-inset: var(--window-inset-top, env(safe-area-inset-top, 0px));
+  --bottom-inset: var(--window-inset-bottom, env(safe-area-inset-bottom, 0px));
   --bottom-nav-height: 64px;
+  --viewport-bottom-offset: 0px;
+  --bottom-keyboard-shift: max(
+    0px,
+    calc(var(--viewport-bottom-offset, 0px) - var(--bottom-inset, 0px))
+  );
 
   --md-sys-color-primary: var(--primary, #6750a4);
   --md-sys-color-on-primary: var(--onPrimary, #ffffff);
@@ -299,22 +304,8 @@ button:active {
   opacity: 0;
   pointer-events: none;
   will-change: opacity, transform;
-  transform: translate3d(
-    0,
-    calc(
-      -1 *
-        max(
-          0px,
-          calc(
-            var(--bottom-actions-keyboard-inset, 0px) - var(--bottom-inset, 0px)
-          )
-        )
-    ),
-    0
-  );
-  transition:
-    opacity 0.2s ease,
-    transform 0.24s cubic-bezier(0.2, 1, 0.2, 1);
+  transform: translate3d(0, calc(-1 * var(--bottom-keyboard-shift, 0px)), 0);
+  transition: opacity 0.2s ease;
 }
 
 .bottom-actions-root.is-active {
