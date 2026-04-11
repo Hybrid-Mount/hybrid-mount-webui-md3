@@ -27,9 +27,7 @@
   --viewport-bottom-offset: 0px;
   --bottom-keyboard-shift: max(
     0px,
-    calc(
-      var(--viewport-bottom-offset, 0px) - var(--stable-bottom-inset, 0px)
-    )
+    calc(var(--viewport-bottom-offset, 0px) - var(--stable-bottom-inset, 0px))
   );
   --bottom-nav-keyboard-shift: var(--bottom-keyboard-shift);
 
@@ -311,10 +309,7 @@ button:active {
   will-change: opacity, transform;
   transform: translate3d(
     0,
-    calc(
-      var(--bottom-actions-rest-offset) -
-        var(--bottom-keyboard-shift, 0px)
-    ),
+    calc(var(--bottom-actions-rest-offset) - var(--bottom-keyboard-shift, 0px)),
     0
   );
   transition:

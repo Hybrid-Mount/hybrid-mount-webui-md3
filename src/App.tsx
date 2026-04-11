@@ -159,10 +159,7 @@ export default function App() {
         rootStyle.setProperty("--bottom-nav-keyboard-shift", `${shift}px`);
       };
 
-      rootStyle.setProperty(
-        "--stable-bottom-inset",
-        `${stableBottomInset}px`,
-      );
+      rootStyle.setProperty("--stable-bottom-inset", `${stableBottomInset}px`);
       applyNavShift(0);
 
       const updateViewportBottomOffset = () => {
