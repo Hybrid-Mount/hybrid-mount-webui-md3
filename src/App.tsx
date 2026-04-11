@@ -149,11 +149,21 @@ export default function App() {
       let viewportRafId = 0;
       let lastInset = -1;
       let stableBottomInset = readBottomInset();
+      let navShiftTimer: number | undefined;
+      let pendingNavShift = 0;
+      let appliedNavShift = -1;
+
+      const applyNavShift = (shift: number) => {
+        if (Math.abs(appliedNavShift - shift) < 2) return;
+        appliedNavShift = shift;
+        rootStyle.setProperty("--bottom-nav-keyboard-shift", `${shift}px`);
+      };
 
       rootStyle.setProperty(
         "--stable-bottom-inset",
         `${stableBottomInset}px`,
       );
+      applyNavShift(0);
 
       const updateViewportBottomOffset = () => {
         if (viewportRafId) return;
@@ -178,6 +188,24 @@ export default function App() {
             }
           }
 
+          const navShift = Math.max(0, inset - stableBottomInset);
+          if (lastInset < 0 || navShift === 0) {
+            if (navShiftTimer !== undefined) {
+              window.clearTimeout(navShiftTimer);
+              navShiftTimer = undefined;
+            }
+            applyNavShift(navShift);
+          } else {
+            pendingNavShift = navShift;
+            if (navShiftTimer !== undefined) {
+              window.clearTimeout(navShiftTimer);
+            }
+            navShiftTimer = window.setTimeout(() => {
+              navShiftTimer = undefined;
+              applyNavShift(pendingNavShift);
+            }, 80);
+          }
+
           if (Math.abs(lastInset - inset) < 2) return;
           lastInset = inset;
           rootStyle.setProperty("--viewport-bottom-offset", `${inset}px`);
@@ -191,12 +219,16 @@ export default function App() {
 
       onCleanup(() => {
         if (viewportRafId) window.cancelAnimationFrame(viewportRafId);
+        if (navShiftTimer !== undefined) {
+          window.clearTimeout(navShiftTimer);
+        }
         viewport.removeEventListener("resize", updateViewportBottomOffset);
         viewport.removeEventListener("scroll", updateViewportBottomOffset);
         window.removeEventListener(
           "orientationchange",
           updateViewportBottomOffset,
         );
+        rootStyle.removeProperty("--bottom-nav-keyboard-shift");
         rootStyle.removeProperty("--stable-bottom-inset");
         rootStyle.removeProperty("--viewport-bottom-offset");
       });

@@ -31,6 +31,7 @@
       var(--viewport-bottom-offset, 0px) - var(--stable-bottom-inset, 0px)
     )
   );
+  --bottom-nav-keyboard-shift: var(--bottom-keyboard-shift);
 
   --md-sys-color-primary: var(--primary, #6750a4);
   --md-sys-color-on-primary: var(--onPrimary, #ffffff);

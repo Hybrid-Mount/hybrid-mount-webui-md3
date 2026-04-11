@@ -8,7 +8,7 @@
   flex-direction: column;
   padding: 12px;
   border: 1px solid var(--md-sys-color-outline);
-  border-radius: 8px;
+  border-radius: 16px;
 }
 
 md-chip-set.chip-set-has-values {
