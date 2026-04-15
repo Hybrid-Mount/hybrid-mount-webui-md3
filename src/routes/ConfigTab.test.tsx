@@ -118,7 +118,7 @@ describe("ConfigTab", () => {
     }));
 
     vi.doMock("../components/BottomActions", () => ({
-      default: (props: { children: unknown }) => <div>{props.children}</div>,
+      default: (props: { children: any }) => <div>{props.children}</div>,
     }));
 
     const { default: ConfigTab } = await import("./ConfigTab");
