@@ -41,11 +41,13 @@ export default function StatusTab() {
 
   const modeDistribution = createMemo(() => {
     const stats = moduleStore.modeStats;
-    const total = (stats?.overlay || 0) + (stats?.magic || 0);
-    if (total === 0) return { overlay: 0, magic: 0 };
+    const total =
+      (stats?.overlay || 0) + (stats?.magic || 0) + (stats?.hymofs || 0);
+    if (total === 0) return { overlay: 0, magic: 0, hymofs: 0 };
     return {
       overlay: (stats.overlay / total) * 100,
       magic: (stats.magic / total) * 100,
+      hymofs: (stats.hymofs / total) * 100,
     };
   });
 
@@ -171,6 +173,10 @@ export default function StatusTab() {
                 class="bar-segment bar-magic"
                 style={{ width: `${modeDistribution().magic}%` }}
               ></div>
+              <div
+                class="bar-segment bar-hymofs"
+                style={{ width: `${modeDistribution().hymofs}%` }}
+              ></div>
             </div>
             <div class="stats-legend">
               <div class="legend-item">
@@ -187,6 +193,14 @@ export default function StatusTab() {
                   {(uiStore.L.modules?.modes?.short?.magic ?? "Magic") +
                     ": " +
                     (moduleStore.modeStats?.magic || 0)}
+                </span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot dot-hymofs"></div>
+                <span>
+                  {(uiStore.L.modules?.modes?.short?.hymofs ?? "HymoFS") +
+                    ": " +
+                    (moduleStore.modeStats?.hymofs || 0)}
                 </span>
               </div>
             </div>

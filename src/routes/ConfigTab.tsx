@@ -2,8 +2,10 @@ import { createSignal, createEffect, createMemo, For } from "solid-js";
 import { uiStore } from "../lib/stores/uiStore";
 import { configStore } from "../lib/stores/configStore";
 import { sysStore } from "../lib/stores/sysStore";
+import { hymofsStore } from "../lib/stores/hymofsStore";
 import { ICONS } from "../lib/constants";
 import { API } from "../lib/api";
+import { getCookie, setCookie } from "../lib/cookies";
 import ChipInput from "../components/ChipInput";
 import BottomActions from "../components/BottomActions";
 import "./ConfigTab.css";
@@ -14,11 +16,16 @@ import "@material/web/icon/icon.js";
 import "@material/web/ripple/ripple.js";
 import "@material/web/dialog/dialog.js";
 import "@material/web/button/text-button.js";
+import "@material/web/switch/switch.js";
 import type { OverlayMode, AppConfig } from "../lib/types";
+
+const HYMOFS_WARNING_COOKIE = "mhm_hymofs_warning_ack";
 
 export default function ConfigTab() {
   const [initialConfigStr, setInitialConfigStr] = createSignal("");
   const [showResetConfirm, setShowResetConfirm] = createSignal(false);
+  const [showHymofsWarning, setShowHymofsWarning] = createSignal(false);
+  const [hymofsPending, setHymofsPending] = createSignal(false);
   let mountSourceInputRef: HTMLElement | undefined;
 
   const isValidPath = (p: string) => !p || (p.startsWith("/") && p.length > 1);
@@ -70,6 +77,50 @@ export default function ConfigTab() {
     configStore.resetConfig().then(() => {
       setInitialConfigStr(JSON.stringify(configStore.config));
     });
+  }
+
+  async function applyHymofsEnabled(
+    enabled: boolean,
+    rememberWarning = false,
+  ) {
+    setHymofsPending(true);
+    try {
+      await API.setHymofsEnabled(enabled);
+      await hymofsStore.refreshStatus();
+      if (enabled && rememberWarning) {
+        setCookie(HYMOFS_WARNING_COOKIE, "1");
+      }
+      uiStore.showToast(
+        enabled
+          ? uiStore.L.config?.hymofsEnabledSuccess || "HymoFS enabled"
+          : uiStore.L.config?.hymofsDisabledSuccess || "HymoFS disabled",
+        "success",
+      );
+    } catch (e: any) {
+      uiStore.showToast(
+        e?.message || uiStore.L.config?.saveFailed || "Failed to save",
+        "error",
+      );
+    } finally {
+      setHymofsPending(false);
+    }
+  }
+
+  function requestHymofsToggle() {
+    if (hymofsStore.enabled) {
+      void applyHymofsEnabled(false);
+      return;
+    }
+    if (getCookie(HYMOFS_WARNING_COOKIE) === "1") {
+      void applyHymofsEnabled(true);
+      return;
+    }
+    setShowHymofsWarning(true);
+  }
+
+  function confirmHymofsEnable() {
+    setShowHymofsWarning(false);
+    void applyHymofsEnabled(true, true);
   }
 
   function toggle(key: keyof AppConfig) {
@@ -136,6 +187,29 @@ export default function ConfigTab() {
             </md-text-button>
             <md-text-button onClick={reset}>
               {uiStore.L.config?.resetConfig ?? "Reset Config"}
+            </md-text-button>
+          </div>
+        </md-dialog>
+
+        <md-dialog
+          open={showHymofsWarning()}
+          onclose={() => setShowHymofsWarning(false)}
+          class="transparent-scrim"
+        >
+          <div slot="headline">
+            {uiStore.L.config?.hymofsWarningTitle ??
+              "Enable Experimental HymoFS?"}
+          </div>
+          <div slot="content">
+            {uiStore.L.config?.hymofsWarningBody ??
+              "HymoFS is experimental. Enabling it will expose the HymoFS tab, allow HymoFS-backed module routing, and permit LKM autoload. Continue only if you know what you are testing."}
+          </div>
+          <div slot="actions">
+            <md-text-button onClick={() => setShowHymofsWarning(false)}>
+              {uiStore.L.common?.cancel ?? "Cancel"}
+            </md-text-button>
+            <md-text-button onClick={confirmHymofsEnable}>
+              {uiStore.L.config?.hymofsEnableConfirm ?? "Enable HymoFS"}
             </md-text-button>
           </div>
         </md-dialog>
@@ -312,6 +386,55 @@ export default function ConfigTab() {
                   </button>
                 )}
               </For>
+            </div>
+          </div>
+
+          <div class="config-card">
+            <div class="card-header">
+              <div class="card-icon">
+                <md-icon>
+                  <svg viewBox="0 0 24 24">
+                    <path d={ICONS.warning} />
+                  </svg>
+                </md-icon>
+              </div>
+              <div class="card-text">
+                <span class="card-title">
+                  {uiStore.L.config?.hymofsMasterTitle ??
+                    "Experimental HymoFS"}
+                </span>
+                <span class="card-desc">
+                  {uiStore.L.config?.hymofsMasterDesc ??
+                    "Enable the experimental HymoFS backend."}
+                </span>
+              </div>
+            </div>
+
+            <div class="setting-list">
+              <div class="list-item">
+                <div class="list-text">
+                  <span class="list-title">
+                    {uiStore.L.config?.hymofsMasterSwitch ?? "Enable HymoFS"}
+                  </span>
+                  <span class="list-desc">
+                    {hymofsStore.enabled
+                      ? uiStore.L.config?.hymofsStateEnabled || "Enabled"
+                      : uiStore.L.config?.hymofsStateDisabled || "Disabled"}
+                  </span>
+                </div>
+                <md-switch
+                  selected={hymofsStore.enabled}
+                  disabled={hymofsPending() || hymofsStore.loading}
+                  aria-label={
+                    uiStore.L.config?.hymofsMasterSwitch || "Enable HymoFS"
+                  }
+                  onClick={(e: Event) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    requestHymofsToggle();
+                  }}
+                />
+              </div>
             </div>
           </div>
 

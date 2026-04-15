@@ -11,6 +11,7 @@ import {
 import { uiStore } from "./lib/stores/uiStore";
 import { configStore } from "./lib/stores/configStore";
 import { sysStore } from "./lib/stores/sysStore";
+import { hymofsStore } from "./lib/stores/hymofsStore";
 import { moduleStore } from "./lib/stores/moduleStore";
 import TopBar from "./components/TopBar";
 import NavBar from "./components/NavBar";
@@ -18,12 +19,14 @@ import Toast from "./components/Toast";
 
 const loadStatusTab = () => import("./routes/StatusTab");
 const loadConfigTab = () => import("./routes/ConfigTab");
+const loadHymofsTab = () => import("./routes/HymofsTab");
 const loadModulesTab = () => import("./routes/ModulesTab");
 const loadInfoTab = () => import("./routes/InfoTab");
 
 const routes = [
   { id: "status", load: loadStatusTab, component: lazy(loadStatusTab) },
   { id: "config", load: loadConfigTab, component: lazy(loadConfigTab) },
+  { id: "hymofs", load: loadHymofsTab, component: lazy(loadHymofsTab) },
   { id: "modules", load: loadModulesTab, component: lazy(loadModulesTab) },
   { id: "info", load: loadInfoTab, component: lazy(loadInfoTab) },
 ];
@@ -45,7 +48,10 @@ export default function App() {
   let preloadTimer: number | undefined;
   let disposed = false;
 
-  const visibleTabs = createMemo(() => routes.map((r) => r.id));
+  const visibleRoutes = createMemo(() =>
+    routes.filter((route) => route.id !== "hymofs" || hymofsStore.enabled),
+  );
+  const visibleTabs = createMemo(() => visibleRoutes().map((r) => r.id));
 
   const baseTranslateX = createMemo(() => {
     const index = visibleTabs().indexOf(activeTab());
@@ -60,6 +66,13 @@ export default function App() {
       next.add(currentTab);
       return next;
     });
+  });
+
+  createEffect(() => {
+    const tabs = visibleTabs();
+    if (!tabs.includes(activeTab())) {
+      setActiveTab(tabs.includes("config") ? "config" : tabs[0] || "status");
+    }
   });
 
   function handleTouchStart(e: TouchEvent) {
@@ -143,12 +156,12 @@ export default function App() {
     await Promise.all([
       configStore.loadConfig(),
       sysStore.ensureStatusLoaded(),
+      hymofsStore.ensureStatusLoaded(),
       moduleStore.ensureModulesLoaded(),
     ]);
 
-    if (disposed) return;
-
-    const pendingRoutes = routes.filter((route) => route.id !== activeTab());
+    const pendingRoutes = visibleRoutes().filter((route) => route.id !== activeTab());
+    let preloadTimer = 0;
     let nextIndex = 0;
 
     const preloadNextRoute = () => {
@@ -197,7 +210,7 @@ export default function App() {
                 : "transform 0.4s cubic-bezier(0.2, 1, 0.2, 1)",
             }}
           >
-            <For each={routes}>
+            <For each={visibleRoutes()}>
               {(route) => (
                 <div
                   class="swipe-page"
@@ -219,7 +232,7 @@ export default function App() {
         <NavBar
           activeTab={activeTab()}
           onTabChange={setActiveTab}
-          tabs={routes}
+          tabs={visibleRoutes()}
         />
       </Show>
       <Toast />

@@ -112,6 +112,19 @@ describe("moduleStore", () => {
           paths: {},
         },
       },
+      {
+        id: "hymofs-mod",
+        name: "HymoFS Module",
+        version: "1.0.0",
+        author: "tester",
+        description: "C",
+        is_mounted: true,
+        mode: "hymofs",
+        rules: {
+          default_mode: "hymofs",
+          paths: {},
+        },
+      },
     ] as any);
 
     const { moduleStore } = await import("./moduleStore");
@@ -120,7 +133,7 @@ describe("moduleStore", () => {
 
     expect(moduleStore.modules[0].mode).toBe("overlay");
     expect(moduleStore.modules[0].rules.default_mode).toBe("overlay");
-    expect(moduleStore.modeStats).toEqual({ overlay: 1, magic: 1 });
+    expect(moduleStore.modeStats).toEqual({ overlay: 1, magic: 1, hymofs: 1 });
   });
 
   it("still allows an explicit manual refresh after the cached initial load", async () => {

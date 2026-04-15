@@ -17,6 +17,7 @@ export default function NavBar(props: Props) {
   const iconMap: Record<string, { regular: string; filled: string }> = {
     status: { regular: ICONS.home, filled: ICONS.home_filled },
     config: { regular: ICONS.settings, filled: ICONS.settings_filled },
+    hymofs: { regular: ICONS.snowflake, filled: ICONS.stealth },
     modules: { regular: ICONS.modules, filled: ICONS.modules_filled },
     info: { regular: ICONS.info, filled: ICONS.info_filled },
   };

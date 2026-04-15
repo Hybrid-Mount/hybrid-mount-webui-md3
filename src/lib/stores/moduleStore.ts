@@ -24,12 +24,13 @@ const createModuleStore = () => {
   }
 
   const modeStats = createMemo((): ModeStats => {
-    const stats = { overlay: 0, magic: 0 };
+    const stats = { overlay: 0, magic: 0, hymofs: 0 };
     modules.forEach((m) => {
       if (!m.is_mounted) return;
       const mode = normalizeModuleMode(m.mode);
       if (mode === "overlay") stats.overlay++;
       else if (mode === "magic") stats.magic++;
+      else if (mode === "hymofs") stats.hymofs++;
     });
     return stats;
   });

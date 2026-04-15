@@ -220,6 +220,11 @@
   color: var(--md-sys-color-on-tertiary-container);
 }
 
+.mode-hymofs {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
 .mode-ignore {
   background-color: var(--md-sys-color-surface-variant);
   color: var(--md-sys-color-on-surface-variant);
@@ -280,7 +285,7 @@
 
 .strategy-selector {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 4px;
 }
@@ -301,6 +306,15 @@
 
 .strategy-option:hover {
   background-color: var(--md-sys-color-surface-container-high);
+}
+
+.strategy-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.strategy-option:disabled:hover {
+  background: transparent;
 }
 
 .strategy-option.selected {
@@ -341,4 +355,10 @@
 
 .observer-sentinel {
   height: 20px;
+}
+
+@media (min-width: 680px) {
+  .strategy-selector {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }

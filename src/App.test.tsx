@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@solidjs/testing-library";
 import { createSignal, onMount } from "solid-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-type RouteId = "status" | "config" | "modules" | "info";
+type RouteId = "status" | "config" | "hymofs" | "modules" | "info";
 
 function createRouteComponent(
   routeId: RouteId,
@@ -39,6 +39,7 @@ describe("App", () => {
     const mountCounts: Record<RouteId, number> = {
       status: 0,
       config: 0,
+      hymofs: 0,
       modules: 0,
       info: 0,
     };
@@ -58,6 +59,13 @@ describe("App", () => {
       ensureStatusLoaded: vi.fn().mockResolvedValue(undefined),
     };
 
+    const hymofsStoreMock = {
+      get enabled() {
+        return false;
+      },
+      ensureStatusLoaded: vi.fn().mockResolvedValue(undefined),
+    };
+
     const moduleStoreMock = {
       ensureModulesLoaded: vi.fn().mockResolvedValue(undefined),
     };
@@ -72,6 +80,10 @@ describe("App", () => {
 
     vi.doMock("./lib/stores/sysStore", () => ({
       sysStore: sysStoreMock,
+    }));
+
+    vi.doMock("./lib/stores/hymofsStore", () => ({
+      hymofsStore: hymofsStoreMock,
     }));
 
     vi.doMock("./lib/stores/moduleStore", () => ({
@@ -117,6 +129,10 @@ describe("App", () => {
       default: createRouteComponent("modules", mountCounts),
     }));
 
+    vi.doMock("./routes/HymofsTab", () => ({
+      default: createRouteComponent("hymofs", mountCounts),
+    }));
+
     vi.doMock("./routes/InfoTab", () => ({
       default: createRouteComponent("info", mountCounts),
     }));
@@ -134,8 +150,13 @@ describe("App", () => {
       expect(uiStoreMock.init).toHaveBeenCalledTimes(1);
       expect(configStoreMock.loadConfig).toHaveBeenCalledTimes(1);
       expect(sysStoreMock.ensureStatusLoaded).toHaveBeenCalledTimes(1);
+      expect(hymofsStoreMock.ensureStatusLoaded).toHaveBeenCalledTimes(1);
       expect(moduleStoreMock.ensureModulesLoaded).toHaveBeenCalledTimes(1);
     });
+
+    expect(
+      screen.queryByRole("button", { name: "nav:hymofs" }),
+    ).not.toBeInTheDocument();
 
     await fireEvent.click(screen.getByRole("button", { name: "nav:config" }));
 
@@ -152,6 +173,7 @@ describe("App", () => {
 
     expect(screen.getByText("config count 1")).toBeInTheDocument();
     expect(mountCounts.config).toBe(1);
+    expect(mountCounts.hymofs).toBe(0);
     expect(mountCounts.modules).toBe(0);
     expect(mountCounts.info).toBe(0);
   });

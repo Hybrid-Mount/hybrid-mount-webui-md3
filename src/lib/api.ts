@@ -8,6 +8,11 @@ import type {
   SystemInfo,
   DeviceInfo,
   ModuleRules,
+  HymofsStatus,
+  HymofsRuleEntry,
+  HymofsLkmStatus,
+  HymofsUnameConfig,
+  KernelUnameValues,
 } from "./types";
 
 interface KsuExecResult {
@@ -73,95 +78,138 @@ export interface AppAPI {
   getSystemInfo: () => Promise<SystemInfo>;
   getDeviceStatus: () => Promise<DeviceInfo>;
   getVersion: () => Promise<string>;
+  getHymofsStatus: () => Promise<HymofsStatus>;
+  getHymofsRules: () => Promise<HymofsRuleEntry[]>;
+  getLkmStatus: () => Promise<HymofsLkmStatus>;
+  isHymofsLkmLoaded: () => Promise<boolean>;
+  setHymofsEnabled: (enabled: boolean) => Promise<void>;
+  setHymofsStealth: (enabled: boolean) => Promise<void>;
+  setHymofsHidexattr: (enabled: boolean) => Promise<void>;
+  setHymofsIgnoreProtocolMismatch: (enabled: boolean) => Promise<void>;
+  setHymofsMapsSpoof: (enabled: boolean) => Promise<void>;
+  setHymofsDebug: (enabled: boolean) => Promise<void>;
+  setHymofsMirror: (path: string) => Promise<void>;
+  getOriginalKernelUname: () => Promise<KernelUnameValues>;
+  setHymofsUname: (uname: Partial<HymofsUnameConfig>) => Promise<void>;
+  clearHymofsUname: () => Promise<void>;
+  setHymofsCmdline: (value: string) => Promise<void>;
+  clearHymofsCmdline: () => Promise<void>;
+  addHymofsMapsRule: (rule: {
+    target_ino: number;
+    target_dev: number;
+    spoofed_ino: number;
+    spoofed_dev: number;
+    spoofed_pathname: string;
+  }) => Promise<void>;
+  clearHymofsMapsRules: () => Promise<void>;
+  setHymofsHideUids: (uids: number[]) => Promise<void>;
+  clearHymofsHideUids: () => Promise<void>;
+  setHymofsMountHide: (
+    enabled: boolean,
+    pathPattern?: string,
+  ) => Promise<void>;
+  setHymofsStatfsSpoof: (
+    enabled: boolean,
+    path?: string,
+    fType?: number,
+  ) => Promise<void>;
+  getUserHideRules: () => Promise<string[]>;
+  addUserHideRule: (path: string) => Promise<void>;
+  removeUserHideRule: (path: string) => Promise<void>;
+  applyUserHideRules: () => Promise<void>;
+  loadHymofsLkm: () => Promise<void>;
+  unloadHymofsLkm: () => Promise<void>;
+  setHymofsLkmAutoload: (enabled: boolean) => Promise<void>;
+  setHymofsLkmKmi: (value: string) => Promise<void>;
+  clearHymofsLkmKmi: () => Promise<void>;
+  fixHymofsMounts: () => Promise<void>;
+  clearHymofsRules: () => Promise<void>;
+  releaseHymofsConnection: () => Promise<void>;
+  invalidateHymofsCache: () => Promise<void>;
   openLink: (url: string) => Promise<void>;
   reboot: () => Promise<void>;
   readLogs: () => Promise<string>;
 }
 
+function requireExec(): KsuModule["exec"] {
+  if (!ksuExec) throw new AppError("No KSU environment");
+  return ksuExec;
+}
+
+async function runCommand(command: string): Promise<KsuExecResult> {
+  const exec = requireExec();
+  return exec(command);
+}
+
+async function runCommandExpectOk(command: string): Promise<string> {
+  const { errno, stdout, stderr } = await runCommand(command);
+  if (errno === 0) return stdout;
+  throw new AppError(stderr || `command failed: ${command}`, errno);
+}
+
+async function runJsonCommand<T>(command: string): Promise<T> {
+  const output = await runCommandExpectOk(command);
+  return JSON.parse(output) as T;
+}
+
 const RealAPI: AppAPI = {
   loadConfig: async (): Promise<AppConfig> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
     const cmd = `${PATHS.BINARY} show-config`;
-    const { errno, stdout, stderr } = await ksuExec(cmd);
-    if (errno === 0 && stdout) {
-      return { ...DEFAULT_CONFIG, ...JSON.parse(stdout) };
-    }
-    throw new AppError(`loadConfig failed: ${stderr}`, errno);
+    return { ...DEFAULT_CONFIG, ...(await runJsonCommand<AppConfig>(cmd)) };
   },
   saveConfig: async (config: AppConfig): Promise<void> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
     const hexPayload = stringToHex(JSON.stringify(config));
     const cmd = `${PATHS.BINARY} save-config --payload ${hexPayload}`;
-    const { errno, stderr } = await ksuExec(cmd);
-    if (errno !== 0) throw new AppError(`saveConfig failed: ${stderr}`, errno);
+    await runCommandExpectOk(cmd);
   },
   resetConfig: async (): Promise<void> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
     const cmd = `${PATHS.BINARY} gen-config`;
-    const { errno, stderr } = await ksuExec(cmd);
-    if (errno !== 0) throw new AppError(`resetConfig failed: ${stderr}`, errno);
+    await runCommandExpectOk(cmd);
   },
   scanModules: async (): Promise<Module[]> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
     const cmd = `${PATHS.BINARY} modules`;
-    const { errno, stdout, stderr } = await ksuExec(cmd);
-    if (errno === 0 && stdout) return JSON.parse(stdout);
-    throw new AppError(`scanModules failed: ${stderr}`, errno);
+    return runJsonCommand<Module[]>(cmd);
   },
   saveModules: async (modules: Module[]): Promise<void> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
     for (const mod of modules) {
       const hexPayload = stringToHex(JSON.stringify(mod.rules));
       const safeModuleId = shellEscapeDoubleQuoted(mod.id);
       const cmd = `${PATHS.BINARY} save-module-rules --module "${safeModuleId}" --payload ${hexPayload}`;
-      const { errno, stderr } = await ksuExec(cmd);
-      if (errno !== 0)
-        throw new AppError(
-          `saveModules failed for ${mod.id}: ${stderr}`,
-          errno,
-        );
+      await runCommandExpectOk(cmd);
     }
   },
   readLogs: async (): Promise<string> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
     let logPath = DEFAULT_CONFIG.logfile || "/data/adb/hybrid-mount/daemon.log";
     try {
       const cfg = await RealAPI.loadConfig();
       if (cfg.logfile) logPath = cfg.logfile;
     } catch {}
-    const { errno, stdout, stderr } = await ksuExec(
+    return runCommandExpectOk(
       `cat "${shellEscapeDoubleQuoted(logPath)}"`,
     );
-    if (errno === 0 && stdout) return stdout;
-    throw new AppError(`readLogs failed: ${stderr}`, errno);
   },
   saveModuleRules: async (
     moduleId: string,
     rules: ModuleRules,
   ): Promise<void> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
     const hexPayload = stringToHex(JSON.stringify(rules));
     const safeModuleId = shellEscapeDoubleQuoted(moduleId);
     const cmd = `${PATHS.BINARY} save-module-rules --module "${safeModuleId}" --payload ${hexPayload}`;
-    const { errno, stderr } = await ksuExec(cmd);
-    if (errno !== 0)
-      throw new AppError(`saveModuleRules failed: ${stderr}`, errno);
+    await runCommandExpectOk(cmd);
   },
   getStorageUsage: async (): Promise<StorageStatus> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
     const stateFile =
       (PATHS as Record<string, string>).DAEMON_STATE ||
       "/data/adb/meta-hybrid/run/daemon_state.json";
-    const { errno, stdout, stderr } = await ksuExec(`cat "${stateFile}"`);
+    const { errno, stdout, stderr } = await runCommand(`cat "${stateFile}"`);
     if (errno === 0 && stdout) {
       return { type: JSON.parse(stdout).storage_mode || "unknown" };
     }
     throw new AppError(`getStorageUsage failed: ${stderr}`, errno);
   },
   getSystemInfo: async (): Promise<SystemInfo> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
     const cmdSys = `echo "KERNEL:$(uname -r)"; echo "SELINUX:$(getenforce)"`;
-    const { errno: errSys, stdout: outSys } = await ksuExec(cmdSys);
+    const { errno: errSys, stdout: outSys } = await runCommand(cmdSys);
     const info: SystemInfo = {
       kernel: "-",
       selinux: "-",
@@ -178,7 +226,7 @@ const RealAPI: AppAPI = {
     const stateFile =
       (PATHS as Record<string, string>).DAEMON_STATE ||
       "/data/adb/meta-hybrid/run/daemon_state.json";
-    const { errno: errState, stdout: outState } = await ksuExec(
+    const { errno: errState, stdout: outState } = await runCommand(
       `cat "${stateFile}"`,
     );
     if (errState === 0 && outState) {
@@ -193,25 +241,23 @@ const RealAPI: AppAPI = {
     return info;
   },
   getDeviceStatus: async (): Promise<DeviceInfo> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
     let model = "Device",
       android = "14",
       kernel = "Unknown";
-    const p1 = await ksuExec("getprop ro.product.model");
+    const p1 = await runCommand("getprop ro.product.model");
     if (p1.errno === 0) model = p1.stdout.trim();
-    const p2 = await ksuExec("getprop ro.build.version.release");
-    const p3 = await ksuExec("getprop ro.build.version.sdk");
+    const p2 = await runCommand("getprop ro.build.version.release");
+    const p3 = await runCommand("getprop ro.build.version.sdk");
     if (p2.errno === 0)
       android = `${p2.stdout.trim()} (API ${p3.stdout.trim()})`;
-    const p4 = await ksuExec("uname -r");
+    const p4 = await runCommand("uname -r");
     if (p4.errno === 0) kernel = p4.stdout.trim();
     return { model, android, kernel, selinux: "Enforcing" };
   },
   getVersion: async (): Promise<string> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
     const binPath = PATHS.BINARY;
     const moduleDir = binPath.substring(0, binPath.lastIndexOf("/"));
-    const { errno, stdout } = await ksuExec(
+    const { errno, stdout } = await runCommand(
       `grep "^version=" "${moduleDir}/module.prop"`,
     );
     if (errno === 0 && stdout) {
@@ -220,17 +266,224 @@ const RealAPI: AppAPI = {
     }
     return APP_VERSION;
   },
+  getHymofsStatus: async (): Promise<HymofsStatus> => {
+    return runJsonCommand<HymofsStatus>(`${PATHS.BINARY} hymofs status`);
+  },
+  getHymofsRules: async (): Promise<HymofsRuleEntry[]> => {
+    return runJsonCommand<HymofsRuleEntry[]>(`${PATHS.BINARY} hymofs list`);
+  },
+  getLkmStatus: async (): Promise<HymofsLkmStatus> => {
+    return runJsonCommand<HymofsLkmStatus>(`${PATHS.BINARY} lkm status`);
+  },
+  isHymofsLkmLoaded: async (): Promise<boolean> => {
+    const { errno } = await runCommand(
+      "grep -q '^hymofs_lkm ' /proc/modules",
+    );
+    return errno === 0;
+  },
+  setHymofsEnabled: async (enabled: boolean): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hymofs ${enabled ? "enable" : "disable"}`,
+    );
+  },
+  setHymofsStealth: async (enabled: boolean): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hymofs stealth ${enabled ? "on" : "off"}`,
+    );
+  },
+  setHymofsHidexattr: async (enabled: boolean): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hymofs hidexattr ${enabled ? "on" : "off"}`,
+    );
+  },
+  setHymofsIgnoreProtocolMismatch: async (enabled: boolean): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hymofs ignore-protocol ${enabled ? "on" : "off"}`,
+    );
+  },
+  setHymofsMapsSpoof: async (enabled: boolean): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hymofs maps-spoof ${enabled ? "on" : "off"}`,
+    );
+  },
+  setHymofsDebug: async (enabled: boolean): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hymofs debug ${enabled ? "on" : "off"}`,
+    );
+  },
+  setHymofsMirror: async (path: string): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hymofs set-mirror "${shellEscapeDoubleQuoted(path)}"`,
+    );
+  },
+  getOriginalKernelUname: async (): Promise<KernelUnameValues> => {
+    const releaseResult = await runCommand("cat /proc/sys/kernel/osrelease 2>/dev/null");
+    const versionResult = await runCommand("cat /proc/sys/kernel/version 2>/dev/null");
+
+    let release =
+      releaseResult.errno === 0 ? releaseResult.stdout.trim() : "";
+    let version =
+      versionResult.errno === 0 ? versionResult.stdout.trim() : "";
+
+    if (!release || !version) {
+      const procVersion = await runCommand("cat /proc/version 2>/dev/null");
+      if (procVersion.errno === 0) {
+        const raw = procVersion.stdout.trim();
+        const releaseMatch = raw.match(/^Linux version\s+(\S+)/);
+        const hashIndex = raw.indexOf("#");
+        if (!release && releaseMatch?.[1]) {
+          release = releaseMatch[1];
+        }
+        if (!version && hashIndex >= 0) {
+          version = raw.slice(hashIndex).trim();
+        }
+      }
+    }
+
+    if (!release && !version) {
+      throw new AppError("Failed to read original kernel uname values");
+    }
+
+    return { release, version };
+  },
+  setHymofsUname: async (uname: Partial<HymofsUnameConfig>): Promise<void> => {
+    const args: string[] = [];
+    const fieldMap: Record<keyof HymofsUnameConfig, string> = {
+      sysname: "--sysname",
+      nodename: "--nodename",
+      release: "--release",
+      version: "--version",
+      machine: "--machine",
+      domainname: "--domainname",
+    };
+    (Object.keys(fieldMap) as (keyof HymofsUnameConfig)[]).forEach((key) => {
+      const value = uname[key];
+      if (value) {
+        args.push(`${fieldMap[key]} "${shellEscapeDoubleQuoted(value)}"`);
+      }
+    });
+    if (!args.length) {
+      throw new AppError("No uname fields provided");
+    }
+    await runCommandExpectOk(`${PATHS.BINARY} hymofs uname set ${args.join(" ")}`);
+  },
+  clearHymofsUname: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} hymofs uname clear`);
+  },
+  setHymofsCmdline: async (value: string): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hymofs cmdline set "${shellEscapeDoubleQuoted(value)}"`,
+    );
+  },
+  clearHymofsCmdline: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} hymofs cmdline clear`);
+  },
+  addHymofsMapsRule: async (rule): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hymofs maps add --target-ino ${rule.target_ino} --target-dev ${rule.target_dev} --spoofed-ino ${rule.spoofed_ino} --spoofed-dev ${rule.spoofed_dev} --path "${shellEscapeDoubleQuoted(rule.spoofed_pathname)}"`,
+    );
+  },
+  clearHymofsMapsRules: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} hymofs maps clear`);
+  },
+  setHymofsHideUids: async (uids: number[]): Promise<void> => {
+    if (!uids.length) {
+      throw new AppError("No UIDs provided");
+    }
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hymofs hide-uids set ${uids.join(" ")}`,
+    );
+  },
+  clearHymofsHideUids: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} hymofs hide-uids clear`);
+  },
+  setHymofsMountHide: async (
+    enabled: boolean,
+    pathPattern?: string,
+  ): Promise<void> => {
+    const args = [
+      `${PATHS.BINARY} hymofs mount-hide ${enabled ? "on" : "off"}`,
+    ];
+    if (pathPattern) {
+      args.push(`--path-pattern "${shellEscapeDoubleQuoted(pathPattern)}"`);
+    }
+    await runCommandExpectOk(args.join(" "));
+  },
+  setHymofsStatfsSpoof: async (
+    enabled: boolean,
+    path?: string,
+    fType?: number,
+  ): Promise<void> => {
+    const args = [
+      `${PATHS.BINARY} hymofs statfs-spoof ${enabled ? "on" : "off"}`,
+    ];
+    if (path) {
+      args.push(`--path "${shellEscapeDoubleQuoted(path)}"`);
+    }
+    if (fType !== undefined) {
+      args.push(`--f-type ${fType}`);
+    }
+    await runCommandExpectOk(args.join(" "));
+  },
+  getUserHideRules: async (): Promise<string[]> => {
+    return runJsonCommand<string[]>(`${PATHS.BINARY} hide list`);
+  },
+  addUserHideRule: async (path: string): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hide add "${shellEscapeDoubleQuoted(path)}"`,
+    );
+  },
+  removeUserHideRule: async (path: string): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} hide remove "${shellEscapeDoubleQuoted(path)}"`,
+    );
+  },
+  applyUserHideRules: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} hide apply`);
+  },
+  loadHymofsLkm: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} lkm load`);
+  },
+  unloadHymofsLkm: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} lkm unload`);
+  },
+  setHymofsLkmAutoload: async (enabled: boolean): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} lkm set-autoload ${enabled ? "on" : "off"}`,
+    );
+  },
+  setHymofsLkmKmi: async (value: string): Promise<void> => {
+    await runCommandExpectOk(
+      `${PATHS.BINARY} lkm set-kmi "${shellEscapeDoubleQuoted(value)}"`,
+    );
+  },
+  clearHymofsLkmKmi: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} lkm clear-kmi`);
+  },
+  fixHymofsMounts: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} hymofs fix-mounts`);
+  },
+  clearHymofsRules: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} hymofs clear`);
+  },
+  releaseHymofsConnection: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} hymofs release-connection`);
+  },
+  invalidateHymofsCache: async (): Promise<void> => {
+    await runCommandExpectOk(`${PATHS.BINARY} hymofs invalidate-cache`);
+  },
   openLink: async (url: string): Promise<void> => {
     if (!ksuExec) {
       window.open(url, "_blank", "noopener,noreferrer");
       return;
     }
     const safeUrl = shellEscapeDoubleQuoted(url);
-    await ksuExec(`am start -a android.intent.action.VIEW -d "${safeUrl}"`);
+    await runCommand(
+      `am start -a android.intent.action.VIEW -d "${safeUrl}"`,
+    );
   },
   reboot: async (): Promise<void> => {
-    if (!ksuExec) throw new AppError("No KSU environment");
-    await ksuExec("reboot");
+    await runCommand("reboot");
   },
 };
 

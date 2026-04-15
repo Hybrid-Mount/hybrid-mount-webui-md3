@@ -10,6 +10,7 @@ import {
 } from "solid-js";
 import { uiStore } from "../lib/stores/uiStore";
 import { moduleStore } from "../lib/stores/moduleStore";
+import { hymofsStore } from "../lib/stores/hymofsStore";
 import { ICONS } from "../lib/constants";
 import Skeleton from "../components/Skeleton";
 import BottomActions from "../components/BottomActions";
@@ -56,6 +57,18 @@ export default function ModulesTab() {
     filterType();
     showUmount();
     setVisibleCount(BATCH_SIZE);
+  });
+
+  const hymofsMasterEnabled = createMemo(() => hymofsStore.enabled);
+  const hymofsAvailable = createMemo(
+    () => hymofsMasterEnabled() && Boolean(hymofsStore.status?.available),
+  );
+  const showHymofsStrategy = createMemo(() => hymofsMasterEnabled());
+
+  createEffect(() => {
+    if (!showHymofsStrategy() && filterType() === "hymofs") {
+      setFilterType("all");
+    }
   });
 
   function load() {
@@ -145,13 +158,24 @@ export default function ModulesTab() {
     const m = uiStore.L.modules?.modes;
     if (!mod.is_mounted) return m?.umount ?? "Umount";
     if (normalizeModuleMode(mod.mode) === "magic") return m?.magic ?? "Magic";
+    if (normalizeModuleMode(mod.mode) === "hymofs")
+      return m?.hymofs ?? "HymoFS";
     return m?.overlay ?? "OverlayFS";
   }
 
   function getModeClass(mod: Module) {
     if (!mod.is_mounted) return "mode-ignore";
     if (normalizeModuleMode(mod.mode) === "magic") return "mode-magic";
+    if (normalizeModuleMode(mod.mode) === "hymofs") return "mode-hymofs";
     return "mode-overlay";
+  }
+
+  function getEffectiveDefaultMode(mod: Module): MountMode {
+    const mode = normalizeModuleMode(mod.rules.default_mode);
+    if (mode === "hymofs" && !hymofsAvailable()) {
+      return "ignore";
+    }
+    return mode;
   }
 
   function updateModuleRules(
@@ -216,6 +240,11 @@ export default function ModulesTab() {
                 <option value="magic">
                   {uiStore.L.modules?.modes?.short?.magic ?? "Magic"}
                 </option>
+                <Show when={showHymofsStrategy()}>
+                  <option value="hymofs">
+                    {uiStore.L.modules?.modes?.short?.hymofs ?? "HymoFS"}
+                  </option>
+                </Show>
               </select>
             </div>
           </div>
@@ -254,83 +283,114 @@ export default function ModulesTab() {
               }
             >
               <For each={filteredModules().slice(0, visibleCount())}>
-                {(mod) => (
-                  <div
-                    class={`module-card ${expandedId() === mod.id ? "expanded" : ""} ${initialRulesSnapshot()[mod.id] !== JSON.stringify(mod.rules) ? "dirty" : ""} ${mod.is_mounted ? "" : "unmounted"}`}
-                  >
-                    <button
-                      class="module-header"
-                      onClick={() => toggleExpand(mod.id)}
-                      type="button"
-                      aria-expanded={expandedId() === mod.id ? "true" : "false"}
+                {(mod) => {
+                  const effectiveDefaultMode = () => getEffectiveDefaultMode(mod);
+                  return (
+                    <div
+                      class={`module-card ${expandedId() === mod.id ? "expanded" : ""} ${initialRulesSnapshot()[mod.id] !== JSON.stringify(mod.rules) ? "dirty" : ""} ${mod.is_mounted ? "" : "unmounted"}`}
                     >
-                      <div class="module-info">
-                        <div class="module-name">{mod.name}</div>
-                        <div class="module-meta">
-                          <span class="module-id">{mod.id}</span>
-                          <span class="version-badge">{mod.version}</span>
+                      <button
+                        class="module-header"
+                        onClick={() => toggleExpand(mod.id)}
+                        type="button"
+                        aria-expanded={expandedId() === mod.id ? "true" : "false"}
+                      >
+                        <div class="module-info">
+                          <div class="module-name">{mod.name}</div>
+                          <div class="module-meta">
+                            <span class="module-id">{mod.id}</span>
+                            <span class="version-badge">{mod.version}</span>
+                          </div>
                         </div>
-                      </div>
-                      <div class={`mode-indicator ${getModeClass(mod)}`}>
-                        {getModeLabel(mod)}
-                      </div>
-                    </button>
+                        <div class={`mode-indicator ${getModeClass(mod)}`}>
+                          {getModeLabel(mod)}
+                        </div>
+                      </button>
 
-                    <div class="module-body-wrapper">
-                      <div class="module-body-inner">
-                        <div class="module-body-content">
-                          <p class="module-desc">{mod.description}</p>
+                      <div class="module-body-wrapper">
+                        <div class="module-body-inner">
+                          <div class="module-body-content">
+                            <p class="module-desc">{mod.description}</p>
 
-                          <div class="body-section">
-                            <div class="section-label">
-                              {uiStore.L.modules?.defaultMode ?? "Strategy"}
-                            </div>
-                            <div class="strategy-selector">
-                              <button
-                                class={`strategy-option ${mod.rules.default_mode === "overlay" ? "selected" : ""}`}
-                                onClick={() =>
-                                  updateDefaultMode(mod, "overlay")
-                                }
-                              >
-                                <span class="opt-title">
-                                  {uiStore.L.modules?.modes?.short?.overlay ??
-                                    "Overlay"}
-                                </span>
-                                <span class="opt-sub">
-                                  {uiStore.L.modules?.defaultTag ?? "Default"}
-                                </span>
-                              </button>
-                              <button
-                                class={`strategy-option ${mod.rules.default_mode === "magic" ? "selected" : ""}`}
-                                onClick={() => updateDefaultMode(mod, "magic")}
-                              >
-                                <span class="opt-title">
-                                  {uiStore.L.modules?.modes?.short?.magic ??
-                                    "Magic"}
-                                </span>
-                                <span class="opt-sub">
-                                  {uiStore.L.modules?.compatTag ?? "Compat"}
-                                </span>
-                              </button>
-                              <button
-                                class={`strategy-option ${mod.rules.default_mode === "ignore" ? "selected" : ""}`}
-                                onClick={() => updateDefaultMode(mod, "ignore")}
-                              >
-                                <span class="opt-title">
-                                  {uiStore.L.modules?.modes?.short?.ignore ??
-                                    "Ignore"}
-                                </span>
-                                <span class="opt-sub">
-                                  {uiStore.L.modules?.disableTag ?? "Disable"}
-                                </span>
-                              </button>
+                            <div class="body-section">
+                              <div class="section-label">
+                                {uiStore.L.modules?.defaultMode ?? "Strategy"}
+                              </div>
+                              <div class="strategy-selector">
+                                <button
+                                  class={`strategy-option ${effectiveDefaultMode() === "overlay" ? "selected" : ""}`}
+                                  onClick={() =>
+                                    updateDefaultMode(mod, "overlay")
+                                  }
+                                >
+                                  <span class="opt-title">
+                                    {uiStore.L.modules?.modes?.short?.overlay ??
+                                      "Overlay"}
+                                  </span>
+                                  <span class="opt-sub">
+                                    {uiStore.L.modules?.defaultTag ?? "Default"}
+                                  </span>
+                                </button>
+                                <button
+                                  class={`strategy-option ${effectiveDefaultMode() === "magic" ? "selected" : ""}`}
+                                  onClick={() => updateDefaultMode(mod, "magic")}
+                                >
+                                  <span class="opt-title">
+                                    {uiStore.L.modules?.modes?.short?.magic ??
+                                      "Magic"}
+                                  </span>
+                                  <span class="opt-sub">
+                                    {uiStore.L.modules?.compatTag ?? "Compat"}
+                                  </span>
+                                </button>
+                                <Show when={showHymofsStrategy()}>
+                                  <button
+                                    class={`strategy-option ${effectiveDefaultMode() === "hymofs" ? "selected" : ""}`}
+                                    onClick={() =>
+                                      updateDefaultMode(mod, "hymofs")
+                                    }
+                                    disabled={!hymofsAvailable()}
+                                    title={
+                                      !hymofsAvailable()
+                                        ? uiStore.L.modules
+                                            ?.hymofsUnavailableHint ??
+                                          "HymoFS is not currently available"
+                                        : undefined
+                                    }
+                                  >
+                                    <span class="opt-title">
+                                      {uiStore.L.modules?.modes?.short?.hymofs ??
+                                        "HymoFS"}
+                                    </span>
+                                    <span class="opt-sub">
+                                      {!hymofsAvailable()
+                                        ? uiStore.L.modules?.unavailableTag ??
+                                          "Unavailable"
+                                        : uiStore.L.modules?.nativeTag ??
+                                          "Stealth"}
+                                    </span>
+                                  </button>
+                                </Show>
+                                <button
+                                  class={`strategy-option ${effectiveDefaultMode() === "ignore" ? "selected" : ""}`}
+                                  onClick={() => updateDefaultMode(mod, "ignore")}
+                                >
+                                  <span class="opt-title">
+                                    {uiStore.L.modules?.modes?.short?.ignore ??
+                                      "Ignore"}
+                                  </span>
+                                  <span class="opt-sub">
+                                    {uiStore.L.modules?.disableTag ?? "Disable"}
+                                  </span>
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  );
+                }}
               </For>
               <div ref={observerTarget} class="observer-sentinel"></div>
             </Show>
