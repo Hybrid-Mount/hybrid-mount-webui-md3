@@ -168,4 +168,15 @@ describe("HymofsTab", () => {
       "success",
     );
   });
+
+  it("keeps sections collapsed until their header is expanded", async () => {
+    const { getByRole } = await renderHymofsTab();
+
+    const identityToggle = getByRole("button", { name: /Identity Spoof/i });
+    expect(identityToggle).toHaveAttribute("aria-expanded", "false");
+
+    await fireEvent.click(identityToggle);
+
+    expect(identityToggle).toHaveAttribute("aria-expanded", "true");
+  });
 });

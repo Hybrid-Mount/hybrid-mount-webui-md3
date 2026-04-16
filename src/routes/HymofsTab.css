@@ -145,6 +145,86 @@ md-dialog.transparent-scrim {
   gap: 12px;
 }
 
+.hymofs-section {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  transition:
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.hymofs-section.expanded {
+  background-color: var(--md-sys-color-surface-container);
+}
+
+.hymofs-section-toggle {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 22px 24px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.hymofs-section-toggle-inner {
+  margin: 0;
+}
+
+.hymofs-section-toggle-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.hymofs-section-chevron {
+  width: 20px;
+  height: 20px;
+  color: var(--md-sys-color-on-surface-variant);
+  transition: transform 0.25s ease;
+}
+
+.hymofs-section.expanded .hymofs-section-chevron {
+  transform: rotate(180deg);
+}
+
+.hymofs-section-body-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hymofs-section.expanded .hymofs-section-body-wrapper {
+  grid-template-rows: 1fr;
+}
+
+.hymofs-section-body-inner {
+  overflow: hidden;
+}
+
+.hymofs-section-body {
+  padding: 20px 24px 28px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  transition-delay: 0s;
+}
+
+.hymofs-section.expanded .hymofs-section-body {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.08s;
+}
+
 .hymofs-card-title {
   font-size: 16px;
   font-weight: 700;
@@ -178,7 +258,7 @@ md-dialog.transparent-scrim {
 .meta-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
 
 .meta-row {
@@ -199,13 +279,13 @@ md-dialog.transparent-scrim {
 .field-stack {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
 }
 
 .sub-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 16px;
 }
 
 .full-field {
@@ -279,7 +359,7 @@ md-dialog.transparent-scrim {
 .button-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 14px;
 }
 
 .status-row {
@@ -297,7 +377,7 @@ md-dialog.transparent-scrim {
 .hymofs-config-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
 .hymofs-config-tile {
@@ -347,7 +427,7 @@ md-dialog.transparent-scrim {
 }
 
 .runtime-note {
-  margin-top: 12px;
+  margin-top: 20px;
   border-radius: 14px;
   padding: 12px 14px;
   background-color: var(--md-sys-color-surface-container-high);
@@ -364,7 +444,7 @@ md-dialog.transparent-scrim {
 .chip-section {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
 }
 
 .chip-section.subdued {
@@ -393,7 +473,7 @@ md-dialog.transparent-scrim {
 .hide-rule-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
 
 .hide-rule-item {
