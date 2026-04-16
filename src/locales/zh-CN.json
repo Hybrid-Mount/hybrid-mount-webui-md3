@@ -84,9 +84,9 @@
       "hymofs": "HymoFS",
       "umount": "Umount",
       "short": {
-        "overlay": "叠加",
-        "magic": "魔法",
-        "hymofs": "HymoFS",
+        "overlay": "Overlay",
+        "magic": "Magic",
+        "hymofs": "Hymo",
         "ignore": "忽略"
       }
     },

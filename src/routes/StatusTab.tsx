@@ -3,6 +3,7 @@ import { uiStore } from "../lib/stores/uiStore";
 import { sysStore } from "../lib/stores/sysStore";
 import { configStore } from "../lib/stores/configStore";
 import { moduleStore } from "../lib/stores/moduleStore";
+import { hymofsStore } from "../lib/stores/hymofsStore";
 import { ICONS } from "../lib/constants";
 import { BUILTIN_PARTITIONS } from "../lib/constants_gen";
 import Skeleton from "../components/Skeleton";
@@ -41,13 +42,17 @@ export default function StatusTab() {
 
   const modeDistribution = createMemo(() => {
     const stats = moduleStore.modeStats;
-    const total =
-      (stats?.overlay || 0) + (stats?.magic || 0) + (stats?.hymofs || 0);
+    const showHymofs = hymofsStore.enabled;
+    const overlay = stats?.overlay || 0;
+    const magic = stats?.magic || 0;
+    const hymofs = showHymofs ? stats?.hymofs || 0 : 0;
+    const total = overlay + magic + hymofs;
+
     if (total === 0) return { overlay: 0, magic: 0, hymofs: 0 };
     return {
-      overlay: (stats.overlay / total) * 100,
-      magic: (stats.magic / total) * 100,
-      hymofs: (stats.hymofs / total) * 100,
+      overlay: (overlay / total) * 100,
+      magic: (magic / total) * 100,
+      hymofs: (hymofs / total) * 100,
     };
   });
 
@@ -173,10 +178,12 @@ export default function StatusTab() {
                 class="bar-segment bar-magic"
                 style={{ width: `${modeDistribution().magic}%` }}
               ></div>
-              <div
-                class="bar-segment bar-hymofs"
-                style={{ width: `${modeDistribution().hymofs}%` }}
-              ></div>
+              <Show when={hymofsStore.enabled}>
+                <div
+                  class="bar-segment bar-hymofs"
+                  style={{ width: `${modeDistribution().hymofs}%` }}
+                ></div>
+              </Show>
             </div>
             <div class="stats-legend">
               <div class="legend-item">
@@ -195,14 +202,16 @@ export default function StatusTab() {
                     (moduleStore.modeStats?.magic || 0)}
                 </span>
               </div>
-              <div class="legend-item">
-                <div class="legend-dot dot-hymofs"></div>
-                <span>
-                  {(uiStore.L.modules?.modes?.short?.hymofs ?? "HymoFS") +
-                    ": " +
-                    (moduleStore.modeStats?.hymofs || 0)}
-                </span>
-              </div>
+              <Show when={hymofsStore.enabled}>
+                <div class="legend-item">
+                  <div class="legend-dot dot-hymofs"></div>
+                  <span>
+                    {(uiStore.L.modules?.modes?.short?.hymofs ?? "HymoFS") +
+                      ": " +
+                      (moduleStore.modeStats?.hymofs || 0)}
+                  </span>
+                </div>
+              </Show>
             </div>
           </Show>
         </div>
