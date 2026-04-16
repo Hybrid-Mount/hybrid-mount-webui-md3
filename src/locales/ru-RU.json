@@ -59,6 +59,7 @@
     "hymofsEnabledSuccess": "HymoFS включён",
     "hymofsDisabledSuccess": "HymoFS выключен",
     "webui": "Настройки WebUI",
+    "experimentalFeatures": "Экспериментальные функции",
     "overlayMode": "Режим overlay",
     "overlayModeDesc": "Выберите стратегию хранилища",
     "mode_tmpfs": "Tmpfs",
@@ -84,8 +85,8 @@
       "hymofs": "HymoFS",
       "umount": "Umount",
       "short": {
-        "overlay": "Оверлей",
-        "magic": "Магия",
+        "overlay": "Overlay",
+        "magic": "Magic",
         "hymofs": "HymoFS",
         "ignore": "Игнорировать"
       }

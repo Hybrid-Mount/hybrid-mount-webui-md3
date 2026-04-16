@@ -59,6 +59,7 @@
     "hymofsEnabledSuccess": "HymoFS enabled",
     "hymofsDisabledSuccess": "HymoFS disabled",
     "webui": "WebUI Settings",
+    "experimentalFeatures": "Experimental Features",
     "overlayMode": "Overlay Mode",
     "overlayModeDesc": "Select backing storage strategy",
     "mode_tmpfs": "Tmpfs",

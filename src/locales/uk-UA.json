@@ -59,6 +59,7 @@
     "hymofsEnabledSuccess": "HymoFS увімкнено",
     "hymofsDisabledSuccess": "HymoFS вимкнено",
     "webui": "Налаштування WebUI",
+    "experimentalFeatures": "Експериментальні функції",
     "overlayMode": "Режим накладання",
     "overlayModeDesc": "Виберіть стратегію резервного зберігання",
     "mode_tmpfs": "Tmpfs",
@@ -84,8 +85,8 @@
       "hymofs": "HymoFS",
       "umount": "Umount",
       "short": {
-        "overlay": "Накладання",
-        "magic": "Магія",
+        "overlay": "Overlay",
+        "magic": "Magic",
         "hymofs": "HymoFS",
         "ignore": "Ігнор"
       }

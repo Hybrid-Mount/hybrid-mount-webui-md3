@@ -59,6 +59,7 @@
     "hymofsEnabledSuccess": "HymoFS abilitato",
     "hymofsDisabledSuccess": "HymoFS disabilitato",
     "webui": "Impostazioni WebUI",
+    "experimentalFeatures": "Funzionalità sperimentali",
     "overlayMode": "Modalita overlay",
     "overlayModeDesc": "Seleziona la strategia di archiviazione di supporto",
     "mode_tmpfs": "Tmpfs",
@@ -84,8 +85,8 @@
       "hymofs": "HymoFS",
       "umount": "Umount",
       "short": {
-        "overlay": "Sovrap.",
-        "magic": "Magia",
+        "overlay": "Overlay",
+        "magic": "Magic",
         "hymofs": "HymoFS",
         "ignore": "Ignora"
       }

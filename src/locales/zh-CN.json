@@ -59,6 +59,7 @@
     "hymofsEnabledSuccess": "HymoFS 已启用",
     "hymofsDisabledSuccess": "HymoFS 已关闭",
     "webui": "WebUI 设置",
+    "experimentalFeatures": "实验性功能",
     "overlayMode": "OverlayFS模式切换",
     "overlayModeDesc": "选择存储方式",
     "mode_tmpfs": "Tmpfs",
@@ -86,7 +87,7 @@
       "short": {
         "overlay": "Overlay",
         "magic": "Magic",
-        "hymofs": "Hymo",
+        "hymofs": "HymoFS",
         "ignore": "忽略"
       }
     },

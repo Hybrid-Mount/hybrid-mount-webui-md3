@@ -59,6 +59,7 @@
     "hymofsEnabledSuccess": "Đã bật HymoFS",
     "hymofsDisabledSuccess": "Đã tắt HymoFS",
     "webui": "Cài đặt WebUI",
+    "experimentalFeatures": "Tính năng thử nghiệm",
     "overlayMode": "Chế độ Overlay",
     "overlayModeDesc": "Chọn chiến lược lưu trữ sao lưu",
     "mode_tmpfs": "Tmpfs",
@@ -84,8 +85,8 @@
       "hymofs": "HymoFS",
       "umount": "Umount",
       "short": {
-        "overlay": "Lớp phủ",
-        "magic": "Phép",
+        "overlay": "Overlay",
+        "magic": "Magic",
         "hymofs": "HymoFS",
         "ignore": "Bỏ qua"
       }

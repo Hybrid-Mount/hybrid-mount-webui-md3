@@ -59,6 +59,7 @@
     "hymofsEnabledSuccess": "HymoFS を有効にしました",
     "hymofsDisabledSuccess": "HymoFS を無効にしました",
     "webui": "WebUI の設定",
+    "experimentalFeatures": "実験的機能",
     "overlayMode": "オーバーレイモード",
     "overlayModeDesc": "バックアップ先のストレージを選択してください",
     "mode_tmpfs": "Tmpfs",
@@ -84,8 +85,8 @@
       "hymofs": "HymoFS",
       "umount": "Umount",
       "short": {
-        "overlay": "オーバーレイ",
-        "magic": "マジック",
+        "overlay": "Overlay",
+        "magic": "Magic",
         "hymofs": "HymoFS",
         "ignore": "無視"
       }
