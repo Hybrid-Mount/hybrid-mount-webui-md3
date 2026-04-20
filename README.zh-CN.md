@@ -5,7 +5,7 @@
 ![语言](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat-square&logo=typescript)
 ![框架](https://img.shields.io/badge/Framework-SolidJS-2C4F7C?style=flat-square&logo=solid)
 ![平台](https://img.shields.io/badge/Platform-Android%20%2F%20KernelSU-green?style=flat-square&logo=android)
-![许可证](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)
+![许可证](https://img.shields.io/badge/License-Apache--2.0-blue?style=flat-square)
 
 Hybrid Mount WebUI 是 **Hybrid Mount** 的 Material Design 3 前端控制台，
 面向 KernelSU 场景提供配置管理、模块策略编辑、运行诊断和运维动作入口。
@@ -118,4 +118,4 @@ pnpm lint
 
 ## 许可证
 
-本项目采用 [GPL-3.0](LICENSE)。
+本项目采用 [Apache-2.0](LICENSE)。

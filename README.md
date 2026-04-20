@@ -5,7 +5,7 @@
 ![Language](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat-square&logo=typescript)
 ![Framework](https://img.shields.io/badge/Framework-SolidJS-2C4F7C?style=flat-square&logo=solid)
 ![Platform](https://img.shields.io/badge/Platform-Android%20%2F%20KernelSU-green?style=flat-square&logo=android)
-![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)
+![License](https://img.shields.io/badge/License-Apache--2.0-blue?style=flat-square)
 
 Hybrid Mount WebUI is a Material Design 3 frontend for **Hybrid Mount** runtime management.
 It provides a stable UI contract for configuration, module policy editing, runtime diagnostics, and operational actions in KernelSU environments.
@@ -118,4 +118,4 @@ pnpm lint
 
 ## License
 
-Licensed under [GPL-3.0](LICENSE).
+Licensed under [Apache-2.0](LICENSE).
