@@ -255,7 +255,7 @@ export default function ModulesTab() {
             when={!moduleStore.loading}
             fallback={
               <For each={Array(6)}>
-                {() => <Skeleton height="64px" borderRadius="16px" />}
+                {() => <Skeleton variant="module-card" />}
               </For>
             }
           >

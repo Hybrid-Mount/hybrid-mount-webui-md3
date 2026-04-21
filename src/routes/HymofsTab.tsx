@@ -274,9 +274,9 @@ export default function HymofsTab() {
               when={!loading()}
               fallback={
                 <div class="skeleton-col">
-                  <Skeleton width="40%" height="24px" />
-                  <Skeleton width="80%" height="48px" />
-                  <Skeleton width="60%" height="20px" />
+                  <Skeleton variant="hero-label" />
+                  <Skeleton variant="hero-title" />
+                  <Skeleton variant="hero-caption" />
                 </div>
               }
             >
@@ -1007,13 +1007,7 @@ export default function HymofsTab() {
                 <div class="hymofs-section-body">
                   <Show
                     when={!loading()}
-                    fallback={
-                      <Skeleton
-                        width="100%"
-                        height="120px"
-                        borderRadius="20px"
-                      />
-                    }
+                    fallback={<Skeleton variant="feature-card" />}
                   >
                     <div class="meta-list">
                       <div class="meta-row">
@@ -1104,16 +1098,8 @@ export default function HymofsTab() {
                   when={!loading()}
                   fallback={
                     <div class="rule-list">
-                      <Skeleton
-                        width="100%"
-                        height="64px"
-                        borderRadius="18px"
-                      />
-                      <Skeleton
-                        width="100%"
-                        height="64px"
-                        borderRadius="18px"
-                      />
+                      <Skeleton variant="rule-card" />
+                      <Skeleton variant="rule-card" />
                     </div>
                   }
                 >

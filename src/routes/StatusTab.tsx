@@ -1,4 +1,10 @@
-import { createEffect, createMemo, createSignal, Show, For } from "solid-js";
+import {
+  createMemo,
+  createRenderEffect,
+  createSignal,
+  Show,
+  For,
+} from "solid-js";
 import { uiStore } from "../lib/stores/uiStore";
 import { sysStore } from "../lib/stores/sysStore";
 import { configStore } from "../lib/stores/configStore";
@@ -63,11 +69,11 @@ export default function StatusTab() {
     };
   });
 
-  createEffect(() => {
+  createRenderEffect(() => {
+    const distribution = modeDistribution();
     const statsBar = statsBarRef;
     if (!statsBar) return;
 
-    const distribution = modeDistribution();
     statsBar.style.setProperty(
       "--bar-overlay-width",
       `${distribution.overlay}%`,
@@ -113,9 +119,9 @@ export default function StatusTab() {
             when={!sysStore.loading}
             fallback={
               <div class="skeleton-col">
-                <Skeleton width="40%" height="24px" />
-                <Skeleton width="80%" height="48px" />
-                <Skeleton width="60%" height="20px" />
+                <Skeleton variant="hero-label" />
+                <Skeleton variant="hero-title" />
+                <Skeleton variant="hero-caption" />
               </div>
             }
           >
@@ -145,7 +151,7 @@ export default function StatusTab() {
           <div class="metric-card">
             <Show
               when={moduleStatsReady()}
-              fallback={<Skeleton width="50%" height="32px" />}
+              fallback={<Skeleton variant="metric" />}
             >
               <div class="metric-icon-bg">
                 <svg viewBox="0 0 24 24">
@@ -162,7 +168,7 @@ export default function StatusTab() {
           <div class="metric-card">
             <Show
               when={!sysStore.loading}
-              fallback={<Skeleton width="50%" height="32px" />}
+              fallback={<Skeleton variant="metric" />}
             >
               <div class="metric-icon-bg">
                 <svg viewBox="0 0 24 24">
@@ -185,9 +191,7 @@ export default function StatusTab() {
           </div>
           <Show
             when={moduleStatsReady()}
-            fallback={
-              <Skeleton width="100%" height="24px" borderRadius="12px" />
-            }
+            fallback={<Skeleton variant="stats-bar" />}
           >
             <div class="stats-bar-container" ref={statsBarRef}>
               <div class="bar-segment bar-overlay"></div>
@@ -238,7 +242,7 @@ export default function StatusTab() {
             </span>
             <Show
               when={!sysStore.loading}
-              fallback={<Skeleton width="100px" height="16px" />}
+              fallback={<Skeleton variant="info-wide" />}
             >
               <span class="info-val">{sysStore.systemInfo?.kernel || "-"}</span>
             </Show>
@@ -250,7 +254,7 @@ export default function StatusTab() {
             </span>
             <Show
               when={!sysStore.loading}
-              fallback={<Skeleton width="60px" height="16px" />}
+              fallback={<Skeleton variant="info-narrow" />}
             >
               <span class="info-val">
                 {sysStore.systemInfo?.selinux || "-"}
@@ -265,7 +269,7 @@ export default function StatusTab() {
           <div class="partition-list">
             <Show
               when={!sysStore.loading}
-              fallback={<Skeleton width="100%" height="32px" />}
+              fallback={<Skeleton variant="chip-row" />}
             >
               <For each={displayPartitions()}>
                 {(part) => (

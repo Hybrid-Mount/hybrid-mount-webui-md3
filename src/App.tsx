@@ -1,5 +1,6 @@
 import {
   createEffect,
+  createRenderEffect,
   createSignal,
   createMemo,
   onMount,
@@ -59,16 +60,16 @@ export default function App() {
     return index >= 0 ? index * -(100 / tabCount()) : 0;
   });
 
-  createEffect(() => {
+  createRenderEffect(() => {
+    const count = tabCount();
+    const translate = baseTranslateX();
+    const offset = dragOffset();
     const container = containerRef;
     if (!container) return;
 
-    container.style.setProperty("--swipe-tab-count", String(tabCount()));
-    container.style.setProperty(
-      "--swipe-base-translate",
-      `${baseTranslateX()}%`,
-    );
-    container.style.setProperty("--swipe-drag-offset", `${dragOffset()}px`);
+    container.style.setProperty("--swipe-tab-count", String(count));
+    container.style.setProperty("--swipe-base-translate", `${translate}%`);
+    container.style.setProperty("--swipe-drag-offset", `${offset}px`);
   });
 
   createEffect(() => {

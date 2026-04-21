@@ -4,7 +4,7 @@
  */
 
 import { ParentProps } from "solid-js";
-import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { createRenderEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 
 export default function BottomActions(props: ParentProps) {
@@ -62,14 +62,14 @@ export default function BottomActions(props: ParentProps) {
     });
   });
 
-  createEffect(() => {
-    if (!rootRef) return;
+  createRenderEffect(() => {
+    const inset = keyboardInset();
+    const active = isActivePage();
+    const root = rootRef;
+    if (!root) return;
 
-    rootRef.style.setProperty(
-      "--bottom-actions-keyboard-inset",
-      `${keyboardInset()}px`,
-    );
-    rootRef.toggleAttribute("inert", !isActivePage());
+    root.style.setProperty("--bottom-actions-keyboard-inset", `${inset}px`);
+    root.toggleAttribute("inert", !active);
   });
 
   return (

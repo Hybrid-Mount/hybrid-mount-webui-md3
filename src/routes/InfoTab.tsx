@@ -349,14 +349,10 @@ export default function InfoTab() {
                       <For each={Array(3)}>
                         {() => (
                           <div class="skeleton-item">
-                            <Skeleton
-                              width="40px"
-                              height="40px"
-                              borderRadius="50%"
-                            />
+                            <Skeleton variant="contributor-avatar" />
                             <div class="skeleton-text">
-                              <Skeleton width="120px" height="16px" />
-                              <Skeleton width="180px" height="12px" />
+                              <Skeleton variant="contributor-title" />
+                              <Skeleton variant="contributor-body" />
                             </div>
                           </div>
                         )}
