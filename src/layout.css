@@ -18,15 +18,25 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  --swipe-tab-count: 1;
+  --swipe-base-translate: 0%;
+  --swipe-drag-offset: 0px;
 }
 .swipe-track {
   display: flex;
-  width: 500%;
+  width: calc(var(--swipe-tab-count) * 100%);
   height: 100%;
   will-change: transform;
+  transform: translateX(
+    calc(var(--swipe-base-translate) + var(--swipe-drag-offset))
+  );
+  transition: transform 0.4s cubic-bezier(0.2, 1, 0.2, 1);
+}
+.swipe-track.is-dragging {
+  transition: none;
 }
 .swipe-page {
-  width: 20%;
+  width: calc(100% / var(--swipe-tab-count));
   height: 100%;
   flex-shrink: 0;
   position: relative;

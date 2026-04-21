@@ -153,6 +153,9 @@
 }
 
 .stats-bar-container {
+  --bar-overlay-width: 0%;
+  --bar-magic-width: 0%;
+  --bar-hymofs-width: 0%;
   height: 24px;
   width: 100%;
   background-color: var(--md-sys-color-surface-container-highest);
@@ -168,14 +171,17 @@
 }
 
 .bar-overlay {
+  width: var(--bar-overlay-width);
   background-color: var(--md-sys-color-secondary-container);
 }
 
 .bar-magic {
+  width: var(--bar-magic-width);
   background-color: var(--md-sys-color-tertiary-container);
 }
 
 .bar-hymofs {
+  width: var(--bar-hymofs-width);
   background-color: var(--md-sys-color-primary-container);
 }
 

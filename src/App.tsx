@@ -52,10 +52,23 @@ export default function App() {
     routes.filter((route) => route.id !== "hymofs" || hymofsStore.enabled),
   );
   const visibleTabs = createMemo(() => visibleRoutes().map((r) => r.id));
+  const tabCount = createMemo(() => Math.max(visibleTabs().length, 1));
 
   const baseTranslateX = createMemo(() => {
     const index = visibleTabs().indexOf(activeTab());
-    return index * -(100 / visibleTabs().length);
+    return index >= 0 ? index * -(100 / tabCount()) : 0;
+  });
+
+  createEffect(() => {
+    const container = containerRef;
+    if (!container) return;
+
+    container.style.setProperty("--swipe-tab-count", String(tabCount()));
+    container.style.setProperty(
+      "--swipe-base-translate",
+      `${baseTranslateX()}%`,
+    );
+    container.style.setProperty("--swipe-drag-offset", `${dragOffset()}px`);
   });
 
   createEffect(() => {
@@ -201,22 +214,10 @@ export default function App() {
           onTouchEnd={handleTouchEnd}
           onTouchCancel={handleTouchEnd}
         >
-          <div
-            class="swipe-track"
-            style={{
-              transform: `translateX(calc(${baseTranslateX()}% + ${dragOffset()}px))`,
-              width: `${visibleTabs().length * 100}%`,
-              transition: isDragging()
-                ? "none"
-                : "transform 0.4s cubic-bezier(0.2, 1, 0.2, 1)",
-            }}
-          >
+          <div class="swipe-track" classList={{ "is-dragging": isDragging() }}>
             <For each={visibleRoutes()}>
               {(route) => (
-                <div
-                  class="swipe-page"
-                  style={{ width: `${100 / visibleTabs().length}%` }}
-                >
+                <div class="swipe-page">
                   <Show
                     when={visitedTabs().has(route.id)}
                     fallback={<div class="page-scroller" aria-hidden="true" />}

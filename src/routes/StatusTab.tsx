@@ -1,4 +1,4 @@
-import { createMemo, createSignal, Show, For } from "solid-js";
+import { createEffect, createMemo, createSignal, Show, For } from "solid-js";
 import { uiStore } from "../lib/stores/uiStore";
 import { sysStore } from "../lib/stores/sysStore";
 import { configStore } from "../lib/stores/configStore";
@@ -33,6 +33,13 @@ export default function StatusTab() {
   const moduleStatsReady = createMemo(
     () => !moduleStore.loading && moduleStore.hasLoaded,
   );
+  const modeStats = createMemo(() => ({
+    overlay: moduleStore.modeStats?.overlay || 0,
+    magic: moduleStore.modeStats?.magic || 0,
+    hymofs: moduleStore.modeStats?.hymofs || 0,
+  }));
+
+  let statsBarRef: HTMLDivElement | undefined;
 
   function getModeDisplayName(mode: string | null | undefined) {
     if (!mode) return "Unknown";
@@ -41,11 +48,11 @@ export default function StatusTab() {
   }
 
   const modeDistribution = createMemo(() => {
-    const stats = moduleStore.modeStats;
+    const stats = modeStats();
     const showHymofs = hymofsStore.enabled;
-    const overlay = stats?.overlay || 0;
-    const magic = stats?.magic || 0;
-    const hymofs = showHymofs ? stats?.hymofs || 0 : 0;
+    const overlay = stats.overlay;
+    const magic = stats.magic;
+    const hymofs = showHymofs ? stats.hymofs : 0;
     const total = overlay + magic + hymofs;
 
     if (total === 0) return { overlay: 0, magic: 0, hymofs: 0 };
@@ -54,6 +61,19 @@ export default function StatusTab() {
       magic: (magic / total) * 100,
       hymofs: (hymofs / total) * 100,
     };
+  });
+
+  createEffect(() => {
+    const statsBar = statsBarRef;
+    if (!statsBar) return;
+
+    const distribution = modeDistribution();
+    statsBar.style.setProperty(
+      "--bar-overlay-width",
+      `${distribution.overlay}%`,
+    );
+    statsBar.style.setProperty("--bar-magic-width", `${distribution.magic}%`);
+    statsBar.style.setProperty("--bar-hymofs-width", `${distribution.hymofs}%`);
   });
 
   return (
@@ -169,20 +189,11 @@ export default function StatusTab() {
               <Skeleton width="100%" height="24px" borderRadius="12px" />
             }
           >
-            <div class="stats-bar-container">
-              <div
-                class="bar-segment bar-overlay"
-                style={{ width: `${modeDistribution().overlay}%` }}
-              ></div>
-              <div
-                class="bar-segment bar-magic"
-                style={{ width: `${modeDistribution().magic}%` }}
-              ></div>
+            <div class="stats-bar-container" ref={statsBarRef}>
+              <div class="bar-segment bar-overlay"></div>
+              <div class="bar-segment bar-magic"></div>
               <Show when={hymofsStore.enabled}>
-                <div
-                  class="bar-segment bar-hymofs"
-                  style={{ width: `${modeDistribution().hymofs}%` }}
-                ></div>
+                <div class="bar-segment bar-hymofs"></div>
               </Show>
             </div>
             <div class="stats-legend">
@@ -191,7 +202,7 @@ export default function StatusTab() {
                 <span>
                   {(uiStore.L.modules?.modes?.short?.overlay ?? "Overlay") +
                     ": " +
-                    (moduleStore.modeStats?.overlay || 0)}
+                    modeStats().overlay}
                 </span>
               </div>
               <div class="legend-item">
@@ -199,7 +210,7 @@ export default function StatusTab() {
                 <span>
                   {(uiStore.L.modules?.modes?.short?.magic ?? "Magic") +
                     ": " +
-                    (moduleStore.modeStats?.magic || 0)}
+                    modeStats().magic}
                 </span>
               </div>
               <Show when={hymofsStore.enabled}>
@@ -208,7 +219,7 @@ export default function StatusTab() {
                   <span>
                     {(uiStore.L.modules?.modes?.short?.hymofs ?? "HymoFS") +
                       ": " +
-                      (moduleStore.modeStats?.hymofs || 0)}
+                      modeStats().hymofs}
                   </span>
                 </div>
               </Show>
