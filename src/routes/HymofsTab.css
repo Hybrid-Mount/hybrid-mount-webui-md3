@@ -5,15 +5,6 @@
   padding: 0 0 100px;
 }
 
-.dialog-container {
-  position: relative;
-  z-index: 500;
-}
-
-md-dialog.transparent-scrim {
-  --md-dialog-scrim-color: transparent;
-}
-
 .hymofs-kmi-dialog {
   padding: 0 !important;
   min-width: 280px;

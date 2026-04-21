@@ -278,7 +278,10 @@ md-icon svg {
   text-align: left;
   position: relative;
   overflow: hidden;
-  transition: all 0.2s;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
   color: var(--md-sys-color-on-surface);
 }
 .mode-item.selected {
@@ -309,14 +312,4 @@ md-icon svg {
 }
 .mode-item.selected .mode-check {
   opacity: 1;
-}
-
-.dialog-container {
-  position: relative;
-  z-index: 500;
-}
-
-md-dialog.transparent-scrim {
-  --md-dialog-scrim-color: transparent;
-  --md-sys-color-scrim: transparent;
 }

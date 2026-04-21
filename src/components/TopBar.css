@@ -29,7 +29,6 @@
   margin: 0;
   font-size: 22px;
   transform-origin: left bottom;
-  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
   white-space: nowrap;
 }
 .top-actions {
@@ -42,11 +41,6 @@ md-icon svg {
   fill: currentColor;
   width: 24px;
   height: 24px;
-}
-
-.dialog-container {
-  position: relative;
-  z-index: 120;
 }
 
 .lang-dialog {
