@@ -33,7 +33,6 @@ function createMockState() {
       stealth: true,
       hideXattr: false,
       kernelDebug: false,
-      ignoreProtocolMismatch: false,
       mapsSpoof: true,
       cmdline: "androidboot.verifiedbootstate=green",
       uname: {
@@ -92,7 +91,6 @@ function buildMockHymofsConfig(enabled: boolean): HymofsStatus["config"] {
   const { hymofs } = mockState;
   return {
     enabled,
-    ignore_protocol_mismatch: hymofs.ignoreProtocolMismatch,
     lkm_autoload: hymofs.lkmAutoload,
     lkm_dir: HYMOFS_LKM_DIR,
     lkm_kmi_override: hymofs.kmiOverride,
@@ -329,10 +327,6 @@ export const MockAPI: AppAPI = {
   async setHymofsHidexattr(enabled: boolean): Promise<void> {
     await delay(200);
     mockState.hymofs.hideXattr = enabled;
-  },
-  async setHymofsIgnoreProtocolMismatch(enabled: boolean): Promise<void> {
-    await delay(180);
-    mockState.hymofs.ignoreProtocolMismatch = enabled;
   },
   async setHymofsDebug(enabled: boolean): Promise<void> {
     await delay(200);

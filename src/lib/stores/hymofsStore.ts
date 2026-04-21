@@ -6,7 +6,6 @@ import { uiStore } from "./uiStore";
 function defaultHymofsConfig(lkm: HymofsLkmStatus): HymofsConfig {
   return {
     enabled: false,
-    ignore_protocol_mismatch: false,
     lkm_autoload: lkm.autoload,
     lkm_dir: "",
     lkm_kmi_override: lkm.kmi_override || "",

@@ -522,33 +522,6 @@ export default function HymofsTab() {
                         {uiStore.L.hymofs?.kernelDebugTitle ?? "Kernel Debug"}
                       </span>
                     </button>
-                    <button
-                      class={`hymofs-config-tile ${config()?.ignore_protocol_mismatch ? "active" : ""}`}
-                      disabled={pending()}
-                      onClick={() =>
-                        runAction(
-                          () =>
-                            API.setHymofsIgnoreProtocolMismatch(
-                              !Boolean(config()?.ignore_protocol_mismatch),
-                            ),
-                          uiStore.L.hymofs?.ignoreProtocolUpdated ??
-                            "Protocol mismatch policy updated",
-                        )
-                      }
-                    >
-                      <md-ripple></md-ripple>
-                      <div class="hymofs-config-icon">
-                        <md-icon>
-                          <svg viewBox="0 0 24 24">
-                            <path d={ICONS.warning} />
-                          </svg>
-                        </md-icon>
-                      </div>
-                      <span class="hymofs-config-label">
-                        {uiStore.L.hymofs?.ignoreProtocolTitle ??
-                          "Ignore Protocol Mismatch"}
-                      </span>
-                    </button>
                   </div>
                   <Show
                     when={

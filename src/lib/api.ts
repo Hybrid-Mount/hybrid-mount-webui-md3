@@ -83,7 +83,6 @@ export interface AppAPI {
   setHymofsEnabled: (enabled: boolean) => Promise<void>;
   setHymofsStealth: (enabled: boolean) => Promise<void>;
   setHymofsHidexattr: (enabled: boolean) => Promise<void>;
-  setHymofsIgnoreProtocolMismatch: (enabled: boolean) => Promise<void>;
   setHymofsDebug: (enabled: boolean) => Promise<void>;
   getOriginalKernelUname: () => Promise<KernelUnameValues>;
   setHymofsUname: (uname: Partial<HymofsUnameConfig>) => Promise<void>;
@@ -164,11 +163,7 @@ const RealAPI: AppAPI = {
     }
   },
   readLogs: async (): Promise<string> => {
-    let logPath = DEFAULT_CONFIG.logfile || "/data/adb/hybrid-mount/daemon.log";
-    try {
-      const cfg = await RealAPI.loadConfig();
-      if (cfg.logfile) logPath = cfg.logfile;
-    } catch {}
+    const logPath = PATHS.DAEMON_LOG || "/data/adb/hybrid-mount/daemon.log";
     return runCommandExpectOk(`cat "${shellEscapeDoubleQuoted(logPath)}"`);
   },
   saveModuleRules: async (
@@ -272,11 +267,6 @@ const RealAPI: AppAPI = {
   setHymofsHidexattr: async (enabled: boolean): Promise<void> => {
     await runCommandExpectOk(
       `${PATHS.BINARY} hymofs hidexattr ${enabled ? "on" : "off"}`,
-    );
-  },
-  setHymofsIgnoreProtocolMismatch: async (enabled: boolean): Promise<void> => {
-    await runCommandExpectOk(
-      `${PATHS.BINARY} hymofs ignore-protocol ${enabled ? "on" : "off"}`,
     );
   },
   setHymofsDebug: async (enabled: boolean): Promise<void> => {

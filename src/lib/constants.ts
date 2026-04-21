@@ -4,7 +4,6 @@ import type { AppConfig } from "./types";
 export const DEFAULT_CONFIG: AppConfig = {
   moduledir: "/data/adb/modules",
   mountsource: "KSU",
-  logfile: RUST_PATHS.DAEMON_LOG || "/data/adb/hybrid-mount/daemon.log",
   partitions: [],
   disable_umount: false,
   enable_overlay_fallback: false,

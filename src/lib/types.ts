@@ -12,7 +12,6 @@ export interface AppConfig {
   overlay_mode: OverlayMode;
   disable_umount: boolean;
   enable_overlay_fallback: boolean;
-  logfile?: string;
 }
 
 export type MountMode = "overlay" | "magic" | "hymofs" | "ignore";
@@ -115,7 +114,6 @@ export interface HymofsKstatRuleConfig {
 
 export interface HymofsConfig {
   enabled: boolean;
-  ignore_protocol_mismatch: boolean;
   lkm_autoload: boolean;
   lkm_dir: string;
   lkm_kmi_override: string;
