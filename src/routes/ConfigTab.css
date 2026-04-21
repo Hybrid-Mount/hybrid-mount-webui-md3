@@ -16,11 +16,11 @@
 }
 .full-width-field {
   width: 100%;
-  --md-outlined-text-field-container-shape: 16px;
+  --md-outlined-text-field-container-shape: var(--radius-lg);
 }
 .config-card {
   background-color: var(--md-sys-color-surface-container);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -34,7 +34,7 @@
 .card-icon {
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background-color: var(--md-sys-color-secondary-container);
   color: var(--md-sys-color-on-secondary-container);
   display: flex;
@@ -67,7 +67,7 @@
 }
 .option-tile {
   background-color: var(--md-sys-color-surface-container);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -103,7 +103,7 @@
 .tile-icon {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -249,7 +249,7 @@ md-icon svg {
   background: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface);
   border: 1px solid var(--md-sys-color-outline-variant);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 8px 12px;
   width: 60px;
   text-align: center;
@@ -272,7 +272,7 @@ md-icon svg {
   gap: 12px;
   padding: 12px;
   border: 1px solid var(--md-sys-color-outline-variant);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: transparent;
   cursor: pointer;
   text-align: left;

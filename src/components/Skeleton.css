@@ -14,7 +14,7 @@
   animation: skeleton-shimmer 1.5s infinite linear;
   width: var(--skeleton-width, 100%);
   height: var(--skeleton-height, 20px);
-  border-radius: var(--skeleton-radius, 12px);
+  border-radius: var(--skeleton-radius, var(--radius-md));
 }
 
 .skeleton--hero-label {
@@ -25,7 +25,7 @@
 .skeleton--hero-title {
   --skeleton-width: 80%;
   --skeleton-height: 48px;
-  --skeleton-radius: 16px;
+  --skeleton-radius: var(--radius-lg);
 }
 
 .skeleton--hero-caption {
@@ -41,7 +41,7 @@
 .skeleton--stats-bar {
   --skeleton-width: 100%;
   --skeleton-height: 24px;
-  --skeleton-radius: 12px;
+  --skeleton-radius: var(--radius-md);
 }
 
 .skeleton--info-wide {
@@ -62,7 +62,7 @@
 .skeleton--contributor-avatar {
   --skeleton-width: 40px;
   --skeleton-height: 40px;
-  --skeleton-radius: 50%;
+  --skeleton-radius: var(--radius-round);
   flex-shrink: 0;
 }
 
@@ -79,19 +79,19 @@
 .skeleton--module-card {
   --skeleton-width: 100%;
   --skeleton-height: 64px;
-  --skeleton-radius: 16px;
+  --skeleton-radius: var(--radius-lg);
 }
 
 .skeleton--feature-card {
   --skeleton-width: 100%;
   --skeleton-height: 120px;
-  --skeleton-radius: 20px;
+  --skeleton-radius: var(--radius-xl);
 }
 
 .skeleton--rule-card {
   --skeleton-width: 100%;
   --skeleton-height: 64px;
-  --skeleton-radius: 18px;
+  --skeleton-radius: var(--radius-xl);
 }
 
 @keyframes skeleton-shimmer {

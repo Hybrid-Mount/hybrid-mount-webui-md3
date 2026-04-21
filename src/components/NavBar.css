@@ -31,12 +31,12 @@
   padding: 0;
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
 }
 .icon-container {
   width: 32px;
   height: 32px;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
   justify-content: center;

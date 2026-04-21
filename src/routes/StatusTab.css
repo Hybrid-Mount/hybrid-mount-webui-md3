@@ -13,7 +13,7 @@
 .hero-card {
   background-color: var(--md-sys-color-primary-container);
   color: var(--md-sys-color-on-primary-container);
-  border-radius: 28px;
+  border-radius: var(--radius-3xl);
   padding: 24px;
   position: relative;
   overflow: hidden;
@@ -33,7 +33,7 @@
   height: 180px;
   background: currentColor;
   opacity: 0.08;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   pointer-events: none;
 }
 
@@ -61,7 +61,7 @@
   align-self: flex-start;
   background: rgba(0, 0, 0, 0.08);
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   font-family: var(--md-ref-typeface-mono);
   display: flex;
@@ -94,7 +94,7 @@
 
 .metric-card {
   background-color: var(--md-sys-color-surface-container);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -133,7 +133,7 @@
 
 .mode-stats-card {
   background-color: var(--md-sys-color-surface-container-low);
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -158,7 +158,7 @@
   height: 24px;
   width: 100%;
   background-color: var(--md-sys-color-surface-container-highest);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: flex;
   overflow: hidden;
   position: relative;
@@ -204,7 +204,7 @@
 .legend-dot {
   width: 10px;
   height: 10px;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
 }
 
 .dot-overlay {
@@ -221,7 +221,7 @@
 
 .info-card {
   background-color: var(--md-sys-color-surface-container-low);
-  border-radius: 24px;
+  border-radius: var(--radius-2xl);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -267,7 +267,7 @@
 .partition-chip {
   font-size: 13px;
   padding: 8px 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   transition:
     background-color 0.2s ease,

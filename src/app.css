@@ -2,9 +2,21 @@
 @import url("https://mui.kernelsu.org/internal/colors.css");
 
 :root {
-  --md-sys-shape-corner-medium: 12px;
-  --md-sys-shape-corner-large: 16px;
-  --md-sys-shape-corner-full: 9999px;
+  --radius-base: 12px;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: var(--radius-base);
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: var(--radius-xl);
+  --radius-3xl: var(--radius-xl);
+  --radius-4xl: var(--radius-xl);
+  --radius-full: 9999px;
+  --radius-round: 50%;
+  --md-sys-shape-corner-small: var(--radius-xs);
+  --md-sys-shape-corner-medium: var(--radius-md);
+  --md-sys-shape-corner-large: var(--radius-lg);
+  --md-sys-shape-corner-full: var(--radius-full);
   --md-sys-color-shadow: var(--shadow, #000000);
   --md-sys-elevation-1:
     0 1px 2px 0 var(--md-sys-color-shadow),
@@ -159,7 +171,7 @@ button:active {
   height: 44px;
   min-width: 90px;
   padding: 0 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background-color: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
   font-weight: 600;
@@ -182,7 +194,7 @@ button:active {
   height: 44px;
   min-width: 90px;
   padding: 0 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background-color: var(--md-sys-color-secondary-container);
   color: var(--md-sys-color-on-secondary-container);
   font-weight: 600;
@@ -196,7 +208,7 @@ button:active {
 .btn-icon {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--radius-round);
   background: transparent;
   color: var(--md-sys-color-on-surface-variant);
   display: flex;
@@ -211,7 +223,7 @@ button:active {
 .md3-card {
   background-color: var(--md-sys-color-surface-container);
   border: 1px solid var(--md-sys-color-outline-variant);
-  border-radius: var(--md-sys-shape-corner-large);
+  border-radius: var(--radius-lg);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -231,7 +243,7 @@ button:active {
   background: var(--md-sys-color-surface-container-highest);
   border: 1px solid var(--md-sys-color-outline);
   border-bottom: 1px solid var(--md-sys-color-outline);
-  border-radius: 4px 4px 0 0;
+  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
   padding: 0 16px;
   color: var(--md-sys-color-on-surface);
   font-size: 16px;
@@ -356,6 +368,6 @@ md-input-chip {
 }
 
 md-dialog {
-  --md-dialog-container-shape: 28px;
+  --md-dialog-container-shape: var(--radius-3xl);
   --md-dialog-transition-duration: 0.3s;
 }

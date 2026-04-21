@@ -19,7 +19,7 @@
 .toast {
   pointer-events: auto;
   padding: 12px 24px;
-  border-radius: 28px;
+  border-radius: var(--radius-3xl);
   font-family: var(--md-ref-typeface-plain);
   font-size: 14px;
   font-weight: 500;
