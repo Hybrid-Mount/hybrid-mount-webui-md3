@@ -183,6 +183,12 @@ export default function HymofsTab() {
     if (loading()) {
       return uiStore.L.hymofs?.statusLoading ?? "Loading";
     }
+    if (status()?.status === "disabled_runtime_present") {
+      return (
+        uiStore.L.hymofs?.statusConfigOffRuntimeOn ??
+        "Config Off / Runtime Still Loaded"
+      );
+    }
     if (status()?.status === "disabled") {
       return uiStore.L.hymofs?.statusDisabled ?? "Disabled";
     }
@@ -301,6 +307,11 @@ export default function HymofsTab() {
         </div>
 
         <div class="hymofs-grid">
+          <div class="runtime-note warning">
+            {uiStore.L.hymofs?.configOnlyHint ??
+              "Most settings below only update config. Runtime changes take effect the next time HymoFS is rebuilt or remounted."}
+          </div>
+
           <section
             class={`hymofs-card hymofs-section ${isSectionExpanded("lkm") ? "expanded" : ""}`}
           >
@@ -606,11 +617,11 @@ export default function HymofsTab() {
                               release: forms.release,
                               version: forms.version,
                             }),
-                          uiStore.L.hymofs?.applyUname ?? "Uname applied",
+                          uiStore.L.common?.saved ?? "Saved",
                         )
                       }
                     >
-                      {uiStore.L.hymofs?.applyUname ?? "Apply Uname"}
+                      {uiStore.L.hymofs?.saveUname ?? "Save Uname"}
                     </md-filled-button>
                     <md-outlined-button
                       disabled={pending()}
@@ -642,11 +653,11 @@ export default function HymofsTab() {
                       onClick={() =>
                         runAction(
                           () => API.setHymofsCmdline(forms.cmdline),
-                          uiStore.L.hymofs?.applyCmdline ?? "Cmdline applied",
+                          uiStore.L.common?.saved ?? "Saved",
                         )
                       }
                     >
-                      {uiStore.L.hymofs?.applyCmdline ?? "Apply Cmdline"}
+                      {uiStore.L.hymofs?.saveCmdline ?? "Save Cmdline"}
                     </md-filled-button>
                     <md-outlined-button
                       disabled={pending()}

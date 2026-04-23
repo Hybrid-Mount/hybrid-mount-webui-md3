@@ -104,9 +104,8 @@ export default function ConfigTab() {
           setCookie(HYMOFS_WARNING_COOKIE, "1");
         }
         uiStore.showToast(
-          hymofsEnabledDraft()
-            ? uiStore.L.config?.hymofsEnabledSuccess || "HymoFS enabled"
-            : uiStore.L.config?.hymofsDisabledSuccess || "HymoFS disabled",
+          uiStore.L.config?.hymofsConfigSaved ||
+            "HymoFS config saved. Runtime was not changed.",
           "success",
         );
         setInitialHymofsEnabled(hymofsEnabledDraft());
