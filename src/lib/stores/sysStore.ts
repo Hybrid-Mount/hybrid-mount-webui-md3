@@ -30,18 +30,57 @@ const createSysStore = () => {
     setLoading(true);
     pendingLoad = (async () => {
       try {
-        const [d, v, s, info] = await Promise.all([
+        const [deviceResult, versionResult, storageResult, systemInfoResult] =
+          await Promise.allSettled([
           API.getDeviceStatus(),
           API.getVersion(),
           API.getStorageUsage(),
           API.getSystemInfo(),
-        ]);
-        setDevice(d);
-        setVersion(v);
-        setStorage(s);
-        setSystemInfo(info);
-        setActivePartitions(info.activeMounts || []);
-        hasLoaded = true;
+          ]);
+        let loadedAny = false;
+        let failedAny = false;
+
+        if (deviceResult.status === "fulfilled") {
+          setDevice(deviceResult.value);
+          loadedAny = true;
+        } else {
+          failedAny = true;
+          console.error("Failed to load device status", deviceResult.reason);
+        }
+
+        if (versionResult.status === "fulfilled") {
+          setVersion(versionResult.value);
+          loadedAny = true;
+        } else {
+          failedAny = true;
+          console.error("Failed to load version", versionResult.reason);
+        }
+
+        if (storageResult.status === "fulfilled") {
+          setStorage(storageResult.value);
+          loadedAny = true;
+        } else {
+          failedAny = true;
+          console.error("Failed to load storage status", storageResult.reason);
+        }
+
+        if (systemInfoResult.status === "fulfilled") {
+          setSystemInfo(systemInfoResult.value);
+          setActivePartitions(systemInfoResult.value.activeMounts || []);
+          loadedAny = true;
+        } else {
+          failedAny = true;
+          console.error("Failed to load system info", systemInfoResult.reason);
+        }
+
+        hasLoaded = hasLoaded || loadedAny;
+
+        if (failedAny) {
+          uiStore.showToast(
+            uiStore.L.status?.loadError || "Failed to load system status",
+            "error",
+          );
+        }
       } catch (e) {
         console.error("Failed to load system status", e);
         uiStore.showToast(

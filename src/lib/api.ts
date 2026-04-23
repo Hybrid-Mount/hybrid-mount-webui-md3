@@ -180,10 +180,24 @@ const RealAPI: AppAPI = {
       (PATHS as Record<string, string>).DAEMON_STATE ||
       "/data/adb/meta-hybrid/run/daemon_state.json";
     const { errno, stdout, stderr } = await runCommand(`cat "${stateFile}"`);
-    if (errno === 0 && stdout) {
-      return { type: JSON.parse(stdout).storage_mode || "unknown" };
+    if (errno !== 0 || !stdout) {
+      return {
+        type: "unknown",
+        error: stderr?.trim() || "Storage status unavailable",
+      };
     }
-    throw new AppError(`getStorageUsage failed: ${stderr}`, errno);
+
+    try {
+      return { type: JSON.parse(stdout).storage_mode || "unknown" };
+    } catch (error) {
+      return {
+        type: "unknown",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to parse storage status",
+      };
+    }
   },
   getSystemInfo: async (): Promise<SystemInfo> => {
     const cmdSys = `echo "KERNEL:$(uname -r)"; echo "SELINUX:$(getenforce)"`;
@@ -208,13 +222,15 @@ const RealAPI: AppAPI = {
       `cat "${stateFile}"`,
     );
     if (errState === 0 && outState) {
-      const state = JSON.parse(outState);
-      info.mountBase = state.mount_point || "Unknown";
-      info.activeMounts = state.active_mounts || [];
-      if (state.zygisksu_enforce !== undefined)
-        info.zygisksuEnforce = state.zygisksu_enforce ? "1" : "0";
-      if (state.tmpfs_xattr_supported !== undefined)
-        info.tmpfs_xattr_supported = state.tmpfs_xattr_supported;
+      try {
+        const state = JSON.parse(outState);
+        info.mountBase = state.mount_point || "Unknown";
+        info.activeMounts = state.active_mounts || [];
+        if (state.zygisksu_enforce !== undefined)
+          info.zygisksuEnforce = state.zygisksu_enforce ? "1" : "0";
+        if (state.tmpfs_xattr_supported !== undefined)
+          info.tmpfs_xattr_supported = state.tmpfs_xattr_supported;
+      } catch {}
     }
     return info;
   },
@@ -401,7 +417,9 @@ const RealAPI: AppAPI = {
       return;
     }
     const safeUrl = shellEscapeDoubleQuoted(url);
-    await runCommand(`am start -a android.intent.action.VIEW -d "${safeUrl}"`);
+    await runCommandExpectOk(
+      `am start -a android.intent.action.VIEW -d "${safeUrl}"`,
+    );
   },
   reboot: async (): Promise<void> => {
     await runCommand("reboot");

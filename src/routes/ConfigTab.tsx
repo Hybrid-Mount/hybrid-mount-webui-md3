@@ -47,15 +47,24 @@ export default function ConfigTab() {
   });
 
   createEffect(() => {
-    if (!configStore.loading && configStore.config) {
-      if (
-        !initialConfigStr() ||
-        initialConfigStr() === JSON.stringify(configStore.config)
-      ) {
-        setInitialConfigStr(JSON.stringify(configStore.config));
-      }
+    if (!configStore.loading && configStore.config && !initialConfigStr()) {
+      setInitialConfigStr(JSON.stringify(configStore.config));
     }
   });
+
+  function readSavedConfig(): AppConfig {
+    try {
+      return initialConfigStr()
+        ? (JSON.parse(initialConfigStr()) as AppConfig)
+        : { ...configStore.config };
+    } catch {
+      return { ...configStore.config };
+    }
+  }
+
+  function updateSavedConfig(nextConfig: AppConfig) {
+    setInitialConfigStr(JSON.stringify(nextConfig));
+  }
 
   function updateConfig<K extends keyof AppConfig>(
     key: K,
@@ -75,7 +84,15 @@ export default function ConfigTab() {
       uiStore.showToast(uiStore.L.config.invalidPath, "error");
       return;
     }
-    await configStore.saveConfig();
+    const nextConfig = { ...configStore.config };
+    const configSaved = await configStore.saveConfig(nextConfig);
+    if (!configSaved) {
+      return;
+    }
+
+    updateSavedConfig(nextConfig);
+    setShowHymofsWarning(false);
+
     const hymofsChanged = hymofsEnabledDraft() !== initialHymofsEnabled();
 
     if (hymofsChanged) {
@@ -102,9 +119,6 @@ export default function ConfigTab() {
         setHymofsPending(false);
       }
     }
-
-    setShowHymofsWarning(false);
-    setInitialConfigStr(JSON.stringify(configStore.config));
   }
 
   function save() {
@@ -124,16 +138,18 @@ export default function ConfigTab() {
   }
 
   function reload() {
-    configStore.loadConfig().then(() => {
-      setInitialConfigStr(JSON.stringify(configStore.config));
+    void configStore.loadConfig().then((loaded) => {
+      if (!loaded) return;
+      updateSavedConfig({ ...configStore.config });
       syncHymofsDraft();
     });
   }
 
   function reset() {
     setShowResetConfirm(false);
-    configStore.resetConfig().then(() => {
-      setInitialConfigStr(JSON.stringify(configStore.config));
+    void configStore.resetConfig().then((resetDone) => {
+      if (!resetDone) return;
+      updateSavedConfig({ ...configStore.config });
       syncHymofsDraft();
     });
   }
@@ -146,19 +162,24 @@ export default function ConfigTab() {
     void persistChanges(true);
   }
 
-  function toggle(key: keyof AppConfig) {
+  async function toggle(key: keyof AppConfig) {
     const currentVal = configStore.config[key] as boolean;
     const newVal = !currentVal;
+    const savedConfig = readSavedConfig();
+    const nextSavedConfig = { ...savedConfig, [key]: newVal };
 
     updateConfig(key, newVal);
 
-    API.saveConfig({ ...configStore.config, [key]: newVal }).catch(() => {
-      updateConfig(key, currentVal);
-      uiStore.showToast(
-        uiStore.L.config?.saveFailed || "Failed to update setting",
-        "error",
-      );
+    const saved = await configStore.saveConfig(nextSavedConfig, {
+      showSuccess: false,
     });
+
+    if (!saved) {
+      updateConfig(key, currentVal);
+      return;
+    }
+
+    updateSavedConfig(nextSavedConfig);
   }
 
   function setOverlayMode(mode: string) {

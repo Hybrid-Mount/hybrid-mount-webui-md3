@@ -54,33 +54,6 @@ export function buildUnloadedHymofsStatus(
   };
 }
 
-function synthesizeUnloadedLkm(previous: HymofsStatus | null): HymofsLkmStatus {
-  const prevLkm = previous?.lkm;
-  return {
-    loaded: false,
-    module_name: prevLkm?.module_name,
-    autoload: prevLkm?.autoload ?? false,
-    kmi_override: prevLkm?.kmi_override ?? "",
-    current_kmi: prevLkm?.current_kmi,
-    search_dir: prevLkm?.search_dir,
-    module_file: prevLkm?.module_file,
-    last_error: null,
-  };
-}
-
-async function fetchStatus(
-  lkmLoaded: boolean,
-  previous: HymofsStatus | null,
-): Promise<HymofsStatus> {
-  if (lkmLoaded) {
-    return API.getHymofsStatus();
-  }
-  return buildUnloadedHymofsStatus(
-    synthesizeUnloadedLkm(previous),
-    previous?.config,
-  );
-}
-
 const createHymofsStore = () => {
   const [status, setStatus] = createSignal<HymofsStatus | null>(null);
   const [loading, setLoading] = createSignal(false);
@@ -93,8 +66,7 @@ const createHymofsStore = () => {
     setLoading(true);
     pendingLoad = (async () => {
       try {
-        const lkmLoaded = await API.isHymofsLkmLoaded();
-        const nextStatus = await fetchStatus(lkmLoaded, status());
+        const nextStatus = await API.getHymofsStatus();
         setStatus(nextStatus);
         hasLoaded = true;
       } catch (e) {
