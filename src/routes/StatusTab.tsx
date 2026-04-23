@@ -11,7 +11,6 @@ import { configStore } from "../lib/stores/configStore";
 import { moduleStore } from "../lib/stores/moduleStore";
 import { hymofsStore } from "../lib/stores/hymofsStore";
 import { ICONS } from "../lib/constants";
-import { BUILTIN_PARTITIONS } from "../lib/constants_gen";
 import Skeleton from "../components/Skeleton";
 import BottomActions from "../components/BottomActions";
 import { API } from "../lib/api";
@@ -25,10 +24,7 @@ import "@material/web/ripple/ripple.js";
 
 export default function StatusTab() {
   const displayPartitions = createMemo(() => [
-    ...new Set([
-      ...BUILTIN_PARTITIONS,
-      ...(configStore.config?.partitions || []),
-    ]),
+    ...new Set(sysStore.activePartitions || []),
   ]);
 
   const mountedCount = createMemo(

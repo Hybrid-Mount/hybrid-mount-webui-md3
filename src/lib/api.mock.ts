@@ -283,6 +283,7 @@ export const MockAPI: AppAPI = {
       selinux: "Enforcing",
       mountBase: "/data/adb/meta-hybrid/mnt",
       activeMounts: ["system", "product"],
+      detectedPartitions: ["system", "product", "system_ext", "mi_ext"],
       zygisksuEnforce: "1",
       tmpfs_xattr_supported: false,
       supported_overlay_modes: ["ext4"],

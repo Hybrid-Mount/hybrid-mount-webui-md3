@@ -24,6 +24,10 @@ interface KsuModule {
   exec: (cmd: string, options?: unknown) => Promise<KsuExecResult>;
 }
 
+interface PartitionInfo {
+  name: string;
+}
+
 let ksuExec: KsuModule["exec"] | null = null;
 
 try {
@@ -232,6 +236,14 @@ const RealAPI: AppAPI = {
           info.tmpfs_xattr_supported = state.tmpfs_xattr_supported;
       } catch {}
     }
+
+    try {
+      const partitions = await runJsonCommand<PartitionInfo[]>(
+        `${PATHS.BINARY} api partitions`,
+      );
+      info.detectedPartitions = partitions.map((partition) => partition.name);
+    } catch {}
+
     return info;
   },
   getDeviceStatus: async (): Promise<DeviceInfo> => {
