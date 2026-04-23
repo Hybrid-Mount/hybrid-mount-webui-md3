@@ -10,6 +10,24 @@ interface SaveConfigOptions {
   showError?: boolean;
 }
 
+function normalizeConfig(
+  nextConfig: Partial<AppConfig> | null | undefined,
+): AppConfig {
+  return {
+    moduledir: nextConfig?.moduledir ?? DEFAULT_CONFIG.moduledir,
+    mountsource: nextConfig?.mountsource ?? DEFAULT_CONFIG.mountsource,
+    partitions: Array.isArray(nextConfig?.partitions)
+      ? [...nextConfig.partitions]
+      : [...DEFAULT_CONFIG.partitions],
+    overlay_mode: nextConfig?.overlay_mode ?? DEFAULT_CONFIG.overlay_mode,
+    disable_umount:
+      nextConfig?.disable_umount ?? DEFAULT_CONFIG.disable_umount,
+    enable_overlay_fallback:
+      nextConfig?.enable_overlay_fallback ??
+      DEFAULT_CONFIG.enable_overlay_fallback,
+  };
+}
+
 const createConfigStore = () => {
   const [config, setConfigStore] = createStore<AppConfig>(DEFAULT_CONFIG);
   const [loading, setLoading] = createSignal(false);
@@ -19,7 +37,7 @@ const createConfigStore = () => {
     setLoading(true);
     try {
       const data = await API.loadConfig();
-      setConfigStore(reconcile(data));
+      setConfigStore(reconcile(normalizeConfig(data)));
       return true;
     } catch (e: any) {
       uiStore.showToast(
@@ -37,9 +55,11 @@ const createConfigStore = () => {
     options: SaveConfigOptions = {},
   ) {
     const { showSuccess = true, showError = true } = options;
+    const normalizedConfig = normalizeConfig(nextConfig);
+
     setSaving(true);
     try {
-      await API.saveConfig(nextConfig);
+      await API.saveConfig(normalizedConfig);
       if (showSuccess) {
         uiStore.showToast(uiStore.L.common?.saved || "Saved", "success");
       }
@@ -86,7 +106,7 @@ const createConfigStore = () => {
       return config;
     },
     set config(v) {
-      setConfigStore(reconcile(v));
+      setConfigStore(reconcile(normalizeConfig(v)));
     },
     get loading() {
       return loading();

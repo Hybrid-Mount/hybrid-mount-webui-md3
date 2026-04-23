@@ -35,8 +35,9 @@ const createModuleStore = () => {
     return stats;
   });
 
-  async function loadModules() {
+  async function loadModules(force = false) {
     if (pendingLoad) return pendingLoad;
+    if (hasLoaded && !force) return true;
 
     setLoading(true);
     pendingLoad = (async () => {
@@ -63,7 +64,7 @@ const createModuleStore = () => {
   }
 
   function ensureModulesLoaded() {
-    if (hasLoaded) return Promise.resolve();
+    if (hasLoaded) return Promise.resolve(true);
     return loadModules();
   }
 

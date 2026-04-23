@@ -71,23 +71,31 @@ export default function ModulesTab() {
     }
   });
 
-  function load() {
-    moduleStore.loadModules().then((loaded) => {
+  function syncSnapshotFromModules() {
+    const snapshot: Record<string, string> = {};
+    moduleStore.modules.forEach((m) => {
+      snapshot[m.id] = JSON.stringify(m.rules);
+    });
+    setInitialRulesSnapshot(snapshot);
+  }
+
+  function isModuleDirty(mod: Module) {
+    const snapshot = initialRulesSnapshot();
+    if (!Object.prototype.hasOwnProperty.call(snapshot, mod.id)) {
+      return false;
+    }
+    return snapshot[mod.id] !== JSON.stringify(mod.rules);
+  }
+
+  function load(force = false) {
+    moduleStore.loadModules(force).then((loaded) => {
       if (!loaded) return;
-      const snapshot: Record<string, string> = {};
-      moduleStore.modules.forEach((m) => {
-        snapshot[m.id] = JSON.stringify(m.rules);
-      });
-      setInitialRulesSnapshot(snapshot);
+      syncSnapshotFromModules();
     });
   }
 
   const dirtyModules = createMemo(() =>
-    moduleStore.modules.filter((m) => {
-      const initial = initialRulesSnapshot()[m.id];
-      if (!initial) return false;
-      return JSON.stringify(m.rules) !== initial;
-    }),
+    moduleStore.modules.filter((m) => isModuleDirty(m)),
   );
 
   const isDirty = createMemo(() => dirtyModules().length > 0);
@@ -108,7 +116,7 @@ export default function ModulesTab() {
       for (const mod of dirty) {
         await API.saveModuleRules(mod.id, mod.rules);
       }
-      await load();
+      await load(true);
       uiStore.showToast(
         uiStore.L.modules?.saveSuccess || "Saved successfully",
         "success",
@@ -289,7 +297,7 @@ export default function ModulesTab() {
                     getEffectiveDefaultMode(mod);
                   return (
                     <div
-                      class={`module-card ${expandedId() === mod.id ? "expanded" : ""} ${initialRulesSnapshot()[mod.id] !== JSON.stringify(mod.rules) ? "dirty" : ""} ${mod.is_mounted ? "" : "unmounted"}`}
+                      class={`module-card ${expandedId() === mod.id ? "expanded" : ""} ${isModuleDirty(mod) ? "dirty" : ""} ${mod.is_mounted ? "" : "unmounted"}`}
                     >
                       <button
                         class="module-header"
@@ -414,7 +422,7 @@ export default function ModulesTab() {
         </Show>
 
         <md-filled-tonal-icon-button
-          onClick={load}
+          onClick={() => load(true)}
           disabled={moduleStore.loading}
           title={uiStore.L.modules?.reload}
         >
