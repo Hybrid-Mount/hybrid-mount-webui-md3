@@ -4,7 +4,7 @@ import { API } from "../lib/api";
 import { ICONS } from "../lib/constants";
 import { uiStore } from "../lib/stores/uiStore";
 import { hymofsStore } from "../lib/stores/hymofsStore";
-import type { HymofsRuleEntry, HymofsStatus } from "../lib/types";
+import type { HymofsStatus } from "../lib/types";
 import BottomActions from "../components/BottomActions";
 import Skeleton from "../components/Skeleton";
 import "./HymofsTab.css";
@@ -32,10 +32,6 @@ const KNOWN_KMI_OPTIONS = [
 ] as const;
 const EXPAND_MORE_ICON = "M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z";
 
-function ruleKind(rule: HymofsRuleEntry) {
-  return String(rule.type || rule.rule_type || "UNKNOWN").toUpperCase();
-}
-
 function parseUnsignedInput(value: string, label: string) {
   const trimmed = value.trim();
   if (!trimmed) {
@@ -53,7 +49,6 @@ function parseUnsignedInput(value: string, label: string) {
 }
 
 export default function HymofsTab() {
-  const [rules, setRules] = createSignal<HymofsRuleEntry[]>([]);
   const [userHideRules, setUserHideRules] = createSignal<string[]>([]);
   const [loading, setLoading] = createSignal(true);
   const [pending, setPending] = createSignal(false);
@@ -105,13 +100,9 @@ export default function HymofsTab() {
       await hymofsStore.refreshStatus();
       const nextStatus = hymofsStore.status;
       const nextUserHideRules = await API.getUserHideRules();
-      const nextRules = nextStatus?.lkm?.loaded
-        ? await API.getHymofsRules()
-        : [];
       if (nextStatus) {
         syncForms(nextStatus);
       }
-      setRules(nextRules);
       setUserHideRules(nextUserHideRules);
     } catch (e: any) {
       uiStore.showToast(
@@ -200,12 +191,6 @@ export default function HymofsTab() {
     lkm()?.autoload
       ? (uiStore.L.hymofs?.autoloadOn ?? "Autoload On")
       : (uiStore.L.hymofs?.autoloadOff ?? "Autoload Off"),
-  );
-  const rulesSummaryText = createMemo(() =>
-    (
-      uiStore.L.hymofs?.rulesVisibleSummary ??
-      "{count} active rules visible from userspace"
-    ).replace("{count}", String(rules().length)),
   );
   const heroSubtitleText = createMemo(
     () =>
@@ -307,11 +292,6 @@ export default function HymofsTab() {
         </div>
 
         <div class="hymofs-grid">
-          <div class="runtime-note warning">
-            {uiStore.L.hymofs?.configOnlyHint ??
-              "Most settings below only update config. Runtime changes take effect the next time HymoFS is rebuilt or remounted."}
-          </div>
-
           <section
             class={`hymofs-card hymofs-section ${isSectionExpanded("lkm") ? "expanded" : ""}`}
           >
@@ -1073,74 +1053,6 @@ export default function HymofsTab() {
             </div>
           </section>
         </div>
-
-        <section
-          class={`hymofs-card hymofs-section rules-card ${isSectionExpanded("rules") ? "expanded" : ""}`}
-        >
-          <button
-            class="hymofs-section-toggle"
-            type="button"
-            aria-expanded={isSectionExpanded("rules") ? "true" : "false"}
-            aria-controls="hymofs-section-rules"
-            onClick={() => toggleSection("rules")}
-          >
-            <div class="hymofs-card-head hymofs-section-toggle-inner">
-              <div>
-                <div class="hymofs-card-title">
-                  {uiStore.L.hymofs?.rulesTitle ?? "Active Rules"}
-                </div>
-                <div class="hymofs-card-subtitle">{rulesSummaryText()}</div>
-              </div>
-              <md-icon class="hymofs-section-chevron" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d={EXPAND_MORE_ICON} />
-                </svg>
-              </md-icon>
-            </div>
-          </button>
-          <div class="hymofs-section-body-wrapper" id="hymofs-section-rules">
-            <div class="hymofs-section-body-inner">
-              <div class="hymofs-section-body">
-                <Show
-                  when={!loading()}
-                  fallback={
-                    <div class="rule-list">
-                      <Skeleton variant="rule-card" />
-                      <Skeleton variant="rule-card" />
-                    </div>
-                  }
-                >
-                  <div class="rule-list">
-                    <For each={rules()}>
-                      {(rule) => (
-                        <div class="rule-card">
-                          <div class="rule-head">
-                            <span
-                              class={`rule-kind ${ruleKind(rule).toLowerCase()}`}
-                            >
-                              {ruleKind(rule)}
-                            </span>
-                            <Show when={rule.file_type != null}>
-                              <span class="rule-aux">
-                                {`${uiStore.L.hymofs?.dtypeLabel ?? "dtype"} ${rule.file_type}`}
-                              </span>
-                            </Show>
-                          </div>
-                          <div class="rule-main mono">
-                            {rule.target || rule.path || rule.args || "-"}
-                          </div>
-                          <Show when={rule.source}>
-                            <div class="rule-sub mono">{rule.source}</div>
-                          </Show>
-                        </div>
-                      )}
-                    </For>
-                  </div>
-                </Show>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
 
       <BottomActions>

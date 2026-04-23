@@ -3,6 +3,7 @@ import { uiStore } from "../lib/stores/uiStore";
 import { configStore } from "../lib/stores/configStore";
 import { sysStore } from "../lib/stores/sysStore";
 import { hymofsStore } from "../lib/stores/hymofsStore";
+import { moduleStore } from "../lib/stores/moduleStore";
 import { ICONS } from "../lib/constants";
 import { API } from "../lib/api";
 import { getCookie, setCookie } from "../lib/cookies";
@@ -79,11 +80,20 @@ export default function ConfigTab() {
     setHymofsEnabledDraft(enabled);
   }
 
+  async function refreshModulesForConfigChange() {
+    const shouldReload = moduleStore.hasLoaded;
+    moduleStore.invalidate();
+    if (shouldReload) {
+      await moduleStore.loadModules(true);
+    }
+  }
+
   async function persistChanges(rememberWarning = false) {
     if (invalidModuleDir()) {
       uiStore.showToast(uiStore.L.config.invalidPath, "error");
       return;
     }
+    const savedConfig = readSavedConfig();
     const nextConfig = { ...configStore.config };
     const configSaved = await configStore.saveConfig(nextConfig);
     if (!configSaved) {
@@ -91,6 +101,9 @@ export default function ConfigTab() {
     }
 
     updateSavedConfig(nextConfig);
+    if (savedConfig.moduledir !== nextConfig.moduledir) {
+      await refreshModulesForConfigChange();
+    }
     setShowHymofsWarning(false);
 
     const hymofsChanged = hymofsEnabledDraft() !== initialHymofsEnabled();
@@ -136,21 +149,21 @@ export default function ConfigTab() {
     void persistChanges();
   }
 
-  function reload() {
-    void configStore.loadConfig().then((loaded) => {
-      if (!loaded) return;
-      updateSavedConfig({ ...configStore.config });
-      syncHymofsDraft();
-    });
+  async function reload() {
+    const loaded = await configStore.loadConfig();
+    if (!loaded) return;
+    updateSavedConfig({ ...configStore.config });
+    syncHymofsDraft();
+    await refreshModulesForConfigChange();
   }
 
-  function reset() {
+  async function reset() {
     setShowResetConfirm(false);
-    void configStore.resetConfig().then((resetDone) => {
-      if (!resetDone) return;
-      updateSavedConfig({ ...configStore.config });
-      syncHymofsDraft();
-    });
+    const resetDone = await configStore.resetConfig();
+    if (!resetDone) return;
+    updateSavedConfig({ ...configStore.config });
+    syncHymofsDraft();
+    await refreshModulesForConfigChange();
   }
 
   function requestHymofsToggle() {
@@ -228,7 +241,7 @@ export default function ConfigTab() {
             <md-text-button onClick={() => setShowResetConfirm(false)}>
               {uiStore.L.common?.cancel ?? "Cancel"}
             </md-text-button>
-            <md-text-button onClick={reset}>
+            <md-text-button onClick={() => void reset()}>
               {uiStore.L.config?.resetConfig ?? "Reset Config"}
             </md-text-button>
           </div>
@@ -548,7 +561,7 @@ export default function ConfigTab() {
 
       <BottomActions>
         <md-filled-tonal-icon-button
-          onClick={reload}
+          onClick={() => void reload()}
           disabled={configStore.loading}
           title={uiStore.L.config.reload}
         >

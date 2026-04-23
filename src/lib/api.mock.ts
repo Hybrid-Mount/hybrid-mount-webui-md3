@@ -9,7 +9,6 @@ import type {
   SystemInfo,
   ModuleRules,
   HymofsStatus,
-  HymofsRuleEntry,
   HymofsLkmStatus,
   HymofsUnameConfig,
   KernelUnameValues,
@@ -283,7 +282,6 @@ export const MockAPI: AppAPI = {
       selinux: "Enforcing",
       mountBase: "/data/adb/meta-hybrid/mnt",
       activeMounts: ["system", "product"],
-      detectedPartitions: ["system", "product", "system_ext", "mi_ext"],
       zygisksuEnforce: "1",
       tmpfs_xattr_supported: false,
       supported_overlay_modes: ["ext4"],
@@ -292,26 +290,6 @@ export const MockAPI: AppAPI = {
   async getHymofsStatus(): Promise<HymofsStatus> {
     await delay(300);
     return buildMockHymofsStatus();
-  },
-  async getHymofsRules(): Promise<HymofsRuleEntry[]> {
-    await delay(180);
-    return [
-      {
-        type: "MERGE",
-        target: "/system/etc",
-        source: "/dev/hymo_mirror/playintegrityfix/system/etc",
-      },
-      {
-        type: "ADD",
-        target: "/system/bin/keystore2",
-        source: "/dev/hymo_mirror/playintegrityfix/system/bin/keystore2",
-        file_type: 8,
-      },
-      {
-        type: "HIDE",
-        path: "/data/adb/magisk",
-      },
-    ];
   },
   async setHymofsEnabled(enabled: boolean): Promise<void> {
     await delay(200);

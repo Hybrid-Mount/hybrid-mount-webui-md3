@@ -9,7 +9,6 @@ import type {
   DeviceInfo,
   ModuleRules,
   HymofsStatus,
-  HymofsRuleEntry,
   HymofsUnameConfig,
   KernelUnameValues,
 } from "./types";
@@ -22,10 +21,6 @@ interface KsuExecResult {
 
 interface KsuModule {
   exec: (cmd: string, options?: unknown) => Promise<KsuExecResult>;
-}
-
-interface PartitionInfo {
-  name: string;
 }
 
 let ksuExec: KsuModule["exec"] | null = null;
@@ -82,7 +77,6 @@ export interface AppAPI {
   getDeviceStatus: () => Promise<DeviceInfo>;
   getVersion: () => Promise<string>;
   getHymofsStatus: () => Promise<HymofsStatus>;
-  getHymofsRules: () => Promise<HymofsRuleEntry[]>;
   setHymofsEnabled: (enabled: boolean) => Promise<void>;
   setHymofsStealth: (enabled: boolean) => Promise<void>;
   setHymofsHidexattr: (enabled: boolean) => Promise<void>;
@@ -236,13 +230,6 @@ const RealAPI: AppAPI = {
       } catch {}
     }
 
-    try {
-      const partitions = await runJsonCommand<PartitionInfo[]>(
-        `${PATHS.BINARY} api partitions`,
-      );
-      info.detectedPartitions = partitions.map((partition) => partition.name);
-    } catch {}
-
     return info;
   },
   getDeviceStatus: async (): Promise<DeviceInfo> => {
@@ -273,9 +260,6 @@ const RealAPI: AppAPI = {
   },
   getHymofsStatus: async (): Promise<HymofsStatus> => {
     return runJsonCommand<HymofsStatus>(`${PATHS.BINARY} hymofs status`);
-  },
-  getHymofsRules: async (): Promise<HymofsRuleEntry[]> => {
-    return runJsonCommand<HymofsRuleEntry[]>(`${PATHS.BINARY} hymofs list`);
   },
   setHymofsEnabled: async (enabled: boolean): Promise<void> => {
     await runCommandExpectOk(

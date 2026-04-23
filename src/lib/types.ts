@@ -40,7 +40,6 @@ export interface SystemInfo {
   selinux: string;
   mountBase: string;
   activeMounts: string[];
-  detectedPartitions?: string[];
   zygisksuEnforce?: string;
   supported_overlay_modes?: OverlayMode[];
   tmpfs_xattr_supported?: boolean;
@@ -134,16 +133,6 @@ export interface HymofsConfig {
   cmdline_value: string;
   kstat_rules: HymofsKstatRuleConfig[];
   maps_rules: HymofsMapsRuleConfig[];
-}
-
-export interface HymofsRuleEntry {
-  type?: string;
-  rule_type?: string;
-  target?: string | null;
-  source?: string | null;
-  path?: string | null;
-  args?: string | null;
-  file_type?: number | null;
 }
 
 export interface HymofsRuntimeInfo {

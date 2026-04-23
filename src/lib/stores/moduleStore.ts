@@ -68,6 +68,10 @@ const createModuleStore = () => {
     return loadModules();
   }
 
+  function invalidate() {
+    hasLoaded = false;
+  }
+
   async function saveModules() {
     setSaving(true);
     try {
@@ -104,6 +108,7 @@ const createModuleStore = () => {
       return modeStats();
     },
     ensureModulesLoaded,
+    invalidate,
     loadModules,
     saveModules,
   };
