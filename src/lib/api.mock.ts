@@ -313,10 +313,6 @@ export const MockAPI: AppAPI = {
       },
     ];
   },
-  async isHymofsLkmLoaded(): Promise<boolean> {
-    await delay(30);
-    return mockState.hymofs.lkmLoaded;
-  },
   async setHymofsEnabled(enabled: boolean): Promise<void> {
     await delay(200);
     mockState.hymofs.enabled = enabled;

@@ -83,7 +83,6 @@ export interface AppAPI {
   getVersion: () => Promise<string>;
   getHymofsStatus: () => Promise<HymofsStatus>;
   getHymofsRules: () => Promise<HymofsRuleEntry[]>;
-  isHymofsLkmLoaded: () => Promise<boolean>;
   setHymofsEnabled: (enabled: boolean) => Promise<void>;
   setHymofsStealth: (enabled: boolean) => Promise<void>;
   setHymofsHidexattr: (enabled: boolean) => Promise<void>;
@@ -277,10 +276,6 @@ const RealAPI: AppAPI = {
   },
   getHymofsRules: async (): Promise<HymofsRuleEntry[]> => {
     return runJsonCommand<HymofsRuleEntry[]>(`${PATHS.BINARY} hymofs list`);
-  },
-  isHymofsLkmLoaded: async (): Promise<boolean> => {
-    const { errno } = await runCommand("grep -q '^hymofs_lkm ' /proc/modules");
-    return errno === 0;
   },
   setHymofsEnabled: async (enabled: boolean): Promise<void> => {
     await runCommandExpectOk(

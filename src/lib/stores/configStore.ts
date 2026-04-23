@@ -23,7 +23,7 @@ const createConfigStore = () => {
       return true;
     } catch (e: any) {
       uiStore.showToast(
-        uiStore.L.config?.loadError || "Failed to load config",
+        e?.message || uiStore.L.config?.loadError || "Failed to load config",
         "error",
       );
       return false;
@@ -47,7 +47,7 @@ const createConfigStore = () => {
     } catch (e: any) {
       if (showError) {
         uiStore.showToast(
-          uiStore.L.config?.saveFailed || "Failed to save config",
+          e?.message || uiStore.L.config?.saveFailed || "Failed to save config",
           "error",
         );
       }
@@ -72,7 +72,7 @@ const createConfigStore = () => {
       return true;
     } catch (e: any) {
       uiStore.showToast(
-        uiStore.L.config?.saveFailed || "Failed to reset config",
+        e?.message || uiStore.L.config?.saveFailed || "Failed to reset config",
         "error",
       );
       return false;

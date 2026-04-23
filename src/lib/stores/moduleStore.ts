@@ -9,7 +9,7 @@ const createModuleStore = () => {
   const [modules, setModulesStore] = createStore<Module[]>([]);
   const [loading, setLoading] = createSignal(false);
   const [saving, setSaving] = createSignal(false);
-  let pendingLoad: Promise<void> | null = null;
+  let pendingLoad: Promise<boolean> | null = null;
   let hasLoaded = false;
 
   function normalizeModule(module: Module): Module {
@@ -46,11 +46,13 @@ const createModuleStore = () => {
         );
         setModulesStore(reconcile(data));
         hasLoaded = true;
+        return true;
       } catch (e: any) {
         uiStore.showToast(
-          uiStore.L.modules?.scanError || "Failed to load modules",
+          e?.message || uiStore.L.modules?.scanError || "Failed to load modules",
           "error",
         );
+        return false;
       } finally {
         setLoading(false);
         pendingLoad = null;
@@ -72,7 +74,9 @@ const createModuleStore = () => {
       uiStore.showToast(uiStore.L.common?.saved || "Saved", "success");
     } catch (e: any) {
       uiStore.showToast(
-        uiStore.L.modules?.saveFailed || "Failed to save module modes",
+        e?.message ||
+          uiStore.L.modules?.saveFailed ||
+          "Failed to save module modes",
         "error",
       );
     }

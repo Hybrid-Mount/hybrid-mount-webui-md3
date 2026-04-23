@@ -72,7 +72,8 @@ export default function ModulesTab() {
   });
 
   function load() {
-    moduleStore.loadModules().then(() => {
+    moduleStore.loadModules().then((loaded) => {
+      if (!loaded) return;
       const snapshot: Record<string, string> = {};
       moduleStore.modules.forEach((m) => {
         snapshot[m.id] = JSON.stringify(m.rules);

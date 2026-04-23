@@ -339,10 +339,6 @@ export default function HymofsTab() {
                       </span>
                       <strong>{lkm()?.current_kmi || "-"}</strong>
                     </div>
-                    <div class="meta-row">
-                      <span>{uiStore.L.hymofs?.lastError ?? "Last error"}</span>
-                      <strong>{lkm()?.last_error || "-"}</strong>
-                    </div>
                   </div>
                   <div class="field-row">
                     <button
