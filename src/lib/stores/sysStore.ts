@@ -2,15 +2,9 @@ import { createSignal, createRoot } from "solid-js";
 import { API } from "../api";
 import { APP_VERSION } from "../constants_gen";
 import { uiStore } from "./uiStore";
-import type { StorageStatus, SystemInfo, DeviceInfo } from "../types";
+import type { StorageStatus, SystemInfo } from "../types";
 
 const createSysStore = () => {
-  const [device, setDevice] = createSignal<DeviceInfo>({
-    model: "-",
-    android: "-",
-    kernel: "-",
-    selinux: "-",
-  });
   const [version, setVersion] = createSignal(APP_VERSION);
   const [storage, setStorage] = createSignal<StorageStatus>({ type: null });
   const [systemInfo, setSystemInfo] = createSignal<SystemInfo>({
@@ -30,23 +24,14 @@ const createSysStore = () => {
     setLoading(true);
     pendingLoad = (async () => {
       try {
-        const [deviceResult, versionResult, storageResult, systemInfoResult] =
+        const [versionResult, storageResult, systemInfoResult] =
           await Promise.allSettled([
-            API.getDeviceStatus(),
             API.getVersion(),
             API.getStorageUsage(),
             API.getSystemInfo(),
           ]);
         let loadedAny = false;
         let failedAny = false;
-
-        if (deviceResult.status === "fulfilled") {
-          setDevice(deviceResult.value);
-          loadedAny = true;
-        } else {
-          failedAny = true;
-          console.error("Failed to load device status", deviceResult.reason);
-        }
 
         if (versionResult.status === "fulfilled") {
           setVersion(versionResult.value);
@@ -102,9 +87,6 @@ const createSysStore = () => {
   }
 
   return {
-    get device() {
-      return device();
-    },
     get version() {
       return version();
     },

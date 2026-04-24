@@ -6,7 +6,6 @@ import type {
   Module,
   StorageStatus,
   SystemInfo,
-  DeviceInfo,
   ModuleRules,
   HymofsStatus,
   HymofsUnameConfig,
@@ -76,7 +75,6 @@ export interface AppAPI {
   saveAllModuleRules: (rules: Record<string, ModuleRules>) => Promise<void>;
   getStorageUsage: () => Promise<StorageStatus>;
   getSystemInfo: () => Promise<SystemInfo>;
-  getDeviceStatus: () => Promise<DeviceInfo>;
   getVersion: () => Promise<string>;
   getHymofsStatus: () => Promise<HymofsStatus>;
   setHymofsEnabled: (enabled: boolean) => Promise<void>;
@@ -209,11 +207,12 @@ const RealAPI: AppAPI = {
       tmpfs_xattr_supported: boolean;
       detectedPartitions: Array<{ fs_type: string }>;
     }>(`${PATHS.BINARY} api system`);
+    const VALID_MODES = new Set(["tmpfs", "ext4"]);
     const overlayModes = [
       ...new Set(
         payload.detectedPartitions
           .map((p) => p.fs_type)
-          .filter((t) => t),
+          .filter((t) => VALID_MODES.has(t)),
       ),
     ];
     return {
@@ -226,20 +225,6 @@ const RealAPI: AppAPI = {
         ? { supported_overlay_modes: overlayModes as OverlayMode[] }
         : {}),
     };
-  },
-  getDeviceStatus: async (): Promise<DeviceInfo> => {
-    let model = "Device",
-      android = "14",
-      kernel = "Unknown";
-    const p1 = await runCommand("getprop ro.product.model");
-    if (p1.errno === 0) model = p1.stdout.trim();
-    const p2 = await runCommand("getprop ro.build.version.release");
-    const p3 = await runCommand("getprop ro.build.version.sdk");
-    if (p2.errno === 0)
-      android = `${p2.stdout.trim()} (API ${p3.stdout.trim()})`;
-    const p4 = await runCommand("uname -r");
-    if (p4.errno === 0) kernel = p4.stdout.trim();
-    return { model, android, kernel, selinux: "Enforcing" };
   },
   getVersion: async (): Promise<string> => {
     const binPath = PATHS.BINARY;

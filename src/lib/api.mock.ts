@@ -3,7 +3,6 @@ import { DEFAULT_CONFIG } from "./constants";
 import type { AppAPI } from "./api";
 import type {
   AppConfig,
-  DeviceInfo,
   Module,
   StorageStatus,
   SystemInfo,
@@ -258,15 +257,6 @@ export const MockAPI: AppAPI = {
   async saveAllModuleRules(rules: Record<string, ModuleRules>): Promise<void> {
     await delay(400);
     console.log("[Mock] All module rules saved:", rules);
-  },
-  async getDeviceStatus(): Promise<DeviceInfo> {
-    await delay(300);
-    return {
-      model: "Pixel 8 Pro (Mock)",
-      android: "14 (API 34)",
-      kernel: "5.15.110-android14-11",
-      selinux: "Enforcing",
-    };
   },
   async getVersion(): Promise<string> {
     await delay(100);

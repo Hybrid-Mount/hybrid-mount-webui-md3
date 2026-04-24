@@ -157,13 +157,6 @@ export interface HymofsStatus {
   runtime?: HymofsRuntimeInfo;
 }
 
-export interface DeviceInfo {
-  model: string;
-  android: string;
-  kernel: string;
-  selinux: string;
-}
-
 export interface ToastMessage {
   id: string;
   text: string;
