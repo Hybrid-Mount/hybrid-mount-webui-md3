@@ -25,8 +25,8 @@ function normalizeConfig(
       nextConfig?.enable_overlay_fallback ??
       DEFAULT_CONFIG.enable_overlay_fallback,
     default_mode: nextConfig?.default_mode ?? DEFAULT_CONFIG.default_mode,
-    hymofs: nextConfig?.hymofs ?? { ...DEFAULT_CONFIG.hymofs },
-    rules: nextConfig?.rules ?? { ...DEFAULT_CONFIG.rules },
+    hymofs: { ...DEFAULT_CONFIG.hymofs, ...(nextConfig?.hymofs ?? {}) },
+    rules: { ...DEFAULT_CONFIG.rules, ...(nextConfig?.rules ?? {}) },
   };
 }
 

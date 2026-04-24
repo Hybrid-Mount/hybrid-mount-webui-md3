@@ -130,16 +130,8 @@ async function runCommandExpectOk(command: string): Promise<string> {
 async function runJsonCommand<T>(command: string): Promise<T> {
   const output = await runCommandExpectOk(command);
   const parsed = JSON.parse(output);
-  if (
-    parsed &&
-    typeof parsed === "object" &&
-    !Array.isArray(parsed) &&
-    typeof parsed.error === "string"
-  ) {
-    const keys = Object.keys(parsed);
-    if (keys.length <= 2 && keys.every((k) => k === "error" || k === "code")) {
-      throw new AppError(parsed.error, 0);
-    }
+  if (parsed && typeof parsed === "object" && parsed.type === "error") {
+    throw new AppError(parsed.error || "Unknown error", 0);
   }
   return parsed as T;
 }

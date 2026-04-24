@@ -166,13 +166,18 @@ export default function App() {
   });
 
   async function initializeApp() {
-    await uiStore.init();
-    await Promise.all([
-      configStore.loadConfig(),
-      sysStore.ensureStatusLoaded(),
-      hymofsStore.ensureStatusLoaded(),
-      moduleStore.ensureModulesLoaded(),
-    ]);
+    try {
+      await uiStore.init();
+      await Promise.all([
+        configStore.loadConfig(),
+        sysStore.ensureStatusLoaded(),
+        hymofsStore.ensureStatusLoaded(),
+        moduleStore.ensureModulesLoaded(),
+      ]);
+    } catch (e) {
+      console.error("App initialization failed", e);
+      return;
+    }
 
     const pendingRoutes = visibleRoutes().filter(
       (route) => route.id !== activeTab(),
