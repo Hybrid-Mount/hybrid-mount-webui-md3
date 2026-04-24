@@ -43,7 +43,6 @@ export interface SystemInfo {
   selinux: string;
   mountBase: string;
   activeMounts: string[];
-  zygisksuEnforce?: string;
   supported_overlay_modes?: OverlayMode[];
   tmpfs_xattr_supported?: boolean;
 }

@@ -255,6 +255,10 @@ export const MockAPI: AppAPI = {
     await delay(400);
     console.log(`[Mock] Rules saved for ${moduleId}:`, rules);
   },
+  async saveAllModuleRules(rules: Record<string, ModuleRules>): Promise<void> {
+    await delay(400);
+    console.log("[Mock] All module rules saved:", rules);
+  },
   async getDeviceStatus(): Promise<DeviceInfo> {
     await delay(300);
     return {
@@ -282,7 +286,6 @@ export const MockAPI: AppAPI = {
       selinux: "Enforcing",
       mountBase: "/data/adb/meta-hybrid/mnt",
       activeMounts: ["system", "product"],
-      zygisksuEnforce: "1",
       tmpfs_xattr_supported: false,
       supported_overlay_modes: ["ext4"],
     };
@@ -420,13 +423,5 @@ export const MockAPI: AppAPI = {
   async reboot(): Promise<void> {
     await delay(120);
     console.log("[Mock] Reboot requested");
-  },
-  async readLogs(): Promise<string> {
-    await delay(80);
-    return [
-      "[Mock] hybrid-mount daemon started",
-      "[Mock] HymoFS ready",
-      "[Mock] Active tabs: status, config, hymofs, modules, info",
-    ].join("\n");
   },
 };

@@ -11,6 +11,7 @@ import type {
   HymofsStatus,
   HymofsUnameConfig,
   KernelUnameValues,
+  OverlayMode,
 } from "./types";
 
 interface KsuExecResult {
@@ -110,7 +111,6 @@ export interface AppAPI {
   invalidateHymofsCache: () => Promise<void>;
   openLink: (url: string) => Promise<void>;
   reboot: () => Promise<void>;
-  readLogs: () => Promise<string>;
 }
 
 function requireExec(): KsuModule["exec"] {
@@ -131,7 +131,19 @@ async function runCommandExpectOk(command: string): Promise<string> {
 
 async function runJsonCommand<T>(command: string): Promise<T> {
   const output = await runCommandExpectOk(command);
-  return JSON.parse(output) as T;
+  const parsed = JSON.parse(output);
+  if (
+    parsed &&
+    typeof parsed === "object" &&
+    !Array.isArray(parsed) &&
+    typeof parsed.error === "string"
+  ) {
+    const keys = Object.keys(parsed);
+    if (keys.length <= 2 && keys.every((k) => k === "error" || k === "code")) {
+      throw new AppError(parsed.error, 0);
+    }
+  }
+  return parsed as T;
 }
 
 const RealAPI: AppAPI = {
@@ -141,7 +153,7 @@ const RealAPI: AppAPI = {
   },
   saveConfig: async (config: AppConfig): Promise<void> => {
     const hexPayload = stringToHex(JSON.stringify(config));
-    const cmd = `${PATHS.BINARY} save-config --payload ${hexPayload}`;
+    const cmd = `${PATHS.BINARY} save-full-config --payload ${hexPayload}`;
     await runCommandExpectOk(cmd);
   },
   resetConfig: async (): Promise<void> => {
@@ -159,11 +171,6 @@ const RealAPI: AppAPI = {
     }
     return RealAPI.saveAllModuleRules(rulesMap);
   },
-  readLogs: async (): Promise<string> => {
-    return runCommandExpectOk(
-      `cat "${shellEscapeDoubleQuoted(PATHS.DAEMON_LOG)}"`,
-    );
-  },
   saveModuleRules: async (
     moduleId: string,
     rules: ModuleRules,
@@ -178,60 +185,47 @@ const RealAPI: AppAPI = {
     await runCommandExpectOk(cmd);
   },
   getStorageUsage: async (): Promise<StorageStatus> => {
-    const { errno, stdout, stderr } = await runCommand(
-      `cat "${shellEscapeDoubleQuoted(PATHS.DAEMON_STATE)}"`,
-    );
-    if (errno !== 0 || !stdout) {
-      return {
-        type: "unknown",
-        error: stderr?.trim() || "Storage status unavailable",
-      };
-    }
-
     try {
-      return { type: JSON.parse(stdout).storage_mode || "unknown" };
-    } catch (error) {
+      const state = await runJsonCommand<{ storage_mode: string }>(
+        `${PATHS.BINARY} state`,
+      );
+      return {
+        type: (state.storage_mode || "unknown") as StorageStatus["type"],
+      };
+    } catch (err) {
       return {
         type: "unknown",
         error:
-          error instanceof Error
-            ? error.message
-            : "Failed to parse storage status",
+          err instanceof Error ? err.message : "Storage status unavailable",
       };
     }
   },
   getSystemInfo: async (): Promise<SystemInfo> => {
-    const cmdSys = `echo "KERNEL:$(uname -r)"; echo "SELINUX:$(getenforce)"`;
-    const { errno: errSys, stdout: outSys } = await runCommand(cmdSys);
-    const info: SystemInfo = {
-      kernel: "-",
-      selinux: "-",
-      mountBase: "-",
-      activeMounts: [],
+    const payload = await runJsonCommand<{
+      kernel: string;
+      selinux: string;
+      mount_base: string;
+      active_mounts: string[];
+      tmpfs_xattr_supported: boolean;
+      detectedPartitions: Array<{ fs_type: string }>;
+    }>(`${PATHS.BINARY} api system`);
+    const overlayModes = [
+      ...new Set(
+        payload.detectedPartitions
+          .map((p) => p.fs_type)
+          .filter((t) => t),
+      ),
+    ];
+    return {
+      kernel: payload.kernel,
+      selinux: payload.selinux,
+      mountBase: payload.mount_base,
+      activeMounts: payload.active_mounts,
+      tmpfs_xattr_supported: payload.tmpfs_xattr_supported,
+      ...(overlayModes.length > 0
+        ? { supported_overlay_modes: overlayModes as OverlayMode[] }
+        : {}),
     };
-    if (errSys === 0 && outSys) {
-      outSys.split("\n").forEach((line) => {
-        if (line.startsWith("KERNEL:")) info.kernel = line.substring(7).trim();
-        else if (line.startsWith("SELINUX:"))
-          info.selinux = line.substring(8).trim();
-      });
-    }
-    const { errno: errState, stdout: outState } = await runCommand(
-      `cat "${shellEscapeDoubleQuoted(PATHS.DAEMON_STATE)}"`,
-    );
-    if (errState === 0 && outState) {
-      try {
-        const state = JSON.parse(outState);
-        info.mountBase = state.mount_point || "Unknown";
-        info.activeMounts = state.active_mounts || [];
-        if (state.zygisksu_enforce !== undefined)
-          info.zygisksuEnforce = state.zygisksu_enforce ? "1" : "0";
-        if (state.tmpfs_xattr_supported !== undefined)
-          info.tmpfs_xattr_supported = state.tmpfs_xattr_supported;
-      } catch {}
-    }
-
-    return info;
   },
   getDeviceStatus: async (): Promise<DeviceInfo> => {
     let model = "Device",
