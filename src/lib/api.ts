@@ -30,7 +30,7 @@ try {
   ksuExec = ksu ? ksu.exec : null;
 } catch {}
 
-const shouldUseMock = import.meta.env.DEV || !ksuExec;
+const shouldUseMock = import.meta.env.DEV && !ksuExec;
 
 function shellEscapeDoubleQuoted(value: string): string {
   return value.replace(/(["\\$`])/g, "\\$1");
@@ -127,11 +127,193 @@ async function runCommandExpectOk(command: string): Promise<string> {
   throw new AppError(stderr || `command failed: ${command}`, errno);
 }
 
-async function runJsonCommand<T>(command: string): Promise<T> {
+type JsonRecord = Record<string, unknown>;
+
+type PayloadGuard<T> = (value: unknown) => value is T;
+
+function isRecord(value: unknown): value is JsonRecord {
+  return !!value && typeof value === "object";
+}
+
+function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
+function isBoolean(value: unknown): value is boolean {
+  return typeof value === "boolean";
+}
+
+function isNumber(value: unknown): value is number {
+  return typeof value === "number";
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every(isString);
+}
+
+function isModuleRules(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  const defaultMode = value.default_mode;
+  const paths = value.paths;
+  return (
+    (defaultMode === "overlay" ||
+      defaultMode === "magic" ||
+      defaultMode === "hymofs" ||
+      defaultMode === "ignore") &&
+    isRecord(paths)
+  );
+}
+
+function isModule(value: unknown): value is Module {
+  if (!isRecord(value)) return false;
+  return (
+    isString(value.id) &&
+    isString(value.name) &&
+    isString(value.version) &&
+    isString(value.author) &&
+    isString(value.description) &&
+    (value.mode === "overlay" ||
+      value.mode === "magic" ||
+      value.mode === "hymofs" ||
+      value.mode === "ignore") &&
+    isBoolean(value.is_mounted) &&
+    isModuleRules(value.rules)
+  );
+}
+
+function isModuleArray(value: unknown): value is Module[] {
+  return Array.isArray(value) && value.every(isModule);
+}
+
+function isAppConfigPayload(value: unknown): value is Partial<AppConfig> {
+  if (!isRecord(value)) return false;
+
+  if (
+    "moduledir" in value &&
+    value.moduledir != null &&
+    !isString(value.moduledir)
+  ) {
+    return false;
+  }
+  if (
+    "mountsource" in value &&
+    value.mountsource != null &&
+    !isString(value.mountsource)
+  ) {
+    return false;
+  }
+  if (
+    "partitions" in value &&
+    value.partitions != null &&
+    !isStringArray(value.partitions)
+  ) {
+    return false;
+  }
+  if (
+    "overlay_mode" in value &&
+    value.overlay_mode != null &&
+    value.overlay_mode !== "tmpfs" &&
+    value.overlay_mode !== "ext4"
+  ) {
+    return false;
+  }
+  if (
+    "disable_umount" in value &&
+    value.disable_umount != null &&
+    !isBoolean(value.disable_umount)
+  ) {
+    return false;
+  }
+  if (
+    "enable_overlay_fallback" in value &&
+    value.enable_overlay_fallback != null &&
+    !isBoolean(value.enable_overlay_fallback)
+  ) {
+    return false;
+  }
+  if (
+    "default_mode" in value &&
+    value.default_mode != null &&
+    value.default_mode !== "overlay" &&
+    value.default_mode !== "magic" &&
+    value.default_mode !== "hymofs" &&
+    value.default_mode !== "ignore"
+  ) {
+    return false;
+  }
+  if ("rules" in value && value.rules != null && !isRecord(value.rules)) {
+    return false;
+  }
+
+  return true;
+}
+
+function isStorageStatePayload(value: unknown): value is { storage_mode?: string } {
+  if (!isRecord(value)) return false;
+  return value.storage_mode === undefined || isString(value.storage_mode);
+}
+
+function isSystemInfoPayload(value: unknown): value is {
+  kernel: string;
+  selinux: string;
+  mount_base: string;
+  active_mounts: string[];
+  tmpfs_xattr_supported: boolean;
+} {
+  if (!isRecord(value)) return false;
+  return (
+    isString(value.kernel) &&
+    isString(value.selinux) &&
+    isString(value.mount_base) &&
+    isStringArray(value.active_mounts) &&
+    isBoolean(value.tmpfs_xattr_supported)
+  );
+}
+
+function isHymofsStatusPayload(value: unknown): value is HymofsStatus {
+  if (!isRecord(value)) return false;
+  return (
+    isString(value.status) &&
+    isBoolean(value.available) &&
+    (value.protocol_version === null || isNumber(value.protocol_version)) &&
+    isStringArray(value.feature_names) &&
+    isStringArray(value.hooks) &&
+    isNumber(value.rule_count) &&
+    isNumber(value.user_hide_rule_count) &&
+    isString(value.mirror_path) &&
+    isRecord(value.lkm) &&
+    isRecord(value.config)
+  );
+}
+
+function isStringListPayload(value: unknown): value is string[] {
+  return isStringArray(value);
+}
+
+function assertValidPayload<T>(
+  value: unknown,
+  guard: PayloadGuard<T>,
+  endpointName: string,
+): T {
+  if (!guard(value)) {
+    throw new AppError(`Invalid ${endpointName} payload`);
+  }
+  return value;
+}
+
+async function runJsonCommand<T>(
+  command: string,
+  guard?: PayloadGuard<T>,
+  endpointName = command,
+): Promise<T> {
   const output = await runCommandExpectOk(command);
-  const parsed = JSON.parse(output);
-  if (parsed && typeof parsed === "object" && parsed.type === "error") {
-    throw new AppError(parsed.error || "Unknown error", 0);
+  const parsed: unknown = JSON.parse(output);
+  if (isRecord(parsed) && parsed.type === "error") {
+    const errMessage = isString(parsed.error) ? parsed.error : "Unknown error";
+    throw new AppError(errMessage, 0);
+  }
+  if (guard) {
+    return assertValidPayload(parsed, guard, endpointName);
   }
   return parsed as T;
 }
@@ -139,7 +321,14 @@ async function runJsonCommand<T>(command: string): Promise<T> {
 const RealAPI: AppAPI = {
   loadConfig: async (): Promise<AppConfig> => {
     const cmd = `${PATHS.BINARY} show-config`;
-    return { ...DEFAULT_CONFIG, ...(await runJsonCommand<AppConfig>(cmd)) };
+    return {
+      ...DEFAULT_CONFIG,
+      ...(await runJsonCommand<Partial<AppConfig>>(
+        cmd,
+        isAppConfigPayload,
+        "show-config",
+      )),
+    };
   },
   saveConfig: async (config: AppConfig): Promise<void> => {
     const hexPayload = stringToHex(JSON.stringify(config));
@@ -152,7 +341,7 @@ const RealAPI: AppAPI = {
   },
   scanModules: async (): Promise<Module[]> => {
     const cmd = `${PATHS.BINARY} modules`;
-    return runJsonCommand<Module[]>(cmd);
+    return runJsonCommand<Module[]>(cmd, isModuleArray, "modules");
   },
   saveModules: async (modules: Module[]): Promise<void> => {
     const rulesMap: Record<string, ModuleRules> = {};
@@ -176,8 +365,10 @@ const RealAPI: AppAPI = {
   },
   getStorageUsage: async (): Promise<StorageStatus> => {
     try {
-      const state = await runJsonCommand<{ storage_mode: string }>(
+      const state = await runJsonCommand<{ storage_mode?: string }>(
         `${PATHS.BINARY} state`,
+        isStorageStatePayload,
+        "state",
       );
       return {
         type: (state.storage_mode || "unknown") as StorageStatus["type"],
@@ -197,7 +388,7 @@ const RealAPI: AppAPI = {
       mount_base: string;
       active_mounts: string[];
       tmpfs_xattr_supported: boolean;
-    }>(`${PATHS.BINARY} api system`);
+    }>(`${PATHS.BINARY} api system`, isSystemInfoPayload, "api system");
     return {
       kernel: payload.kernel,
       selinux: payload.selinux,
@@ -220,7 +411,11 @@ const RealAPI: AppAPI = {
     return APP_VERSION;
   },
   getHymofsStatus: async (): Promise<HymofsStatus> => {
-    return runJsonCommand<HymofsStatus>(`${PATHS.BINARY} hymofs status`);
+    return runJsonCommand<HymofsStatus>(
+      `${PATHS.BINARY} hymofs status`,
+      isHymofsStatusPayload,
+      "hymofs status",
+    );
   },
   setHymofsEnabled: async (enabled: boolean): Promise<void> => {
     await runCommandExpectOk(
@@ -317,7 +512,11 @@ const RealAPI: AppAPI = {
     await runCommandExpectOk(`${PATHS.BINARY} hymofs maps clear`);
   },
   getUserHideRules: async (): Promise<string[]> => {
-    return runJsonCommand<string[]>(`${PATHS.BINARY} hide list`);
+    return runJsonCommand<string[]>(
+      `${PATHS.BINARY} hide list`,
+      isStringListPayload,
+      "hide list",
+    );
   },
   addUserHideRule: async (path: string): Promise<void> => {
     await runCommandExpectOk(
@@ -374,7 +573,7 @@ const RealAPI: AppAPI = {
     );
   },
   reboot: async (): Promise<void> => {
-    await runCommand("reboot");
+    await runCommandExpectOk("reboot");
   },
 };
 

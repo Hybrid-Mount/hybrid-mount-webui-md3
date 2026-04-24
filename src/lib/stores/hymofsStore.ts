@@ -18,7 +18,7 @@ const createHymofsStore = () => {
         const nextStatus = await API.getHymofsStatus();
         setStatus(nextStatus);
         hasLoaded = true;
-      } catch (e) {
+      } catch (_e) {
         setStatus(null);
         if (showError) {
           uiStore.showToast(

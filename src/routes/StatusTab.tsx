@@ -98,9 +98,18 @@ export default function StatusTab() {
               {uiStore.L?.common?.cancel ?? "Cancel"}
             </md-text-button>
             <md-text-button
-              onClick={() => {
+              onClick={async () => {
                 setShowRebootConfirm(false);
-                API.reboot();
+                try {
+                  await API.reboot();
+                } catch (error) {
+                  uiStore.showToast(
+                    error instanceof Error
+                      ? error.message
+                      : uiStore.L?.status?.loadError ?? "Reboot failed",
+                    "error",
+                  );
+                }
               }}
             >
               {uiStore.L?.common?.reboot ?? "Reboot"}
