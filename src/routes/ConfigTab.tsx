@@ -8,10 +8,8 @@ import { ICONS } from "../lib/constants";
 import { API } from "../lib/api";
 import { getCookie, setCookie } from "../lib/cookies";
 import ChipInput from "../components/ChipInput";
-import BottomActions from "../components/BottomActions";
 import "./ConfigTab.css";
 import "@material/web/textfield/outlined-text-field.js";
-import "@material/web/iconbutton/filled-tonal-icon-button.js";
 import "@material/web/icon/icon.js";
 import "@material/web/ripple/ripple.js";
 import "@material/web/dialog/dialog.js";
@@ -22,7 +20,6 @@ const HYMOFS_WARNING_COOKIE = "mhm_hymofs_warning_ack";
 
 export default function ConfigTab() {
   const [lastSavedConfig, setLastSavedConfig] = createSignal("");
-  const [showResetConfirm, setShowResetConfirm] = createSignal(false);
   const [showHymofsWarning, setShowHymofsWarning] = createSignal(false);
   const [hymofsPending, setHymofsPending] = createSignal(false);
   let mountSourceInputRef: HTMLElement | undefined;
@@ -86,21 +83,6 @@ export default function ConfigTab() {
     if (!saved) {
       updateConfig("partitions", prev);
     }
-  }
-
-  async function reload() {
-    const loaded = await configStore.loadConfig();
-    if (!loaded) return;
-    setLastSavedConfig(JSON.stringify(configStore.config));
-    await refreshModulesForConfigChange();
-  }
-
-  async function reset() {
-    setShowResetConfirm(false);
-    const resetDone = await configStore.resetConfig();
-    if (!resetDone) return;
-    setLastSavedConfig(JSON.stringify(configStore.config));
-    await refreshModulesForConfigChange();
   }
 
   async function toggle(key: keyof AppConfig) {
@@ -182,28 +164,6 @@ export default function ConfigTab() {
   return (
     <>
       <div class="dialog-container">
-        <md-dialog
-          open={showResetConfirm()}
-          onclose={() => setShowResetConfirm(false)}
-          class="transparent-scrim"
-        >
-          <div slot="headline">
-            {uiStore.L.config?.resetConfigTitle ?? "Reset Configuration?"}
-          </div>
-          <div slot="content">
-            {uiStore.L.config?.resetConfigConfirm ??
-              "This will reset all backend settings to defaults. Continue?"}
-          </div>
-          <div slot="actions">
-            <md-text-button onClick={() => setShowResetConfirm(false)}>
-              {uiStore.L.common?.cancel ?? "Cancel"}
-            </md-text-button>
-            <md-text-button onClick={() => void reset()}>
-              {uiStore.L.config?.resetConfig ?? "Reset Config"}
-            </md-text-button>
-          </div>
-        </md-dialog>
-
         <md-dialog
           open={showHymofsWarning()}
           onclose={() => setShowHymofsWarning(false)}
@@ -451,33 +411,6 @@ export default function ConfigTab() {
         </section>
 
         <section class="config-group">
-          <div class="webui-label">{uiStore.L.config?.webui || "WebUI"}</div>
-          <div class="options-grid">
-            <button
-              class="option-tile clickable error"
-              onClick={() => setShowResetConfirm(true)}
-              disabled={configStore.saving}
-            >
-              <md-ripple></md-ripple>
-              <div class="tile-top">
-                <div class="tile-icon">
-                  <md-icon>
-                    <svg viewBox="0 0 24 24">
-                      <path d={ICONS.replay} />
-                    </svg>
-                  </md-icon>
-                </div>
-              </div>
-              <div class="tile-bottom">
-                <span class="tile-label">
-                  {uiStore.L.config?.resetConfig || "Reset Config"}
-                </span>
-              </div>
-            </button>
-          </div>
-        </section>
-
-        <section class="config-group">
           <div class="webui-label">
             {uiStore.L.config?.experimentalFeatures || "Experimental Features"}
           </div>
@@ -517,20 +450,6 @@ export default function ConfigTab() {
           </div>
         </section>
       </div>
-
-      <BottomActions>
-        <md-filled-tonal-icon-button
-          onClick={() => void reload()}
-          disabled={configStore.loading}
-          title={uiStore.L.config.reload}
-        >
-          <md-icon>
-            <svg viewBox="0 0 24 24">
-              <path d={ICONS.refresh} />
-            </svg>
-          </md-icon>
-        </md-filled-tonal-icon-button>
-      </BottomActions>
     </>
   );
 }
