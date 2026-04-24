@@ -20,8 +20,7 @@ function normalizeConfig(
       ? [...nextConfig.partitions]
       : [...DEFAULT_CONFIG.partitions],
     overlay_mode: nextConfig?.overlay_mode ?? DEFAULT_CONFIG.overlay_mode,
-    disable_umount:
-      nextConfig?.disable_umount ?? DEFAULT_CONFIG.disable_umount,
+    disable_umount: nextConfig?.disable_umount ?? DEFAULT_CONFIG.disable_umount,
     enable_overlay_fallback:
       nextConfig?.enable_overlay_fallback ??
       DEFAULT_CONFIG.enable_overlay_fallback,

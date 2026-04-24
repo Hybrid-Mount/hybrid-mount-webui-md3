@@ -160,7 +160,9 @@ const RealAPI: AppAPI = {
     return RealAPI.saveAllModuleRules(rulesMap);
   },
   readLogs: async (): Promise<string> => {
-    return runCommandExpectOk(`cat "${shellEscapeDoubleQuoted(PATHS.DAEMON_LOG)}"`);
+    return runCommandExpectOk(
+      `cat "${shellEscapeDoubleQuoted(PATHS.DAEMON_LOG)}"`,
+    );
   },
   saveModuleRules: async (
     moduleId: string,

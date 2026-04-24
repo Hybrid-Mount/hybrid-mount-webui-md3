@@ -32,10 +32,10 @@ const createSysStore = () => {
       try {
         const [deviceResult, versionResult, storageResult, systemInfoResult] =
           await Promise.allSettled([
-          API.getDeviceStatus(),
-          API.getVersion(),
-          API.getStorageUsage(),
-          API.getSystemInfo(),
+            API.getDeviceStatus(),
+            API.getVersion(),
+            API.getStorageUsage(),
+            API.getSystemInfo(),
           ]);
         let loadedAny = false;
         let failedAny = false;

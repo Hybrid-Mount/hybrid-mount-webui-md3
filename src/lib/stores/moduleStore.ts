@@ -50,7 +50,9 @@ const createModuleStore = () => {
         return true;
       } catch (e: any) {
         uiStore.showToast(
-          e?.message || uiStore.L.modules?.scanError || "Failed to load modules",
+          e?.message ||
+            uiStore.L.modules?.scanError ||
+            "Failed to load modules",
           "error",
         );
         return false;
