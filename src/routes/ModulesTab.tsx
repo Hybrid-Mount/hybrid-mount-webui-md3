@@ -19,7 +19,6 @@ import { normalizeModuleMode } from "../lib/moduleMode";
 import type { Module, MountMode } from "../lib/types";
 import "./ModulesTab.css";
 import "@material/web/iconbutton/filled-tonal-icon-button.js";
-import "@material/web/button/filled-button.js";
 import "@material/web/button/filled-tonal-button.js";
 import "@material/web/icon/icon.js";
 
@@ -30,10 +29,6 @@ export default function ModulesTab() {
   const [filterType, setFilterType] = createSignal<"all" | MountMode>("all");
   const [showUmount, setShowUmount] = createSignal(false);
   const [expandedId, setExpandedId] = createSignal<string | null>(null);
-  const [initialRulesSnapshot, setInitialRulesSnapshot] = createSignal<
-    Record<string, string>
-  >({});
-  const [isSaving, setIsSaving] = createSignal(false);
   const [visibleCount, setVisibleCount] = createSignal(BATCH_SIZE);
   let observerTarget: HTMLDivElement | undefined;
 
@@ -71,34 +66,9 @@ export default function ModulesTab() {
     }
   });
 
-  function syncSnapshotFromModules() {
-    const snapshot: Record<string, string> = {};
-    moduleStore.modules.forEach((m) => {
-      snapshot[m.id] = JSON.stringify(m.rules);
-    });
-    setInitialRulesSnapshot(snapshot);
-  }
-
-  function isModuleDirty(mod: Module) {
-    const snapshot = initialRulesSnapshot();
-    if (!Object.prototype.hasOwnProperty.call(snapshot, mod.id)) {
-      return false;
-    }
-    return snapshot[mod.id] !== JSON.stringify(mod.rules);
-  }
-
   function load(force = false) {
-    moduleStore.loadModules(force).then((loaded) => {
-      if (!loaded) return;
-      syncSnapshotFromModules();
-    });
+    moduleStore.loadModules(force);
   }
-
-  const dirtyModules = createMemo(() =>
-    moduleStore.modules.filter((m) => isModuleDirty(m)),
-  );
-
-  const isDirty = createMemo(() => dirtyModules().length > 0);
 
   function updateModule(modId: string, transform: (m: Module) => Module) {
     const idx = moduleStore.modules.findIndex((m) => m.id === modId);
@@ -109,24 +79,14 @@ export default function ModulesTab() {
     moduleStore.modules = newModules;
   }
 
-  async function performSave() {
-    setIsSaving(true);
+  async function updateDefaultMode(mod: Module, mode: MountMode) {
+    const newRules = { ...mod.rules, default_mode: mode };
+    updateModuleRules(mod.id, () => newRules);
     try {
-      const dirty = dirtyModules();
-      const rulesMap: Record<string, Module["rules"]> = {};
-      for (const mod of dirty) {
-        rulesMap[mod.id] = mod.rules;
-      }
-      await API.saveAllModuleRules(rulesMap);
-      await load(true);
-      uiStore.showToast(
-        uiStore.L.modules?.saveSuccess || "Saved successfully",
-        "success",
-      );
+      await API.saveModuleRules(mod.id, newRules);
     } catch (e: any) {
       uiStore.showToast(e.message || "Failed to save", "error");
-    } finally {
-      setIsSaving(false);
+      await load(true);
     }
   }
 
@@ -194,10 +154,6 @@ export default function ModulesTab() {
     updateFn: (rules: Module["rules"]) => Module["rules"],
   ) {
     updateModule(modId, (m) => ({ ...m, rules: updateFn(m.rules) }));
-  }
-
-  function updateDefaultMode(mod: Module, mode: MountMode) {
-    updateModuleRules(mod.id, (rules) => ({ ...rules, default_mode: mode }));
   }
 
   return (
@@ -299,7 +255,7 @@ export default function ModulesTab() {
                     getEffectiveDefaultMode(mod);
                   return (
                     <div
-                      class={`module-card ${expandedId() === mod.id ? "expanded" : ""} ${isModuleDirty(mod) ? "dirty" : ""} ${mod.is_mounted ? "" : "unmounted"}`}
+                      class={`module-card ${expandedId() === mod.id ? "expanded" : ""} ${mod.is_mounted ? "" : "unmounted"}`}
                     >
                       <button
                         class="module-header"
@@ -434,20 +390,6 @@ export default function ModulesTab() {
             </svg>
           </md-icon>
         </md-filled-tonal-icon-button>
-
-        <div class="spacer"></div>
-
-        <md-filled-button
-          onClick={performSave}
-          disabled={isSaving() || !isDirty()}
-        >
-          <md-icon slot="icon">
-            <svg viewBox="0 0 24 24">
-              <path d={ICONS.save} />
-            </svg>
-          </md-icon>
-          {isSaving() ? uiStore.L.common?.saving : uiStore.L.modules?.save}
-        </md-filled-button>
       </BottomActions>
     </>
   );

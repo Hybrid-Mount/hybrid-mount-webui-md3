@@ -11,7 +11,6 @@ import ChipInput from "../components/ChipInput";
 import BottomActions from "../components/BottomActions";
 import "./ConfigTab.css";
 import "@material/web/textfield/outlined-text-field.js";
-import "@material/web/button/filled-button.js";
 import "@material/web/iconbutton/filled-tonal-icon-button.js";
 import "@material/web/icon/icon.js";
 import "@material/web/ripple/ripple.js";
@@ -22,13 +21,7 @@ import type { OverlayMode, AppConfig } from "../lib/types";
 const HYMOFS_WARNING_COOKIE = "mhm_hymofs_warning_ack";
 
 export default function ConfigTab() {
-  const [initialConfigStr, setInitialConfigStr] = createSignal("");
-  const [initialHymofsEnabled, setInitialHymofsEnabled] = createSignal(
-    hymofsStore.enabled,
-  );
-  const [hymofsEnabledDraft, setHymofsEnabledDraft] = createSignal(
-    hymofsStore.enabled,
-  );
+  const [lastSavedConfig, setLastSavedConfig] = createSignal("");
   const [showResetConfirm, setShowResetConfirm] = createSignal(false);
   const [showHymofsWarning, setShowHymofsWarning] = createSignal(false);
   const [hymofsPending, setHymofsPending] = createSignal(false);
@@ -39,45 +32,17 @@ export default function ConfigTab() {
     () => !isValidPath(configStore.config.moduledir),
   );
 
-  const isDirty = createMemo(() => {
-    if (!initialConfigStr()) return false;
-    return (
-      JSON.stringify(configStore.config) !== initialConfigStr() ||
-      hymofsEnabledDraft() !== initialHymofsEnabled()
-    );
-  });
-
   createEffect(() => {
-    if (!configStore.loading && configStore.config && !initialConfigStr()) {
-      setInitialConfigStr(JSON.stringify(configStore.config));
+    if (!configStore.loading && configStore.config && !lastSavedConfig()) {
+      setLastSavedConfig(JSON.stringify(configStore.config));
     }
   });
-
-  function readSavedConfig(): AppConfig {
-    try {
-      return initialConfigStr()
-        ? (JSON.parse(initialConfigStr()) as AppConfig)
-        : { ...configStore.config };
-    } catch {
-      return { ...configStore.config };
-    }
-  }
-
-  function updateSavedConfig(nextConfig: AppConfig) {
-    setInitialConfigStr(JSON.stringify(nextConfig));
-  }
 
   function updateConfig<K extends keyof AppConfig>(
     key: K,
     value: AppConfig[K],
   ) {
     configStore.config = { ...configStore.config, [key]: value };
-  }
-
-  function syncHymofsDraft() {
-    const enabled = hymofsStore.enabled;
-    setInitialHymofsEnabled(enabled);
-    setHymofsEnabledDraft(enabled);
   }
 
   async function refreshModulesForConfigChange() {
@@ -88,72 +53,45 @@ export default function ConfigTab() {
     }
   }
 
-  async function persistChanges(rememberWarning = false) {
+  async function saveCurrentConfig(): Promise<boolean> {
     if (invalidModuleDir()) {
       uiStore.showToast(uiStore.L.config.invalidPath, "error");
-      return;
+      return false;
     }
-    const savedConfig = readSavedConfig();
-    const nextConfig = { ...configStore.config };
-    const configSaved = await configStore.saveConfig(nextConfig);
-    if (!configSaved) {
-      return;
-    }
-
-    updateSavedConfig(nextConfig);
-    if (savedConfig.moduledir !== nextConfig.moduledir) {
-      await refreshModulesForConfigChange();
-    }
-    setShowHymofsWarning(false);
-
-    const hymofsChanged = hymofsEnabledDraft() !== initialHymofsEnabled();
-
-    if (hymofsChanged) {
-      setHymofsPending(true);
+    const prevSnapshot = lastSavedConfig();
+    const saved = await configStore.saveConfig(configStore.config, {
+      showSuccess: false,
+    });
+    if (saved) {
+      setLastSavedConfig(JSON.stringify(configStore.config));
+    } else if (prevSnapshot) {
       try {
-        await API.setHymofsEnabled(hymofsEnabledDraft());
-        await hymofsStore.refreshStatus();
-        if (hymofsEnabledDraft() && rememberWarning) {
-          setCookie(HYMOFS_WARNING_COOKIE, "1");
-        }
-        uiStore.showToast(
-          uiStore.L.config?.hymofsConfigSaved ||
-            "HymoFS config saved. Runtime was not changed.",
-          "success",
-        );
-        setInitialHymofsEnabled(hymofsEnabledDraft());
-      } catch (e: any) {
-        uiStore.showToast(
-          e?.message || uiStore.L.config?.saveFailed || "Failed to save",
-          "error",
-        );
-      } finally {
-        setHymofsPending(false);
-      }
+        configStore.config = JSON.parse(prevSnapshot) as AppConfig;
+      } catch {}
+    }
+    return saved;
+  }
+
+  async function handleTextFieldCommit(key: keyof AppConfig) {
+    const saved = await saveCurrentConfig();
+    if (saved && key === "moduledir") {
+      await refreshModulesForConfigChange();
     }
   }
 
-  function save() {
-    const wantsEnable = hymofsEnabledDraft();
-    const wasEnabled = initialHymofsEnabled();
-
-    if (
-      wantsEnable &&
-      !wasEnabled &&
-      getCookie(HYMOFS_WARNING_COOKIE) !== "1"
-    ) {
-      setShowHymofsWarning(true);
-      return;
+  async function handlePartitionsChange(vals: string[]) {
+    const prev = [...configStore.config.partitions];
+    updateConfig("partitions", vals);
+    const saved = await saveCurrentConfig();
+    if (!saved) {
+      updateConfig("partitions", prev);
     }
-
-    void persistChanges();
   }
 
   async function reload() {
     const loaded = await configStore.loadConfig();
     if (!loaded) return;
-    updateSavedConfig({ ...configStore.config });
-    syncHymofsDraft();
+    setLastSavedConfig(JSON.stringify(configStore.config));
     await refreshModulesForConfigChange();
   }
 
@@ -161,41 +99,60 @@ export default function ConfigTab() {
     setShowResetConfirm(false);
     const resetDone = await configStore.resetConfig();
     if (!resetDone) return;
-    updateSavedConfig({ ...configStore.config });
-    syncHymofsDraft();
+    setLastSavedConfig(JSON.stringify(configStore.config));
     await refreshModulesForConfigChange();
-  }
-
-  function requestHymofsToggle() {
-    setHymofsEnabledDraft((value) => !value);
-  }
-
-  function confirmHymofsEnable() {
-    void persistChanges(true);
   }
 
   async function toggle(key: keyof AppConfig) {
     const currentVal = configStore.config[key] as boolean;
-    const newVal = !currentVal;
-    const savedConfig = readSavedConfig();
-    const nextSavedConfig = { ...savedConfig, [key]: newVal };
-
-    updateConfig(key, newVal);
-
-    const saved = await configStore.saveConfig(nextSavedConfig, {
-      showSuccess: false,
-    });
-
+    updateConfig(key, !currentVal);
+    const saved = await saveCurrentConfig();
     if (!saved) {
       updateConfig(key, currentVal);
+    }
+  }
+
+  async function setOverlayMode(mode: string) {
+    const prev = configStore.config.overlay_mode;
+    updateConfig("overlay_mode", mode as OverlayMode);
+    const saved = await saveCurrentConfig();
+    if (!saved) {
+      updateConfig("overlay_mode", prev);
+    }
+  }
+
+  async function handleHymofsToggle() {
+    const wantsEnable = !hymofsStore.enabled;
+
+    if (wantsEnable && getCookie(HYMOFS_WARNING_COOKIE) !== "1") {
+      setShowHymofsWarning(true);
       return;
     }
 
-    updateSavedConfig(nextSavedConfig);
+    await applyHymofsToggle(wantsEnable);
   }
 
-  function setOverlayMode(mode: string) {
-    updateConfig("overlay_mode", mode as OverlayMode);
+  async function applyHymofsToggle(enabled: boolean) {
+    setShowHymofsWarning(false);
+    setHymofsPending(true);
+    try {
+      await API.setHymofsEnabled(enabled);
+      await hymofsStore.refreshStatus();
+      if (enabled) {
+        setCookie(HYMOFS_WARNING_COOKIE, "1");
+      }
+      uiStore.showToast(
+        uiStore.L.config?.hymofsConfigSaved || "HymoFS config saved.",
+        "success",
+      );
+    } catch (e: any) {
+      uiStore.showToast(
+        e?.message || uiStore.L.config?.saveFailed || "Failed to save",
+        "error",
+      );
+    } finally {
+      setHymofsPending(false);
+    }
   }
 
   const availableModes = createMemo(() => {
@@ -264,7 +221,7 @@ export default function ConfigTab() {
             <md-text-button onClick={() => setShowHymofsWarning(false)}>
               {uiStore.L.common?.cancel ?? "Cancel"}
             </md-text-button>
-            <md-text-button onClick={confirmHymofsEnable}>
+            <md-text-button onClick={() => applyHymofsToggle(true)}>
               {uiStore.L.config?.hymofsEnableConfirm ?? "Enable HymoFS"}
             </md-text-button>
           </div>
@@ -301,6 +258,7 @@ export default function ConfigTab() {
                     (e.currentTarget as HTMLInputElement).value,
                   )
                 }
+                onChange={() => handleTextFieldCommit("moduledir")}
                 error={invalidModuleDir()}
                 supporting-text={
                   invalidModuleDir()
@@ -347,6 +305,7 @@ export default function ConfigTab() {
                     (e.currentTarget as HTMLInputElement).value,
                   )
                 }
+                onChange={() => handleTextFieldCommit("mountsource")}
                 onFocus={() => {
                   setTimeout(() => {
                     mountSourceInputRef?.scrollIntoView({
@@ -389,7 +348,7 @@ export default function ConfigTab() {
               <ChipInput
                 values={configStore.config.partitions}
                 placeholder="e.g. product, system_ext..."
-                onValuesChange={(vals) => updateConfig("partitions", vals)}
+                onValuesChange={(vals) => handlePartitionsChange(vals)}
               />
             </div>
           </div>
@@ -524,11 +483,11 @@ export default function ConfigTab() {
           </div>
           <div class="options-grid">
             <button
-              class={`option-tile clickable secondary ${hymofsEnabledDraft() ? "active" : ""}`}
-              onClick={requestHymofsToggle}
+              class={`option-tile clickable secondary ${hymofsStore.enabled ? "active" : ""}`}
+              onClick={handleHymofsToggle}
               disabled={hymofsPending() || hymofsStore.loading}
               type="button"
-              aria-pressed={hymofsEnabledDraft()}
+              aria-pressed={hymofsStore.enabled}
               aria-label={
                 uiStore.L.config?.hymofsMasterSwitch || "Enable HymoFS"
               }
@@ -540,7 +499,7 @@ export default function ConfigTab() {
                     <svg viewBox="0 0 24 24">
                       <path
                         d={
-                          hymofsEnabledDraft()
+                          hymofsStore.enabled
                             ? ICONS.snowflake_filled
                             : ICONS.snowflake
                         }
@@ -571,20 +530,6 @@ export default function ConfigTab() {
             </svg>
           </md-icon>
         </md-filled-tonal-icon-button>
-
-        <div class="spacer"></div>
-
-        <md-filled-button
-          onClick={save}
-          disabled={configStore.saving || !isDirty()}
-        >
-          <md-icon slot="icon">
-            <svg viewBox="0 0 24 24">
-              <path d={ICONS.save} />
-            </svg>
-          </md-icon>
-          {configStore.saving ? uiStore.L.common.saving : uiStore.L.config.save}
-        </md-filled-button>
       </BottomActions>
     </>
   );
