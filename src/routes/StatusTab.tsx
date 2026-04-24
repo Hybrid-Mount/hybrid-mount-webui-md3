@@ -106,7 +106,7 @@ export default function StatusTab() {
                   uiStore.showToast(
                     error instanceof Error
                       ? error.message
-                      : uiStore.L?.status?.loadError ?? "Reboot failed",
+                      : (uiStore.L?.status?.loadError ?? "Reboot failed"),
                     "error",
                   );
                 }

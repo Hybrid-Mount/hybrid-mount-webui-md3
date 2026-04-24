@@ -151,38 +151,125 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every(isString);
 }
 
-function isModuleRules(value: unknown): boolean {
-  if (!isRecord(value)) return false;
-  const defaultMode = value.default_mode;
-  const paths = value.paths;
+function isMountMode(value: unknown): value is Module["mode"] {
   return (
-    (defaultMode === "overlay" ||
-      defaultMode === "magic" ||
-      defaultMode === "hymofs" ||
-      defaultMode === "ignore") &&
-    isRecord(paths)
+    value === "overlay" ||
+    value === "magic" ||
+    value === "hymofs" ||
+    value === "ignore"
   );
 }
 
-function isModule(value: unknown): value is Module {
-  if (!isRecord(value)) return false;
-  return (
-    isString(value.id) &&
-    isString(value.name) &&
-    isString(value.version) &&
-    isString(value.author) &&
-    isString(value.description) &&
-    (value.mode === "overlay" ||
-      value.mode === "magic" ||
-      value.mode === "hymofs" ||
-      value.mode === "ignore") &&
-    isBoolean(value.is_mounted) &&
-    isModuleRules(value.rules)
-  );
+function toMountMode(value: unknown, fallback: Module["mode"] = "overlay") {
+  return isMountMode(value) ? value : fallback;
 }
 
-function isModuleArray(value: unknown): value is Module[] {
-  return Array.isArray(value) && value.every(isModule);
+function toLooseBoolean(value: unknown, fallback: boolean): boolean {
+  if (isBoolean(value)) return value;
+  if (value === 1 || value === "1" || value === "true") return true;
+  if (value === 0 || value === "0" || value === "false") return false;
+  return fallback;
+}
+
+function toStringMap(value: unknown): Record<string, string> {
+  if (!isRecord(value)) return {};
+  const result: Record<string, string> = {};
+  for (const [key, mapValue] of Object.entries(value)) {
+    if (isString(mapValue)) {
+      result[key] = mapValue;
+    }
+  }
+  return result;
+}
+
+function toModule(value: unknown, fallbackId?: string): Module | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const id =
+    isString(value.id) && value.id.length > 0
+      ? value.id
+      : isString(fallbackId) && fallbackId.length > 0
+        ? fallbackId
+        : null;
+  if (!id) return null;
+
+  const rulesSource = isRecord(value.rules) ? value.rules : {};
+  const moduleMode = toMountMode(
+    value.mode ?? rulesSource.default_mode ?? value.default_mode,
+  );
+  const rulesDefaultMode = toMountMode(
+    rulesSource.default_mode ?? value.default_mode,
+    moduleMode,
+  );
+  const rulesPaths = toStringMap(
+    isRecord(rulesSource.paths) ? rulesSource.paths : value.paths,
+  );
+
+  const mountedRaw =
+    value.is_mounted ?? value.isMounted ?? value.mounted ?? value.enabled;
+
+  return {
+    id,
+    name: isString(value.name) && value.name.length > 0 ? value.name : id,
+    version: isString(value.version) ? value.version : "",
+    author: isString(value.author) ? value.author : "",
+    description: isString(value.description) ? value.description : "",
+    mode: moduleMode,
+    is_mounted: toLooseBoolean(mountedRaw, true),
+    enabled: isBoolean(value.enabled) ? value.enabled : undefined,
+    source_path: isString(value.source_path)
+      ? value.source_path
+      : isString(value.sourcePath)
+        ? value.sourcePath
+        : undefined,
+    rules: {
+      default_mode: rulesDefaultMode,
+      paths: rulesPaths,
+    },
+  };
+}
+
+function normalizeModuleArrayPayload(value: unknown[]): Module[] | null {
+  const modules = value
+    .map((item) => toModule(item))
+    .filter((module): module is Module => module !== null);
+  if (value.length > 0 && modules.length === 0) {
+    return null;
+  }
+  return modules;
+}
+
+function parseModulesPayload(value: unknown): Module[] | null {
+  if (Array.isArray(value)) {
+    return normalizeModuleArrayPayload(value);
+  }
+
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  for (const key of ["modules", "data", "items", "list"] as const) {
+    const candidate = value[key];
+    if (Array.isArray(candidate)) {
+      return normalizeModuleArrayPayload(candidate);
+    }
+  }
+
+  const mappedModules = Object.entries(value)
+    .map(([moduleId, moduleValue]) => toModule(moduleValue, moduleId))
+    .filter((module): module is Module => module !== null);
+
+  if (mappedModules.length > 0) {
+    return mappedModules;
+  }
+
+  if (Object.keys(value).length === 0) {
+    return [];
+  }
+
+  return null;
 }
 
 function isAppConfigPayload(value: unknown): value is Partial<AppConfig> {
@@ -248,7 +335,9 @@ function isAppConfigPayload(value: unknown): value is Partial<AppConfig> {
   return true;
 }
 
-function isStorageStatePayload(value: unknown): value is { storage_mode?: string } {
+function isStorageStatePayload(
+  value: unknown,
+): value is { storage_mode?: string } {
   if (!isRecord(value)) return false;
   return value.storage_mode === undefined || isString(value.storage_mode);
 }
@@ -341,7 +430,12 @@ const RealAPI: AppAPI = {
   },
   scanModules: async (): Promise<Module[]> => {
     const cmd = `${PATHS.BINARY} modules`;
-    return runJsonCommand<Module[]>(cmd, isModuleArray, "modules");
+    const payload = await runJsonCommand<unknown>(cmd, undefined, "modules");
+    const parsed = parseModulesPayload(payload);
+    if (!parsed) {
+      throw new AppError("Invalid modules payload");
+    }
+    return parsed;
   },
   saveModules: async (modules: Module[]): Promise<void> => {
     const rulesMap: Record<string, ModuleRules> = {};
