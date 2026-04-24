@@ -72,6 +72,7 @@ export interface AppAPI {
   scanModules: (path?: string) => Promise<Module[]>;
   saveModules: (modules: Module[]) => Promise<void>;
   saveModuleRules: (moduleId: string, rules: ModuleRules) => Promise<void>;
+  saveAllModuleRules: (rules: Record<string, ModuleRules>) => Promise<void>;
   getStorageUsage: () => Promise<StorageStatus>;
   getSystemInfo: () => Promise<SystemInfo>;
   getDeviceStatus: () => Promise<DeviceInfo>;
@@ -152,31 +153,32 @@ const RealAPI: AppAPI = {
     return runJsonCommand<Module[]>(cmd);
   },
   saveModules: async (modules: Module[]): Promise<void> => {
+    const rulesMap: Record<string, ModuleRules> = {};
     for (const mod of modules) {
-      const hexPayload = stringToHex(JSON.stringify(mod.rules));
-      const safeModuleId = shellEscapeDoubleQuoted(mod.id);
-      const cmd = `${PATHS.BINARY} save-module-rules --module "${safeModuleId}" --payload ${hexPayload}`;
-      await runCommandExpectOk(cmd);
+      rulesMap[mod.id] = mod.rules;
     }
+    return RealAPI.saveAllModuleRules(rulesMap);
   },
   readLogs: async (): Promise<string> => {
-    const logPath = PATHS.DAEMON_LOG || "/data/adb/hybrid-mount/daemon.log";
-    return runCommandExpectOk(`cat "${shellEscapeDoubleQuoted(logPath)}"`);
+    return runCommandExpectOk(`cat "${shellEscapeDoubleQuoted(PATHS.DAEMON_LOG)}"`);
   },
   saveModuleRules: async (
     moduleId: string,
     rules: ModuleRules,
   ): Promise<void> => {
+    return RealAPI.saveAllModuleRules({ [moduleId]: rules });
+  },
+  saveAllModuleRules: async (
+    rules: Record<string, ModuleRules>,
+  ): Promise<void> => {
     const hexPayload = stringToHex(JSON.stringify(rules));
-    const safeModuleId = shellEscapeDoubleQuoted(moduleId);
-    const cmd = `${PATHS.BINARY} save-module-rules --module "${safeModuleId}" --payload ${hexPayload}`;
+    const cmd = `${PATHS.BINARY} save-all-module-rules --payload ${hexPayload}`;
     await runCommandExpectOk(cmd);
   },
   getStorageUsage: async (): Promise<StorageStatus> => {
-    const stateFile =
-      (PATHS as Record<string, string>).DAEMON_STATE ||
-      "/data/adb/meta-hybrid/run/daemon_state.json";
-    const { errno, stdout, stderr } = await runCommand(`cat "${stateFile}"`);
+    const { errno, stdout, stderr } = await runCommand(
+      `cat "${shellEscapeDoubleQuoted(PATHS.DAEMON_STATE)}"`,
+    );
     if (errno !== 0 || !stdout) {
       return {
         type: "unknown",
@@ -212,11 +214,8 @@ const RealAPI: AppAPI = {
           info.selinux = line.substring(8).trim();
       });
     }
-    const stateFile =
-      (PATHS as Record<string, string>).DAEMON_STATE ||
-      "/data/adb/meta-hybrid/run/daemon_state.json";
     const { errno: errState, stdout: outState } = await runCommand(
-      `cat "${stateFile}"`,
+      `cat "${shellEscapeDoubleQuoted(PATHS.DAEMON_STATE)}"`,
     );
     if (errState === 0 && outState) {
       try {

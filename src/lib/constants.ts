@@ -8,11 +8,41 @@ export const DEFAULT_CONFIG: AppConfig = {
   disable_umount: false,
   enable_overlay_fallback: false,
   overlay_mode: "tmpfs",
+  default_mode: "overlay",
+  rules: {},
+  hymofs: {
+    enabled: false,
+    lkm_autoload: true,
+    lkm_dir: "/data/adb/hymofs/lkm",
+    lkm_kmi_override: "",
+    mirror_path: "/data/adb/hymofs/mirror",
+    enable_kernel_debug: false,
+    enable_stealth: false,
+    enable_hidexattr: false,
+    enable_mount_hide: false,
+    enable_maps_spoof: false,
+    enable_statfs_spoof: false,
+    mount_hide: { enabled: false, path_pattern: "" },
+    statfs_spoof: { enabled: false, path: "", spoof_f_type: 0 },
+    hide_uids: [],
+    uname: {
+      sysname: "",
+      nodename: "",
+      release: "",
+      version: "",
+      machine: "",
+      domainname: "",
+    },
+    uname_release: "",
+    uname_version: "",
+    cmdline_value: "",
+    kstat_rules: [],
+    maps_rules: [],
+  },
 };
 
 export const PATHS = {
   ...RUST_PATHS,
-  BINARY: "/data/adb/modules/hybrid_mount/hybrid-mount",
 };
 
 export const DEFAULT_SEED = "#6750A4";

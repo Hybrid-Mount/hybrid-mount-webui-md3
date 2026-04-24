@@ -12,6 +12,9 @@ export interface AppConfig {
   overlay_mode: OverlayMode;
   disable_umount: boolean;
   enable_overlay_fallback: boolean;
+  default_mode: MountMode;
+  hymofs: HymofsConfig;
+  rules: Record<string, ModuleRules>;
 }
 
 export type MountMode = "overlay" | "magic" | "hymofs" | "ignore";

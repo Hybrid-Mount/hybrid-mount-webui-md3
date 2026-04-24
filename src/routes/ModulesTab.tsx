@@ -113,9 +113,11 @@ export default function ModulesTab() {
     setIsSaving(true);
     try {
       const dirty = dirtyModules();
+      const rulesMap: Record<string, Module["rules"]> = {};
       for (const mod of dirty) {
-        await API.saveModuleRules(mod.id, mod.rules);
+        rulesMap[mod.id] = mod.rules;
       }
+      await API.saveAllModuleRules(rulesMap);
       await load(true);
       uiStore.showToast(
         uiStore.L.modules?.saveSuccess || "Saved successfully",

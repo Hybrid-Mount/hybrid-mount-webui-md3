@@ -25,6 +25,9 @@ function normalizeConfig(
     enable_overlay_fallback:
       nextConfig?.enable_overlay_fallback ??
       DEFAULT_CONFIG.enable_overlay_fallback,
+    default_mode: nextConfig?.default_mode ?? DEFAULT_CONFIG.default_mode,
+    hymofs: nextConfig?.hymofs ?? { ...DEFAULT_CONFIG.hymofs },
+    rules: nextConfig?.rules ?? { ...DEFAULT_CONFIG.rules },
   };
 }
 
@@ -32,22 +35,42 @@ const createConfigStore = () => {
   const [config, setConfigStore] = createStore<AppConfig>(DEFAULT_CONFIG);
   const [loading, setLoading] = createSignal(false);
   const [saving, setSaving] = createSignal(false);
+  let pendingLoad: Promise<boolean> | null = null;
+  let hasLoaded = false;
 
-  async function loadConfig() {
+  async function loadConfig(force = false) {
+    if (pendingLoad) return pendingLoad;
+    if (hasLoaded && !force) return true;
+
     setLoading(true);
-    try {
-      const data = await API.loadConfig();
-      setConfigStore(reconcile(normalizeConfig(data)));
-      return true;
-    } catch (e: any) {
-      uiStore.showToast(
-        e?.message || uiStore.L.config?.loadError || "Failed to load config",
-        "error",
-      );
-      return false;
-    } finally {
-      setLoading(false);
-    }
+    pendingLoad = (async () => {
+      try {
+        const data = await API.loadConfig();
+        setConfigStore(reconcile(normalizeConfig(data)));
+        hasLoaded = true;
+        return true;
+      } catch (e: any) {
+        uiStore.showToast(
+          e?.message || uiStore.L.config?.loadError || "Failed to load config",
+          "error",
+        );
+        return false;
+      } finally {
+        setLoading(false);
+        pendingLoad = null;
+      }
+    })();
+
+    return pendingLoad;
+  }
+
+  function ensureConfigLoaded() {
+    if (hasLoaded) return Promise.resolve(true);
+    return loadConfig();
+  }
+
+  function invalidate() {
+    hasLoaded = false;
   }
 
   async function saveConfig(
@@ -81,7 +104,8 @@ const createConfigStore = () => {
     setSaving(true);
     try {
       await API.resetConfig();
-      const loaded = await loadConfig();
+      invalidate();
+      const loaded = await loadConfig(true);
       if (!loaded) {
         return false;
       }
@@ -114,6 +138,11 @@ const createConfigStore = () => {
     get saving() {
       return saving();
     },
+    get hasLoaded() {
+      return hasLoaded;
+    },
+    ensureConfigLoaded,
+    invalidate,
     loadConfig,
     saveConfig,
     resetConfig,
