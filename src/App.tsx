@@ -36,6 +36,7 @@ export default function App() {
   const [activeTab, setActiveTab] = createSignal("status");
   const [dragOffset, setDragOffset] = createSignal(0);
   const [isDragging, setIsDragging] = createSignal(false);
+  const [initialDataReady, setInitialDataReady] = createSignal(false);
   const [visitedTabs, setVisitedTabs] = createSignal(
     new Set<string>([activeTab()]),
   );
@@ -168,12 +169,13 @@ export default function App() {
   async function initializeApp() {
     try {
       await uiStore.init();
-      await Promise.all([
+      await Promise.allSettled([
         configStore.loadConfig(),
         sysStore.ensureStatusLoaded(),
         hymofsStore.ensureStatusLoaded(),
         moduleStore.ensureModulesLoaded(),
       ]);
+      setInitialDataReady(true);
     } catch (e) {
       console.error("App initialization failed", e);
       return;
@@ -203,7 +205,7 @@ export default function App() {
   return (
     <div class="app-root">
       <Show
-        when={uiStore.isReady}
+        when={uiStore.isReady && initialDataReady()}
         fallback={
           <div class="loading-container">
             <div class="spinner"></div>
