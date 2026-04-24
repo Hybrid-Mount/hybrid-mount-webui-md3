@@ -197,25 +197,14 @@ const RealAPI: AppAPI = {
       mount_base: string;
       active_mounts: string[];
       tmpfs_xattr_supported: boolean;
-      detectedPartitions: Array<{ fs_type: string }>;
     }>(`${PATHS.BINARY} api system`);
-    const VALID_MODES = new Set(["tmpfs", "ext4"]);
-    const overlayModes = [
-      ...new Set(
-        payload.detectedPartitions
-          .map((p) => p.fs_type)
-          .filter((t) => VALID_MODES.has(t)),
-      ),
-    ];
     return {
       kernel: payload.kernel,
       selinux: payload.selinux,
       mountBase: payload.mount_base,
       activeMounts: payload.active_mounts,
       tmpfs_xattr_supported: payload.tmpfs_xattr_supported,
-      ...(overlayModes.length > 0
-        ? { supported_overlay_modes: overlayModes as OverlayMode[] }
-        : {}),
+      supported_overlay_modes: ["tmpfs", "ext4"] as OverlayMode[],
     };
   },
   getVersion: async (): Promise<string> => {
