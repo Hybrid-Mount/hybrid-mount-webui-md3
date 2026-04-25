@@ -1,10 +1,4 @@
-import {
-  createMemo,
-  createRenderEffect,
-  createSignal,
-  Show,
-  For,
-} from "solid-js";
+import { createMemo, createSignal, Show, For } from "solid-js";
 import { uiStore } from "../lib/stores/uiStore";
 import { sysStore } from "../lib/stores/sysStore";
 import { configStore } from "../lib/stores/configStore";
@@ -28,21 +22,20 @@ export default function StatusTab() {
   ]);
 
   const [showRebootConfirm, setShowRebootConfirm] = createSignal(false);
-  let modeStatsBarRef: HTMLDivElement | undefined;
   const modeStats = createMemo(() => {
     const stateStats = sysStore.storage?.modeStats;
     if (stateStats) {
       return {
-        overlay: stateStats.overlay || 0,
-        magic: stateStats.magic || 0,
-        hymofs: stateStats.hymofs || 0,
+        overlay: Number(stateStats.overlay) || 0,
+        magic: Number(stateStats.magic) || 0,
+        hymofs: Number(stateStats.hymofs) || 0,
       };
     }
 
     return {
-      overlay: moduleStore.modeStats?.overlay || 0,
-      magic: moduleStore.modeStats?.magic || 0,
-      hymofs: moduleStore.modeStats?.hymofs || 0,
+      overlay: Number(moduleStore.modeStats?.overlay) || 0,
+      magic: Number(moduleStore.modeStats?.magic) || 0,
+      hymofs: Number(moduleStore.modeStats?.hymofs) || 0,
     };
   });
 
@@ -77,24 +70,6 @@ export default function StatusTab() {
       magic: (magic / total) * 100,
       hymofs: (hymofs / total) * 100,
     };
-  });
-
-  createRenderEffect(() => {
-    const modeStatsBar = modeStatsBarRef;
-    if (!modeStatsBar) return;
-    const distribution = modeDistribution();
-    modeStatsBar.style.setProperty(
-      "--bar-overlay-width",
-      `${distribution.overlay}%`,
-    );
-    modeStatsBar.style.setProperty(
-      "--bar-magic-width",
-      `${distribution.magic}%`,
-    );
-    modeStatsBar.style.setProperty(
-      "--bar-hymofs-width",
-      `${distribution.hymofs}%`,
-    );
   });
 
   function getModeDisplayName(mode: string | null | undefined) {
@@ -214,11 +189,20 @@ export default function StatusTab() {
           <div class="card-title">
             {uiStore.L?.status?.modeStats ?? "Mode Distribution"}
           </div>
-          <div class="stats-bar-container" ref={modeStatsBarRef}>
-            <div class="bar-segment bar-overlay"></div>
-            <div class="bar-segment bar-magic"></div>
+          <div class="stats-bar-container">
+            <div
+              class="bar-segment bar-overlay"
+              style={{ width: `${modeDistribution().overlay}%` }}
+            ></div>
+            <div
+              class="bar-segment bar-magic"
+              style={{ width: `${modeDistribution().magic}%` }}
+            ></div>
             <Show when={hymofsStore.enabled}>
-              <div class="bar-segment bar-hymofs"></div>
+              <div
+                class="bar-segment bar-hymofs"
+                style={{ width: `${modeDistribution().hymofs}%` }}
+              ></div>
             </Show>
           </div>
           <div class="stats-legend">
