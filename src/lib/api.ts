@@ -344,6 +344,8 @@ type StorageStatePayload = {
   overlay_count?: unknown;
   magic_count?: unknown;
   hymofs_count?: unknown;
+  overlayfs_count?: unknown;
+  magicmount_count?: unknown;
   mounted_count?: unknown;
   module_count?: unknown;
   modules_count?: unknown;
@@ -369,8 +371,10 @@ function pickModeStatsFromRecord(
   value: unknown,
 ): StorageStatus["modeStats"] | null {
   if (!isRecord(value)) return null;
-  const overlay = toNonNegativeInt(value.overlay);
-  const magic = toNonNegativeInt(value.magic);
+  const overlay =
+    toNonNegativeInt(value.overlay) ?? toNonNegativeInt(value.overlayfs);
+  const magic =
+    toNonNegativeInt(value.magic) ?? toNonNegativeInt(value.magicmount);
   const hymofs = toNonNegativeInt(value.hymofs);
   if (overlay === undefined && magic === undefined && hymofs === undefined) {
     return null;
@@ -395,8 +399,12 @@ function extractStorageModeStats(
     if (parsed) return parsed;
   }
 
-  const overlay = toNonNegativeInt(state.overlay_count);
-  const magic = toNonNegativeInt(state.magic_count);
+  const overlay =
+    toNonNegativeInt(state.overlay_count) ??
+    toNonNegativeInt(state.overlayfs_count);
+  const magic =
+    toNonNegativeInt(state.magic_count) ??
+    toNonNegativeInt(state.magicmount_count);
   const hymofs = toNonNegativeInt(state.hymofs_count);
   if (overlay === undefined && magic === undefined && hymofs === undefined) {
     return undefined;
