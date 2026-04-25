@@ -36,6 +36,8 @@ export interface StorageStatus {
   type: "tmpfs" | "ext4" | "unknown" | null;
   error?: string;
   supported_modes?: OverlayMode[];
+  modeStats?: ModeStats;
+  mountedCount?: number;
 }
 
 export interface SystemInfo {

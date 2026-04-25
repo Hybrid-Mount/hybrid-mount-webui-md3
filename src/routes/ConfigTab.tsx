@@ -119,7 +119,8 @@ export default function ConfigTab() {
     setHymofsPending(true);
     try {
       await API.setHymofsEnabled(enabled);
-      await hymofsStore.refreshStatus();
+      hymofsStore.setEnabledOptimistic(enabled);
+      void hymofsStore.refreshStatus(false);
       if (enabled) {
         setCookie(HYMOFS_WARNING_COOKIE, "1");
       }

@@ -335,11 +335,99 @@ function isAppConfigPayload(value: unknown): value is Partial<AppConfig> {
   return true;
 }
 
-function isStorageStatePayload(
-  value: unknown,
-): value is { storage_mode?: string } {
+type StorageStatePayload = {
+  storage_mode?: string;
+  mode_stats?: unknown;
+  mode_distribution?: unknown;
+  modules_stats?: unknown;
+  mount_stats?: unknown;
+  overlay_count?: unknown;
+  magic_count?: unknown;
+  hymofs_count?: unknown;
+  mounted_count?: unknown;
+  module_count?: unknown;
+  modules_count?: unknown;
+  mounted_modules?: unknown;
+};
+
+function isStorageStatePayload(value: unknown): value is StorageStatePayload {
   if (!isRecord(value)) return false;
   return value.storage_mode === undefined || isString(value.storage_mode);
+}
+
+function toNonNegativeInt(value: unknown): number | undefined {
+  if (isNumber(value) && Number.isFinite(value)) {
+    return Math.max(0, Math.trunc(value));
+  }
+  if (isString(value) && /^\d+$/.test(value)) {
+    return Number.parseInt(value, 10);
+  }
+  return undefined;
+}
+
+function pickModeStatsFromRecord(
+  value: unknown,
+): StorageStatus["modeStats"] | null {
+  if (!isRecord(value)) return null;
+  const overlay = toNonNegativeInt(value.overlay);
+  const magic = toNonNegativeInt(value.magic);
+  const hymofs = toNonNegativeInt(value.hymofs);
+  if (overlay === undefined && magic === undefined && hymofs === undefined) {
+    return null;
+  }
+  return {
+    overlay: overlay ?? 0,
+    magic: magic ?? 0,
+    hymofs: hymofs ?? 0,
+  };
+}
+
+function extractStorageModeStats(
+  state: StorageStatePayload,
+): StorageStatus["modeStats"] | undefined {
+  for (const key of [
+    "mode_stats",
+    "mode_distribution",
+    "modules_stats",
+    "mount_stats",
+  ] as const) {
+    const parsed = pickModeStatsFromRecord(state[key]);
+    if (parsed) return parsed;
+  }
+
+  const overlay = toNonNegativeInt(state.overlay_count);
+  const magic = toNonNegativeInt(state.magic_count);
+  const hymofs = toNonNegativeInt(state.hymofs_count);
+  if (overlay === undefined && magic === undefined && hymofs === undefined) {
+    return undefined;
+  }
+
+  return {
+    overlay: overlay ?? 0,
+    magic: magic ?? 0,
+    hymofs: hymofs ?? 0,
+  };
+}
+
+function extractMountedCount(
+  state: StorageStatePayload,
+  modeStats?: StorageStatus["modeStats"],
+): number | undefined {
+  for (const key of [
+    "mounted_count",
+    "module_count",
+    "modules_count",
+    "mounted_modules",
+  ] as const) {
+    const count = toNonNegativeInt(state[key]);
+    if (count !== undefined) return count;
+  }
+
+  if (modeStats) {
+    return modeStats.overlay + modeStats.magic + modeStats.hymofs;
+  }
+
+  return undefined;
 }
 
 function isSystemInfoPayload(value: unknown): value is {
@@ -459,13 +547,16 @@ const RealAPI: AppAPI = {
   },
   getStorageUsage: async (): Promise<StorageStatus> => {
     try {
-      const state = await runJsonCommand<{ storage_mode?: string }>(
+      const state = await runJsonCommand<StorageStatePayload>(
         `${PATHS.BINARY} state`,
         isStorageStatePayload,
         "state",
       );
+      const modeStats = extractStorageModeStats(state);
       return {
         type: (state.storage_mode || "unknown") as StorageStatus["type"],
+        modeStats,
+        mountedCount: extractMountedCount(state, modeStats),
       };
     } catch (err) {
       return {

@@ -3,14 +3,22 @@ import type { HymofsStatus } from "../types";
 import { API } from "../api";
 import { uiStore } from "./uiStore";
 
+const STATUS_CACHE_TTL_MS = 3000;
+
 const createHymofsStore = () => {
   const [status, setStatus] = createSignal<HymofsStatus | null>(null);
   const [loading, setLoading] = createSignal(false);
   let pendingLoad: Promise<void> | null = null;
   let hasLoaded = false;
+  let lastLoadedAt = 0;
 
-  async function loadStatus(showError = true) {
+  function hasFreshStatus() {
+    return hasLoaded && Date.now() - lastLoadedAt < STATUS_CACHE_TTL_MS;
+  }
+
+  async function loadStatus(showError = true, force = false) {
     if (pendingLoad) return pendingLoad;
+    if (!force && hasFreshStatus()) return Promise.resolve();
 
     setLoading(true);
     pendingLoad = (async () => {
@@ -18,6 +26,7 @@ const createHymofsStore = () => {
         const nextStatus = await API.getHymofsStatus();
         setStatus(nextStatus);
         hasLoaded = true;
+        lastLoadedAt = Date.now();
       } catch (_e) {
         setStatus(null);
         if (showError) {
@@ -36,8 +45,21 @@ const createHymofsStore = () => {
   }
 
   function ensureStatusLoaded() {
-    if (hasLoaded) return Promise.resolve();
-    return loadStatus(false);
+    return loadStatus(false, false);
+  }
+
+  function setEnabledOptimistic(enabled: boolean) {
+    const current = status();
+    if (!current) return;
+    setStatus({
+      ...current,
+      config: {
+        ...current.config,
+        enabled,
+      },
+    });
+    hasLoaded = true;
+    lastLoadedAt = Date.now();
   }
 
   return {
@@ -51,7 +73,9 @@ const createHymofsStore = () => {
       return loading();
     },
     ensureStatusLoaded,
-    refreshStatus: () => loadStatus(true),
+    refreshStatus: (showError = true, force = true) =>
+      loadStatus(showError, force),
+    setEnabledOptimistic,
   };
 };
 

@@ -169,11 +169,11 @@ export default function App() {
   async function initializeApp() {
     try {
       await uiStore.init();
+      void moduleStore.ensureModulesLoaded();
       await Promise.allSettled([
         configStore.loadConfig(),
         sysStore.ensureStatusLoaded(),
         hymofsStore.ensureStatusLoaded(),
-        moduleStore.ensureModulesLoaded(),
       ]);
       setInitialDataReady(true);
     } catch (e) {

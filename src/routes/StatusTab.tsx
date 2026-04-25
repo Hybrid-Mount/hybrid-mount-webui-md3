@@ -27,19 +27,44 @@ export default function StatusTab() {
     ...new Set(sysStore.activePartitions || []),
   ]);
 
-  const mountedCount = createMemo(
-    () => moduleStore.modules?.filter((m) => m.is_mounted).length ?? 0,
-  );
-
   const [showRebootConfirm, setShowRebootConfirm] = createSignal(false);
-  const moduleStatsReady = createMemo(
-    () => !moduleStore.loading && moduleStore.hasLoaded,
-  );
-  const modeStats = createMemo(() => ({
-    overlay: moduleStore.modeStats?.overlay || 0,
-    magic: moduleStore.modeStats?.magic || 0,
-    hymofs: moduleStore.modeStats?.hymofs || 0,
-  }));
+  const modeStats = createMemo(() => {
+    const stateStats = sysStore.storage?.modeStats;
+    if (stateStats) {
+      return {
+        overlay: stateStats.overlay || 0,
+        magic: stateStats.magic || 0,
+        hymofs: stateStats.hymofs || 0,
+      };
+    }
+
+    if (moduleStore.hasLoaded) {
+      return {
+        overlay: moduleStore.modeStats?.overlay || 0,
+        magic: moduleStore.modeStats?.magic || 0,
+        hymofs: moduleStore.modeStats?.hymofs || 0,
+      };
+    }
+
+    return { overlay: 0, magic: 0, hymofs: 0 };
+  });
+
+  const mountedCount = createMemo(() => {
+    if (typeof sysStore.storage?.mountedCount === "number") {
+      return sysStore.storage.mountedCount;
+    }
+
+    if (sysStore.storage?.modeStats) {
+      const stats = modeStats();
+      return stats.overlay + stats.magic + stats.hymofs;
+    }
+
+    if (moduleStore.hasLoaded) {
+      return moduleStore.modules?.filter((m) => m.is_mounted).length ?? 0;
+    }
+
+    return 0;
+  });
 
   let statsBarRef: HTMLDivElement | undefined;
 
@@ -154,20 +179,15 @@ export default function StatusTab() {
 
         <div class="metrics-row">
           <div class="metric-card">
-            <Show
-              when={moduleStatsReady()}
-              fallback={<Skeleton variant="metric" />}
-            >
-              <div class="metric-icon-bg">
-                <svg viewBox="0 0 24 24">
-                  <path d={ICONS.modules} />
-                </svg>
-              </div>
-              <span class="metric-value">{mountedCount()}</span>
-              <span class="metric-label">
-                {uiStore.L?.status?.moduleActive ?? "Active Modules"}
-              </span>
-            </Show>
+            <div class="metric-icon-bg">
+              <svg viewBox="0 0 24 24">
+                <path d={ICONS.modules} />
+              </svg>
+            </div>
+            <span class="metric-value">{mountedCount()}</span>
+            <span class="metric-label">
+              {uiStore.L?.status?.moduleActive ?? "Active Modules"}
+            </span>
           </div>
 
           <div class="metric-card">
@@ -194,46 +214,41 @@ export default function StatusTab() {
           <div class="card-title">
             {uiStore.L?.status?.modeStats ?? "Mode Distribution"}
           </div>
-          <Show
-            when={moduleStatsReady()}
-            fallback={<Skeleton variant="stats-bar" />}
-          >
-            <div class="stats-bar-container" ref={statsBarRef}>
-              <div class="bar-segment bar-overlay"></div>
-              <div class="bar-segment bar-magic"></div>
-              <Show when={hymofsStore.enabled}>
-                <div class="bar-segment bar-hymofs"></div>
-              </Show>
+          <div class="stats-bar-container" ref={statsBarRef}>
+            <div class="bar-segment bar-overlay"></div>
+            <div class="bar-segment bar-magic"></div>
+            <Show when={hymofsStore.enabled}>
+              <div class="bar-segment bar-hymofs"></div>
+            </Show>
+          </div>
+          <div class="stats-legend">
+            <div class="legend-item">
+              <div class="legend-dot dot-overlay"></div>
+              <span>
+                {(uiStore.L.modules?.modes?.short?.overlay ?? "Overlay") +
+                  ": " +
+                  modeStats().overlay}
+              </span>
             </div>
-            <div class="stats-legend">
+            <div class="legend-item">
+              <div class="legend-dot dot-magic"></div>
+              <span>
+                {(uiStore.L.modules?.modes?.short?.magic ?? "Magic") +
+                  ": " +
+                  modeStats().magic}
+              </span>
+            </div>
+            <Show when={hymofsStore.enabled}>
               <div class="legend-item">
-                <div class="legend-dot dot-overlay"></div>
+                <div class="legend-dot dot-hymofs"></div>
                 <span>
-                  {(uiStore.L.modules?.modes?.short?.overlay ?? "Overlay") +
+                  {(uiStore.L.modules?.modes?.short?.hymofs ?? "HymoFS") +
                     ": " +
-                    modeStats().overlay}
+                    modeStats().hymofs}
                 </span>
               </div>
-              <div class="legend-item">
-                <div class="legend-dot dot-magic"></div>
-                <span>
-                  {(uiStore.L.modules?.modes?.short?.magic ?? "Magic") +
-                    ": " +
-                    modeStats().magic}
-                </span>
-              </div>
-              <Show when={hymofsStore.enabled}>
-                <div class="legend-item">
-                  <div class="legend-dot dot-hymofs"></div>
-                  <span>
-                    {(uiStore.L.modules?.modes?.short?.hymofs ?? "HymoFS") +
-                      ": " +
-                      modeStats().hymofs}
-                  </span>
-                </div>
-              </Show>
-            </div>
-          </Show>
+            </Show>
+          </div>
         </div>
 
         <div class="info-card">
