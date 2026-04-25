@@ -1,4 +1,10 @@
-import { createMemo, createRenderEffect, createSignal, Show, For } from "solid-js";
+import {
+  createMemo,
+  createRenderEffect,
+  createSignal,
+  Show,
+  For,
+} from "solid-js";
 import { uiStore } from "../lib/stores/uiStore";
 import { sysStore } from "../lib/stores/sysStore";
 import { configStore } from "../lib/stores/configStore";
@@ -81,7 +87,10 @@ export default function StatusTab() {
       "--bar-overlay-width",
       `${distribution.overlay}%`,
     );
-    modeStatsBar.style.setProperty("--bar-magic-width", `${distribution.magic}%`);
+    modeStatsBar.style.setProperty(
+      "--bar-magic-width",
+      `${distribution.magic}%`,
+    );
     modeStatsBar.style.setProperty(
       "--bar-hymofs-width",
       `${distribution.hymofs}%`,

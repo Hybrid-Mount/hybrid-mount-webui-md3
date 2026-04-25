@@ -397,7 +397,9 @@ export default function HymofsTab() {
                 <div class="hymofs-section-body">
                   <div class="meta-list">
                     <div class="meta-row">
-                      <span>{uiStore.L.hymofs?.currentKmi ?? "Current KMI"}</span>
+                      <span>
+                        {uiStore.L.hymofs?.currentKmi ?? "Current KMI"}
+                      </span>
                       <strong>{lkm()?.current_kmi || "-"}</strong>
                     </div>
                   </div>
@@ -412,7 +414,8 @@ export default function HymofsTab() {
                         {uiStore.L.hymofs?.kmiOverride ?? "KMI Override"}
                       </div>
                       <div class="hymofs-select-button-value">
-                        {forms.kmi || (uiStore.L.hymofs?.autoKmi ?? "Auto Detect")}
+                        {forms.kmi ||
+                          (uiStore.L.hymofs?.autoKmi ?? "Auto Detect")}
                       </div>
                     </button>
                   </div>
@@ -434,20 +437,27 @@ export default function HymofsTab() {
                       disabled={pending()}
                       onClick={() =>
                         runAction(
-                          () => API.setHymofsLkmAutoload(!Boolean(lkm()?.autoload)),
-                          uiStore.L.hymofs?.autoloadUpdated ?? "Autoload updated",
+                          () =>
+                            API.setHymofsLkmAutoload(!Boolean(lkm()?.autoload)),
+                          uiStore.L.hymofs?.autoloadUpdated ??
+                            "Autoload updated",
                         )
                       }
                     >
                       {lkm()?.autoload
-                        ? (uiStore.L.hymofs?.disableAutoload ?? "Disable autoload")
-                        : (uiStore.L.hymofs?.enableAutoload ?? "Enable autoload")}
+                        ? (uiStore.L.hymofs?.disableAutoload ??
+                          "Disable autoload")
+                        : (uiStore.L.hymofs?.enableAutoload ??
+                          "Enable autoload")}
                     </md-outlined-button>
                     <md-filled-button
                       disabled={pending()}
                       onClick={() =>
                         runAction(
-                          () => (lkm()?.loaded ? API.unloadHymofsLkm() : API.loadHymofsLkm()),
+                          () =>
+                            lkm()?.loaded
+                              ? API.unloadHymofsLkm()
+                              : API.loadHymofsLkm(),
                           lkm()?.loaded
                             ? (uiStore.L.hymofs?.unloadLkm ?? "LKM unloaded")
                             : (uiStore.L.hymofs?.loadLkm ?? "LKM loaded"),
@@ -491,106 +501,105 @@ export default function HymofsTab() {
               class="hymofs-section-body-wrapper"
               id="hymofs-section-runtime"
             >
-                <div class="hymofs-section-body-inner">
-                  <div class="hymofs-section-body">
-                    <div class="hymofs-config-grid">
-                      <button
-                        type="button"
-                        class={`hymofs-config-tile ${config()?.enable_stealth ? "active" : ""}`}
-                        disabled={pending()}
-                        onClick={() =>
-                          runAction(
-                            () =>
-                              API.setHymofsStealth(
-                                !Boolean(config()?.enable_stealth),
-                              ),
-                            uiStore.L.hymofs?.stealthUpdated ??
-                              "Stealth updated",
-                          )
-                        }
-                      >
-                        <md-ripple></md-ripple>
-                        <div class="hymofs-config-icon">
-                          <md-icon>
-                            <svg viewBox="0 0 24 24">
-                              <path d={ICONS.ghost} />
-                            </svg>
-                          </md-icon>
-                        </div>
-                        <span class="hymofs-config-label">
-                          {uiStore.L.hymofs?.stealthTitle ?? "Stealth"}
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        class={`hymofs-config-tile ${config()?.enable_hidexattr ? "active" : ""}`}
-                        disabled={pending()}
-                        onClick={() =>
-                          runAction(
-                            () =>
-                              API.setHymofsHidexattr(
-                                !Boolean(config()?.enable_hidexattr),
-                              ),
-                            uiStore.L.hymofs?.hidexattrUpdated ??
-                              "HideXattr updated",
-                          )
-                        }
-                      >
-                        <md-ripple></md-ripple>
-                        <div class="hymofs-config-icon">
-                          <md-icon>
-                            <svg viewBox="0 0 24 24">
-                              <path d={ICONS.visibility_off} />
-                            </svg>
-                          </md-icon>
-                        </div>
-                        <span class="hymofs-config-label">
-                          {uiStore.L.hymofs?.hidexattrTitle ?? "HideXattr"}
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        class={`hymofs-config-tile ${config()?.enable_kernel_debug ? "active" : ""}`}
-                        disabled={pending()}
-                        onClick={() =>
-                          runAction(
-                            () =>
-                              API.setHymofsDebug(
-                                !Boolean(config()?.enable_kernel_debug),
-                              ),
-                            uiStore.L.hymofs?.kernelDebugUpdated ??
-                              "Kernel debug updated",
-                          )
-                        }
-                      >
-                        <md-ripple></md-ripple>
-                        <div class="hymofs-config-icon">
-                          <md-icon>
-                            <svg viewBox="0 0 24 24">
-                              <path d={ICONS.bug} />
-                            </svg>
-                          </md-icon>
-                        </div>
-                        <span class="hymofs-config-label">
-                          {uiStore.L.hymofs?.kernelDebugTitle ?? "Kernel Debug"}
-                        </span>
-                      </button>
-                    </div>
-                    <Show
-                      when={
-                        !status()?.available &&
-                        status()?.status !== "disabled" &&
-                        !lkm()?.loaded
+              <div class="hymofs-section-body-inner">
+                <div class="hymofs-section-body">
+                  <div class="hymofs-config-grid">
+                    <button
+                      type="button"
+                      class={`hymofs-config-tile ${config()?.enable_stealth ? "active" : ""}`}
+                      disabled={pending()}
+                      onClick={() =>
+                        runAction(
+                          () =>
+                            API.setHymofsStealth(
+                              !Boolean(config()?.enable_stealth),
+                            ),
+                          uiStore.L.hymofs?.stealthUpdated ?? "Stealth updated",
+                        )
                       }
                     >
-                      <div class="runtime-note warning">
-                        {uiStore.L.hymofs?.lkmUnavailableHint ??
-                          "HymoFS is enabled, but the kernel module is not loaded yet."}
+                      <md-ripple></md-ripple>
+                      <div class="hymofs-config-icon">
+                        <md-icon>
+                          <svg viewBox="0 0 24 24">
+                            <path d={ICONS.ghost} />
+                          </svg>
+                        </md-icon>
                       </div>
-                    </Show>
+                      <span class="hymofs-config-label">
+                        {uiStore.L.hymofs?.stealthTitle ?? "Stealth"}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      class={`hymofs-config-tile ${config()?.enable_hidexattr ? "active" : ""}`}
+                      disabled={pending()}
+                      onClick={() =>
+                        runAction(
+                          () =>
+                            API.setHymofsHidexattr(
+                              !Boolean(config()?.enable_hidexattr),
+                            ),
+                          uiStore.L.hymofs?.hidexattrUpdated ??
+                            "HideXattr updated",
+                        )
+                      }
+                    >
+                      <md-ripple></md-ripple>
+                      <div class="hymofs-config-icon">
+                        <md-icon>
+                          <svg viewBox="0 0 24 24">
+                            <path d={ICONS.visibility_off} />
+                          </svg>
+                        </md-icon>
+                      </div>
+                      <span class="hymofs-config-label">
+                        {uiStore.L.hymofs?.hidexattrTitle ?? "HideXattr"}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      class={`hymofs-config-tile ${config()?.enable_kernel_debug ? "active" : ""}`}
+                      disabled={pending()}
+                      onClick={() =>
+                        runAction(
+                          () =>
+                            API.setHymofsDebug(
+                              !Boolean(config()?.enable_kernel_debug),
+                            ),
+                          uiStore.L.hymofs?.kernelDebugUpdated ??
+                            "Kernel debug updated",
+                        )
+                      }
+                    >
+                      <md-ripple></md-ripple>
+                      <div class="hymofs-config-icon">
+                        <md-icon>
+                          <svg viewBox="0 0 24 24">
+                            <path d={ICONS.bug} />
+                          </svg>
+                        </md-icon>
+                      </div>
+                      <span class="hymofs-config-label">
+                        {uiStore.L.hymofs?.kernelDebugTitle ?? "Kernel Debug"}
+                      </span>
+                    </button>
                   </div>
+                  <Show
+                    when={
+                      !status()?.available &&
+                      status()?.status !== "disabled" &&
+                      !lkm()?.loaded
+                    }
+                  >
+                    <div class="runtime-note warning">
+                      {uiStore.L.hymofs?.lkmUnavailableHint ??
+                        "HymoFS is enabled, but the kernel module is not loaded yet."}
+                    </div>
+                  </Show>
                 </div>
               </div>
+            </div>
           </section>
 
           <section
@@ -855,7 +864,9 @@ export default function HymofsTab() {
                     </div>
                   </div>
                   <div class="hymofs-section-toggle-end">
-                    <div class="state-pill">{config()?.maps_rules?.length ?? 0}</div>
+                    <div class="state-pill">
+                      {config()?.maps_rules?.length ?? 0}
+                    </div>
                     <md-icon class="hymofs-section-chevron" aria-hidden="true">
                       <svg viewBox="0 0 24 24">
                         <path d={EXPAND_MORE_ICON} />
@@ -869,14 +880,18 @@ export default function HymofsTab() {
                   <div class="hymofs-section-body field-stack">
                     <div class="meta-list">
                       <div class="meta-row">
-                        <span>{uiStore.L.hymofs?.mapsRuleCount ?? "Maps rules"}</span>
+                        <span>
+                          {uiStore.L.hymofs?.mapsRuleCount ?? "Maps rules"}
+                        </span>
                         <strong>{config()?.maps_rules?.length ?? 0}</strong>
                       </div>
                     </div>
                     <div class="sub-grid">
                       <md-outlined-text-field
                         class="full-field hymofs-input-field"
-                        label={uiStore.L.hymofs?.mapsTargetIno ?? "Target Inode"}
+                        label={
+                          uiStore.L.hymofs?.mapsTargetIno ?? "Target Inode"
+                        }
                         value={forms.mapsTargetIno}
                         onInput={(e: Event) =>
                           setForms(
@@ -888,7 +903,9 @@ export default function HymofsTab() {
                       />
                       <md-outlined-text-field
                         class="full-field hymofs-input-field"
-                        label={uiStore.L.hymofs?.mapsTargetDev ?? "Target Device"}
+                        label={
+                          uiStore.L.hymofs?.mapsTargetDev ?? "Target Device"
+                        }
                         value={forms.mapsTargetDev}
                         onInput={(e: Event) =>
                           setForms(
@@ -900,7 +917,9 @@ export default function HymofsTab() {
                       />
                       <md-outlined-text-field
                         class="full-field hymofs-input-field"
-                        label={uiStore.L.hymofs?.mapsSpoofedIno ?? "Spoofed Inode"}
+                        label={
+                          uiStore.L.hymofs?.mapsSpoofedIno ?? "Spoofed Inode"
+                        }
                         value={forms.mapsSpoofedIno}
                         onInput={(e: Event) =>
                           setForms(
@@ -912,7 +931,9 @@ export default function HymofsTab() {
                       />
                       <md-outlined-text-field
                         class="full-field hymofs-input-field"
-                        label={uiStore.L.hymofs?.mapsSpoofedDev ?? "Spoofed Device"}
+                        label={
+                          uiStore.L.hymofs?.mapsSpoofedDev ?? "Spoofed Device"
+                        }
                         value={forms.mapsSpoofedDev}
                         onInput={(e: Event) =>
                           setForms(
@@ -925,7 +946,9 @@ export default function HymofsTab() {
                     </div>
                     <md-outlined-text-field
                       class="full-field hymofs-input-field"
-                      label={uiStore.L.hymofs?.mapsSpoofedPath ?? "Spoofed Path"}
+                      label={
+                        uiStore.L.hymofs?.mapsSpoofedPath ?? "Spoofed Path"
+                      }
                       value={forms.mapsPath}
                       onInput={(e: Event) =>
                         setForms(
@@ -976,7 +999,8 @@ export default function HymofsTab() {
                         onClick={() =>
                           runAction(
                             () => API.clearHymofsMapsRules(),
-                            uiStore.L.hymofs?.mapsCleared ?? "Maps rules cleared",
+                            uiStore.L.hymofs?.mapsCleared ??
+                              "Maps rules cleared",
                           )
                         }
                       >
@@ -1055,11 +1079,15 @@ export default function HymofsTab() {
                   >
                     <div class="meta-list">
                       <div class="meta-row">
-                        <span>{uiStore.L.hymofs?.featureBits ?? "Feature bits"}</span>
+                        <span>
+                          {uiStore.L.hymofs?.featureBits ?? "Feature bits"}
+                        </span>
                         <strong>{status()?.feature_bits ?? 0}</strong>
                       </div>
                       <div class="meta-row">
-                        <span>{uiStore.L.hymofs?.hideUidCount ?? "Hide UIDs"}</span>
+                        <span>
+                          {uiStore.L.hymofs?.hideUidCount ?? "Hide UIDs"}
+                        </span>
                         <strong>{config()?.hide_uids?.length ?? 0}</strong>
                       </div>
                       <div class="meta-row">
@@ -1069,11 +1097,15 @@ export default function HymofsTab() {
                         <strong>{status()?.user_hide_rule_count ?? 0}</strong>
                       </div>
                       <div class="meta-row">
-                        <span>{uiStore.L.hymofs?.mapsRuleCount ?? "Maps rules"}</span>
+                        <span>
+                          {uiStore.L.hymofs?.mapsRuleCount ?? "Maps rules"}
+                        </span>
                         <strong>{config()?.maps_rules?.length ?? 0}</strong>
                       </div>
                       <div class="meta-row">
-                        <span>{uiStore.L.hymofs?.kstatRuleCount ?? "Kstat rules"}</span>
+                        <span>
+                          {uiStore.L.hymofs?.kstatRuleCount ?? "Kstat rules"}
+                        </span>
                         <strong>{config()?.kstat_rules?.length ?? 0}</strong>
                       </div>
                     </div>
@@ -1084,7 +1116,9 @@ export default function HymofsTab() {
                     </div>
                     <div class="chip-section subdued">
                       <For each={status()?.hooks || []}>
-                        {(name) => <span class="feature-chip hook">{name}</span>}
+                        {(name) => (
+                          <span class="feature-chip hook">{name}</span>
+                        )}
                       </For>
                     </div>
                     <div class="chip-section">
