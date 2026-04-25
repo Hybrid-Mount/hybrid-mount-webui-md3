@@ -5,6 +5,8 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
+    "generate:info-tab-data": "node ./scripts/generate-info-tab-data.mjs",
+    "prebuild": "pnpm generate:info-tab-data",
     "dev": "vite",
     "build": "vite build --emptyOutDir",
     "preview": "vite preview",
