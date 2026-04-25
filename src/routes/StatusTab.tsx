@@ -1,10 +1,4 @@
-import {
-  createMemo,
-  createRenderEffect,
-  createSignal,
-  Show,
-  For,
-} from "solid-js";
+import { createMemo, createRenderEffect, createSignal, Show, For } from "solid-js";
 import { uiStore } from "../lib/stores/uiStore";
 import { sysStore } from "../lib/stores/sysStore";
 import { configStore } from "../lib/stores/configStore";
@@ -28,6 +22,7 @@ export default function StatusTab() {
   ]);
 
   const [showRebootConfirm, setShowRebootConfirm] = createSignal(false);
+  let modeStatsBarRef: HTMLDivElement | undefined;
   const modeStats = createMemo(() => {
     const stateStats = sysStore.storage?.modeStats;
     if (stateStats) {
@@ -38,15 +33,11 @@ export default function StatusTab() {
       };
     }
 
-    if (moduleStore.hasLoaded) {
-      return {
-        overlay: moduleStore.modeStats?.overlay || 0,
-        magic: moduleStore.modeStats?.magic || 0,
-        hymofs: moduleStore.modeStats?.hymofs || 0,
-      };
-    }
-
-    return { overlay: 0, magic: 0, hymofs: 0 };
+    return {
+      overlay: moduleStore.modeStats?.overlay || 0,
+      magic: moduleStore.modeStats?.magic || 0,
+      hymofs: moduleStore.modeStats?.hymofs || 0,
+    };
   });
 
   const mountedCount = createMemo(() => {
@@ -66,14 +57,6 @@ export default function StatusTab() {
     return 0;
   });
 
-  let statsBarRef: HTMLDivElement | undefined;
-
-  function getModeDisplayName(mode: string | null | undefined) {
-    if (!mode) return "Unknown";
-    const key = `mode_${mode}` as keyof typeof uiStore.L.config;
-    return uiStore.L.config?.[key] || mode.toUpperCase();
-  }
-
   const modeDistribution = createMemo(() => {
     const stats = modeStats();
     const showHymofs = hymofsStore.enabled;
@@ -91,17 +74,25 @@ export default function StatusTab() {
   });
 
   createRenderEffect(() => {
+    const modeStatsBar = modeStatsBarRef;
+    if (!modeStatsBar) return;
     const distribution = modeDistribution();
-    const statsBar = statsBarRef;
-    if (!statsBar) return;
-
-    statsBar.style.setProperty(
+    modeStatsBar.style.setProperty(
       "--bar-overlay-width",
       `${distribution.overlay}%`,
     );
-    statsBar.style.setProperty("--bar-magic-width", `${distribution.magic}%`);
-    statsBar.style.setProperty("--bar-hymofs-width", `${distribution.hymofs}%`);
+    modeStatsBar.style.setProperty("--bar-magic-width", `${distribution.magic}%`);
+    modeStatsBar.style.setProperty(
+      "--bar-hymofs-width",
+      `${distribution.hymofs}%`,
+    );
   });
+
+  function getModeDisplayName(mode: string | null | undefined) {
+    if (!mode) return "Unknown";
+    const key = `mode_${mode}` as keyof typeof uiStore.L.config;
+    return uiStore.L.config?.[key] || mode.toUpperCase();
+  }
 
   return (
     <>
@@ -214,7 +205,7 @@ export default function StatusTab() {
           <div class="card-title">
             {uiStore.L?.status?.modeStats ?? "Mode Distribution"}
           </div>
-          <div class="stats-bar-container" ref={statsBarRef}>
+          <div class="stats-bar-container" ref={modeStatsBarRef}>
             <div class="bar-segment bar-overlay"></div>
             <div class="bar-segment bar-magic"></div>
             <Show when={hymofsStore.enabled}>
